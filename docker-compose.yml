@@ -1,0 +1,24 @@
+version: "3.7"
+
+services:
+  frontend:
+    image: node:lts-alpine3.22
+    container_name: frontend
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "3000:3000"
+    command: >
+      sh -c "cd /app && yarn && yarn dev"
+  backend:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+    container_name: backend
+    volumes:
+      - ./backend/pb_migrations/:/pb/pb_migrations
+      - ./backend/pb_hooks/:/pb/pb_hooks
+      - ./backend/pb_data/:/pb/pb_data
+    ports:
+      - "8080:8080"
+      - "8090:8090"
