@@ -1,41 +1,102 @@
-# App Title
+# Campus Virtual V2
 
-TODO: Project Description.
+## 🇧🇷️ Português (PT-BR)
 
-Pocketbase admin url:
+## Sumário
 
-- [http://localhost:8080/\_/](http://localhost:8080/_/)
+- [Introdução](#introdução)
+- [Detalhes Técnicos](#detalhes-técnicos)
+- [Rodando a aplicação](#rodando-a-aplicação)
 
-Frontend urls:
+## Introdução
+Este projeto materializa a reformulação e evolução estrutural do Campus Virtual V1 
+([código](https://github.com/andresjesse/prototipo-campus-virtual) e [site](https://campus.gp.utfpr.edu.br/)). A ideia
+nasceu a partir da necessidade de dinamizar a interação e facilitar a manutenção do sistema, sendo levada para frente como
+um projeto de TCC (atualmente em andamento).
+
+## Detalhes Técnicos
+A _stack_ principal conta com:
+- React
+- PocketBase
+- WebGL
+- Three.js
+
+Para testes e controle de qualidade de código:
+- ESlint
+- Jest
+- React Testing Library
+- Playwright
+
+## Rodando a aplicação
+Para iniciar a aplicação, basta utilizar o `docker compose` para levantar os contêineres:
+
+````bash
+docker compose up
+````
+
+A partir disso, é possível acessar:
+
+O sistema:
 
 - [http://localhost:3000](http://localhost:3000)
 
-## Setup
+O painel administrativo do PocketBase:
 
-1. Install Docker
+- [http://localhost:8080/\_/](http://localhost:8080/_/)
 
-2. Run `docker compose up`
 
-3. [First run only]: Check backend container log for pocketbase superuser setup URL.
+As _snapshots_ do banco de dados são aplicados automaticamente assim que o sistema é iniciado.
+Caso isto não ocorra, entre no contêiner do backend, navegue até a pasta `/pb` e execute o 
+seguinte comando:
 
-## Backend
+```bash
+./pocketbase migrate up
+```
 
-Pocketbase automigrate is off. After changing collections migrate manually:
+## 🇺🇸️ English (EN-US)
 
-1. Shell into `backend` container;
+## Summary
 
-2. `cd /pb && ./pocketbase migrate collections`.
+- [Introduction](#introduction)
+- [Technical Details](#technical-details)
+- [Running the Application](#running-the-application)
 
-## Frontend
+## Introduction
+This project brings to life the structural redesign and evolution of the Virtual Campus V1 
+([source code](https://github.com/andresjesse/prototipo-campus-virtual) and [live site](https://campus.gp.utfpr.edu.br/)).
+The idea was born out of the need to make user interactions more dynamic and simplify system maintenance. It is 
+currently being driven forward as an ongoing _Trabalho de Conclusão de Curso_ (TCC).
 
-Node is served from container, so always run commands from it:
+## Technical Details
+The core tech stack includes:
+- React
+- PocketBase
+- WebGL
+- Three.js
 
-1. Shell into `frontend` container;
+For testing and code quality control:
+- ESLint
+- Jest
+- React Testing Library
+- Playwright
 
-2. `cd /app`
+## Running the Application
+To spin up the application, simply use `docker compose` to launch the containers:
 
-3. Execute your commands, e.g. `yarn add some-lib`
+```bash
+docker compose up
+```
 
-## Deploy
+Once running, you can access:
 
-TODO.
+The application:
+- [http://localhost:3000](http://localhost:3000)
+
+The PocketBase Admin Dashboard:
+- [http://localhost:8080/_/](http://localhost:8080/_/)
+
+Database snapshots are automatically applied when the system starts. If they fail to run, log into the backend container, navigate to the `/pb` directory, and execute the following command:
+
+```bash
+./pocketbase migrate up
+```
