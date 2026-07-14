@@ -7,7 +7,11 @@ import "@mantine/core/styles.css";
 
 const root = document.getElementById("root");
 
-ReactDOM.createRoot(root as any).render(
+if (!root) {
+  throw new Error("Root element not found");
+}
+
+ReactDOM.createRoot(root).render(
   <MantineProvider>
     <Router />
   </MantineProvider>,
