@@ -1,9 +1,11 @@
+import "@mantine/core/styles.css";
+
 import { MantineProvider } from "@mantine/core";
 import ReactDOM from "react-dom/client";
 
-import { Router } from "./router";
+import { AuthenticationProvider } from "@/providers/authentication-provider";
 
-import "@mantine/core/styles.css";
+import { Router } from "./router";
 
 const root = document.getElementById("root");
 
@@ -13,6 +15,8 @@ if (!root) {
 
 ReactDOM.createRoot(root).render(
   <MantineProvider>
-    <Router />
+    <AuthenticationProvider>
+      <Router />
+    </AuthenticationProvider>
   </MantineProvider>,
 );
