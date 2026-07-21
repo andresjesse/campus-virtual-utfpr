@@ -5,6 +5,7 @@ import {
   Text,
   TextInput,
 } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import { EyeIcon } from "@phosphor-icons/react/dist/csr/Eye";
 import { EyeSlashIcon } from "@phosphor-icons/react/dist/csr/EyeSlash";
 import { LockIcon } from "@phosphor-icons/react/dist/csr/Lock";
@@ -28,7 +29,6 @@ export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [formErrors, setFormErrors] = useState<LoginFormErrors>({});
-  const [authenticationError, setAuthenticationError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -37,7 +37,6 @@ export default function LoginForm() {
     const validationErrors = validateLoginForm(email, password);
 
     setFormErrors(validationErrors);
-    setAuthenticationError("");
 
     if (Object.keys(validationErrors).length > 0) {
       return;
@@ -48,7 +47,12 @@ export default function LoginForm() {
     try {
       await authenticate(email, password);
     } catch {
-      setAuthenticationError(AUTHENTICATION_ERROR);
+      setPassword("");
+      notifications.show({
+        color: "red",
+        title: "Não foi possível entrar",
+        message: AUTHENTICATION_ERROR,
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -71,7 +75,6 @@ export default function LoginForm() {
               ...currentErrors,
               email: undefined,
             }));
-            setAuthenticationError("");
           }}
           classNames={{
             root: classes.field,
@@ -104,7 +107,6 @@ export default function LoginForm() {
               ...currentErrors,
               password: undefined,
             }));
-            setAuthenticationError("");
           }}
           classNames={{
             root: classes.field,
@@ -119,12 +121,6 @@ export default function LoginForm() {
         <Text className={classes.forgotPassword}>
           Esqueceu sua senha?
         </Text>
-
-        {authenticationError && (
-          <Text role="alert" className={classes.authenticationError}>
-            {authenticationError}
-          </Text>
-        )}
 
         <Button
           type="submit"

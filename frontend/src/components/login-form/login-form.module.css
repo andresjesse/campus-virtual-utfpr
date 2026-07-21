@@ -69,13 +69,6 @@
   text-align: center;
 }
 
-.authenticationError {
-  margin-top: -0.5rem;
-  color: #ff8787;
-  font-size: 0.8125rem;
-  text-align: center;
-}
-
 .submitButton {
   height: 3.5rem;
   margin-top: 0.25rem;
