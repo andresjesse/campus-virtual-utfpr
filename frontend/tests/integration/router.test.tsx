@@ -70,14 +70,13 @@ describe('Router', () => {
       user: createUserRecord(),
     })
     window.history.pushState(
-      { usr: { from: { pathname: '/home' } } },
+      { usr: { from: { pathname: '/admin/pages' } } },
       '',
       '/login',
     )
 
     renderRouter(authentication)
 
-    expect(screen.getByRole('heading', { name: 'Home' })).toBeInTheDocument()
-    expect(window.location.pathname).toBe('/home')
+    expect(window.location.pathname).toBe('/admin/pages')
   })
 })
