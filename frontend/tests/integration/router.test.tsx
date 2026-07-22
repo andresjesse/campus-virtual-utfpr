@@ -1,22 +1,82 @@
 import { MantineProvider } from '@mantine/core'
 import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 
+import { AuthenticationContext } from '@/contexts/authentication-context'
 import { Router } from '@/router'
+import { createAuthenticationContextValue } from '../mocks/authentication'
+import { createUserRecord } from '../mocks/pocketbase'
+
+function renderRouter(
+  authentication = createAuthenticationContextValue(),
+) {
+  render(
+    <MantineProvider>
+      <AuthenticationContext.Provider value={authentication}>
+        <Router />
+      </AuthenticationContext.Provider>
+    </MantineProvider>,
+  )
+}
 
 describe('Router', () => {
-  it('navigates from home to the administrator page', async () => {
-    const user = userEvent.setup()
-    window.history.pushState({}, '', '/')
+  it('redirects unauthenticated users from the administrator page to login', async () => {
+    const authentication = createAuthenticationContextValue()
+    window.history.pushState({}, '', '/admin')
 
-    render(
-      <MantineProvider>
-        <Router />
-      </MantineProvider>,
+    renderRouter(authentication)
+
+    expect(
+      await screen.findByRole('heading', { name: 'UTFPR Virtual' }),
+    ).toBeInTheDocument()
+    expect(window.location.pathname).toBe('/login')
+  })
+
+  it.each([
+    ['editor', false],
+    ['administrator', true],
+  ])('allows an authenticated %s to access the protected area', (_, isAdmin) => {
+    const user = createUserRecord({ is_admin: isAdmin })
+    const authentication = createAuthenticationContextValue({
+      isAuthenticated: true,
+      token: 'valid-token',
+      user,
+    })
+    window.history.pushState({}, '', '/admin')
+
+    renderRouter(authentication)
+
+    expect(screen.getByText('Admin Home')).toBeInTheDocument()
+    expect(window.location.pathname).toBe('/admin')
+  })
+
+  it('redirects an authenticated user away from login', () => {
+    const authentication = createAuthenticationContextValue({
+      isAuthenticated: true,
+      token: 'valid-token',
+      user: createUserRecord(),
+    })
+    window.history.pushState({}, '', '/login')
+
+    renderRouter(authentication)
+
+    expect(screen.getByText('Admin Home')).toBeInTheDocument()
+    expect(window.location.pathname).toBe('/admin')
+  })
+
+  it('restores the original destination after authentication', () => {
+    const authentication = createAuthenticationContextValue({
+      isAuthenticated: true,
+      token: 'valid-token',
+      user: createUserRecord(),
+    })
+    window.history.pushState(
+      { usr: { from: { pathname: '/admin/pages' } } },
+      '',
+      '/login',
     )
 
-    await user.click(screen.getByRole('link', { name: 'Admin' }))
+    renderRouter(authentication)
 
-    expect(window.location.pathname).toBe('/admin')
+    expect(window.location.pathname).toBe('/admin/pages')
   })
 })

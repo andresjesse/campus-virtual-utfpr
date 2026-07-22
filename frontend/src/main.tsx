@@ -1,9 +1,13 @@
+import "@mantine/core/styles.css";
+import "@mantine/notifications/styles.css";
+
 import { MantineProvider } from "@mantine/core";
+import { Notifications } from "@mantine/notifications";
 import ReactDOM from "react-dom/client";
 
-import { Router } from "./router";
+import { AuthenticationProvider } from "@/providers/authentication-provider";
 
-import "@mantine/core/styles.css";
+import { Router } from "./router";
 
 const root = document.getElementById("root");
 
@@ -12,7 +16,10 @@ if (!root) {
 }
 
 ReactDOM.createRoot(root).render(
-  <MantineProvider>
-    <Router />
+  <MantineProvider defaultColorScheme="dark">
+    <Notifications />
+    <AuthenticationProvider>
+      <Router />
+    </AuthenticationProvider>
   </MantineProvider>,
 );
