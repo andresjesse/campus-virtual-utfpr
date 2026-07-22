@@ -1,6 +1,5 @@
 import { MantineProvider } from '@mantine/core'
 import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 
 import { AuthenticationContext } from '@/contexts/authentication-context'
 import { Router } from '@/router'
@@ -21,13 +20,10 @@ function renderRouter(
 
 describe('Router', () => {
   it('redirects unauthenticated users from the administrator page to login', async () => {
-    const user = userEvent.setup()
     const authentication = createAuthenticationContextValue()
-    window.history.pushState({}, '', '/')
+    window.history.pushState({}, '', '/admin')
 
     renderRouter(authentication)
-
-    await user.click(screen.getByRole('link', { name: 'Admin' }))
 
     expect(
       await screen.findByRole('heading', { name: 'UTFPR Virtual' }),
