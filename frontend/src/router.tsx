@@ -32,10 +32,6 @@ export const Router = () => {
                 path="menu-items"
                 element={<Pages.Admin.Placeholder title="Itens e Categorias do Menu" />}
               />
-              <Route
-                path="menu-categories"
-                element={<Pages.Admin.Placeholder title="Categorias do Menu" />}
-              />
             </Route>
             <Route element={<AuthorizationRoute capability="entities.manage" />}>
               <Route
