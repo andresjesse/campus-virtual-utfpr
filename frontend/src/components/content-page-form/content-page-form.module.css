@@ -1,0 +1,58 @@
+.form {
+  height: 100%;
+  min-height: 100%;
+}
+
+.metadata {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(11rem, 0.8fr);
+  gap: 1.4rem;
+  padding: 0.9rem 1.5rem 0.8rem;
+  border-bottom: 2px solid #555;
+}
+
+.titleLabel,
+.selectLabel {
+  margin-bottom: 0.3rem;
+  color: #f3f3f3;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.titleInput {
+  height: 2.25rem;
+  padding: 0.35rem 0;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
+}
+
+.titleInput:focus {
+  border-bottom-color: var(--admin-yellow);
+  box-shadow: 0 1px 0 var(--admin-yellow);
+}
+
+.selectInput {
+  height: 2.25rem;
+  color: #eee;
+  background: #292929;
+  border-color: #494949;
+}
+
+.selectInput:focus,
+.selectInput[data-expanded="true"] {
+  border-color: var(--admin-yellow);
+  box-shadow: 0 0 0 1px var(--admin-yellow);
+}
+
+@media (max-width: 62rem) {
+  .metadata {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1rem;
+  }
+}
