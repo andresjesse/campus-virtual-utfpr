@@ -1,0 +1,12 @@
+.input {
+  height: 2.4rem;
+  color: #eee;
+  font-size: 0.8rem;
+  background: #393939;
+  border: 2px solid #b8bdc4;
+  border-radius: 1.5rem;
+}
+
+.input:focus {
+  border-color: var(--admin-yellow);
+}

@@ -1,0 +1,42 @@
+.user {
+  width: 100%;
+  padding: 0;
+  color: #f3f3f3;
+  border-radius: 0.4rem;
+  overflow: hidden;
+}
+
+.user:hover {
+  background: #333;
+}
+
+.user :global(.mantine-Avatar-root) {
+  flex: 0 0 auto;
+}
+
+.avatarSlot {
+  display: grid;
+  flex: 0 0 3rem;
+  width: 3rem;
+  height: 3rem;
+  place-items: center;
+}
+
+.details {
+  min-width: 0;
+  max-width: 10rem;
+  margin-inline-start: 0.75rem;
+  overflow: hidden;
+  opacity: 1;
+  white-space: nowrap;
+  transition:
+    max-width 180ms ease,
+    margin 180ms ease,
+    opacity 130ms ease;
+}
+
+.collapsed .details {
+  max-width: 0;
+  margin-inline-start: 0;
+  opacity: 0;
+}

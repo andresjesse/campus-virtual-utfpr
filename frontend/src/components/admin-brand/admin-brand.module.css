@@ -1,0 +1,12 @@
+.brand {
+  color: #a6a7ab;
+  font-size: clamp(1.35rem, 1.75vw, 1.8rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+}
+
+.brand span {
+  color: var(--admin-yellow);
+  font-weight: 800;
+}

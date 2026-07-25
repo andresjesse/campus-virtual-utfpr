@@ -1,0 +1,12 @@
+.palette {
+  padding: 0.9rem;
+  color: #f3f3f3;
+  background: var(--admin-sidebar);
+}
+
+@media (max-width: 62rem) {
+  .palette {
+    display: grid;
+    gap: 0.75rem;
+  }
+}
