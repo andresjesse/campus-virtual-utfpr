@@ -17,3 +17,17 @@ Object.defineProperty(window, 'matchMedia', {
     dispatchEvent: jest.fn(),
   })),
 })
+
+class ResizeObserverMock {
+  disconnect() {}
+  observe() {}
+  unobserve() {}
+}
+
+Object.defineProperty(globalThis, 'ResizeObserver', {
+  value: ResizeObserverMock,
+})
+
+Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
+  value: jest.fn(),
+})

@@ -1,4 +1,5 @@
 import { MantineProvider } from '@mantine/core'
+import { Notifications } from '@mantine/notifications'
 import { render, screen } from '@testing-library/react'
 
 import { AuthenticationContext } from '@/contexts/authentication-context'
@@ -6,11 +7,21 @@ import { Router } from '@/router'
 import { createAuthenticationContextValue } from '../mocks/authentication'
 import { createUserRecord } from '../mocks/pocketbase'
 
+jest.mock('@/services/content-pages', () => ({
+  getContentPageErrorMessage: () => 'Request failed',
+  listContentPages: jest.fn(async () => []),
+}))
+
+jest.mock('@/services/pocketbase', () => ({
+  pocketbase: { files: { getURL: jest.fn(() => '') } },
+}))
+
 function renderRouter(
   authentication = createAuthenticationContextValue(),
 ) {
   render(
     <MantineProvider>
+      <Notifications />
       <AuthenticationContext.Provider value={authentication}>
         <Router />
       </AuthenticationContext.Provider>
@@ -18,12 +29,19 @@ function renderRouter(
   )
 }
 
+function authenticatedUser(isAdmin = false) {
+  return createAuthenticationContextValue({
+    isAuthenticated: true,
+    token: 'valid-token',
+    user: createUserRecord({ is_admin: isAdmin }),
+  })
+}
+
 describe('Router', () => {
   it('redirects unauthenticated users from the administrator page to login', async () => {
-    const authentication = createAuthenticationContextValue()
     window.history.pushState({}, '', '/admin')
 
-    renderRouter(authentication)
+    renderRouter()
 
     expect(
       await screen.findByRole('heading', { name: 'UTFPR Virtual' }),
@@ -34,49 +52,62 @@ describe('Router', () => {
   it.each([
     ['editor', false],
     ['administrator', true],
-  ])('allows an authenticated %s to access the protected area', (_, isAdmin) => {
-    const user = createUserRecord({ is_admin: isAdmin })
-    const authentication = createAuthenticationContextValue({
-      isAuthenticated: true,
-      token: 'valid-token',
-      user,
-    })
+  ])('redirects an authenticated %s to content pages', async (_, isAdmin) => {
     window.history.pushState({}, '', '/admin')
 
-    renderRouter(authentication)
+    renderRouter(authenticatedUser(isAdmin))
 
-    expect(screen.getByText('Admin Home')).toBeInTheDocument()
-    expect(window.location.pathname).toBe('/admin')
+    expect(
+      await screen.findByText('Nenhuma página cadastrada'),
+    ).toBeInTheDocument()
+    expect(window.location.pathname).toBe('/admin/pages')
   })
 
-  it('redirects an authenticated user away from login', () => {
-    const authentication = createAuthenticationContextValue({
-      isAuthenticated: true,
-      token: 'valid-token',
-      user: createUserRecord(),
-    })
+  it('hides administrator-only navigation and rejects a direct editor URL', async () => {
+    window.history.pushState({}, '', '/admin/entities')
+
+    renderRouter(authenticatedUser(false))
+
+    expect(
+      await screen.findByText('Nenhuma página cadastrada'),
+    ).toBeInTheDocument()
+    expect(screen.queryByText('Entidades 3D')).not.toBeInTheDocument()
+    expect(screen.queryByText('Arquivos Mesh')).not.toBeInTheDocument()
+    expect(window.location.pathname).toBe('/admin/pages')
+  })
+
+  it('allows an administrator to access entity routes', async () => {
+    window.history.pushState({}, '', '/admin/entities')
+
+    renderRouter(authenticatedUser(true))
+
+    expect(await screen.findByRole('heading', { name: 'Entidades 3D' })).toBeInTheDocument()
+    expect(window.location.pathname).toBe('/admin/entities')
+  })
+
+  it('redirects an authenticated user away from login', async () => {
     window.history.pushState({}, '', '/login')
 
-    renderRouter(authentication)
+    renderRouter(authenticatedUser())
 
-    expect(screen.getByText('Admin Home')).toBeInTheDocument()
-    expect(window.location.pathname).toBe('/admin')
+    expect(
+      await screen.findByText('Nenhuma página cadastrada'),
+    ).toBeInTheDocument()
+    expect(window.location.pathname).toBe('/admin/pages')
   })
 
-  it('restores the original destination after authentication', () => {
-    const authentication = createAuthenticationContextValue({
-      isAuthenticated: true,
-      token: 'valid-token',
-      user: createUserRecord(),
-    })
+  it('restores the original destination after authentication', async () => {
     window.history.pushState(
       { usr: { from: { pathname: '/admin/pages' } } },
       '',
       '/login',
     )
 
-    renderRouter(authentication)
+    renderRouter(authenticatedUser())
 
+    expect(
+      await screen.findByText('Nenhuma página cadastrada'),
+    ).toBeInTheDocument()
     expect(window.location.pathname).toBe('/admin/pages')
   })
 })
