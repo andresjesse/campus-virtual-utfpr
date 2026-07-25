@@ -12,7 +12,7 @@ type LoginLocationState = {
 function AuthenticationLoader() {
   return (
     <Center mih="100dvh">
-      <Loader aria-label="Verificando autenticação" color="yellow" />
+      <Loader aria-label="Verificando autenticação" />
     </Center>
   );
 }
