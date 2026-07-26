@@ -1,0 +1,53 @@
+.page {
+  display: grid;
+  min-height: calc(100dvh - 60px);
+  grid-template-columns: minmax(0, 1fr) 19rem;
+}
+
+.workspace {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 0.55rem 1rem 0;
+}
+
+.backRow {
+  flex: 0 0 auto;
+  min-height: 2rem;
+  margin-bottom: 0.4rem;
+}
+
+.saveStatus {
+  margin-inline-end: 1rem;
+  letter-spacing: 0.02em;
+  opacity: 0.75;
+}
+
+.canvas {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--admin-surface);
+  border-radius: 1.5rem 1.5rem 0 0;
+}
+
+@media (max-width: 75rem) {
+  .page {
+    grid-template-columns: minmax(0, 1fr) 16rem;
+  }
+}
+
+@media (max-width: 62rem) {
+  .page {
+    display: block;
+  }
+
+  .workspace {
+    padding: 0.75rem;
+  }
+
+  .canvas {
+    min-height: calc(100dvh - 6.5rem);
+  }
+
+}

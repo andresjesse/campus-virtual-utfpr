@@ -1,0 +1,55 @@
+:root {
+  --admin-yellow: #fdc003;
+  --admin-header: #373737;
+  --admin-sidebar: #383838;
+  --admin-surface: #252525;
+  --admin-main: #515151;
+  --admin-border: #626262;
+}
+
+.header {
+  background: var(--admin-header);
+  border-bottom: 2px solid #727272;
+}
+
+.navbar {
+  overflow: hidden;
+  background: var(--admin-sidebar);
+  border-inline-end: 0;
+  transition: width 180ms ease;
+}
+
+.main {
+  min-height: 100dvh;
+  background: var(--admin-main);
+}
+
+.collapseSection {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 3.1rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid #4b4b4b;
+}
+
+.collapseSectionFolded {
+  justify-content: center;
+}
+
+.collapseButton {
+  display: grid;
+  width: 1.8rem;
+  height: 1.8rem;
+  padding: 0;
+  color: #9ba1a8;
+  background: transparent;
+  border: 2px solid currentColor;
+  border-radius: 0.3rem;
+  cursor: pointer;
+  place-items: center;
+}
+
+.rotated {
+  transform: rotate(180deg);
+}

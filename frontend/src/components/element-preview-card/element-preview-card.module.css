@@ -1,0 +1,17 @@
+.card,
+.muted {
+  display: grid;
+  min-height: 5rem;
+  color: #f4f4f4;
+  background: #393939;
+  border: 2px solid #e1e1e1;
+  border-radius: 0.4rem;
+  place-items: center;
+}
+
+.muted {
+  color: #969da5;
+  background: #e2e8ee;
+  border: 0;
+  border-radius: 0;
+}

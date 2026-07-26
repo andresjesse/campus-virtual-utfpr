@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 
-import { Home } from '@/pages/home'
+import Home from '@/pages/home'
 
 describe('Home', () => {
   it('renders the administrator navigation link', () => {
