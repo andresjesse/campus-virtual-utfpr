@@ -47,6 +47,8 @@ export const Router = () => {
             </Route>
           </Route>
         </Route>
+
+        <Route path="/*" element={<Pages.FallbackRoutes.NotFound />} />
       </Routes>
     </BrowserRouter>
   );
