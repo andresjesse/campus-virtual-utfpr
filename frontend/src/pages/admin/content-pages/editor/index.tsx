@@ -12,7 +12,7 @@ import {
   getContentPageEditorData,
   getContentPageErrorMessage,
   listRelatedOptions,
-} from "@/services/content-pages";
+} from "@/services/content-pages/metadata.ts";
 import type {
   ContentPageFormValues,
   RelatedOption,

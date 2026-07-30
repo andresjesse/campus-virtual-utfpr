@@ -4,7 +4,7 @@ import {
   createContentPage,
   getContentPageErrorMessage,
   updateContentPage,
-} from "@/services/content-pages";
+} from "@/services/content-pages/metadata.ts";
 import type { ContentPageFormValues } from "@/types/content-page";
 
 export type AutosaveStatus = "error" | "saved" | "saving";

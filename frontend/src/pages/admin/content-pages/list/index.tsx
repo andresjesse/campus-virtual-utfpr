@@ -12,7 +12,7 @@ import {
   getContentPageErrorMessage,
   deleteContentPage,
   listContentPages,
-} from "@/services/content-pages";
+} from "@/services/content-pages/metadata.ts";
 import type { ContentPageListRecord } from "@/types/content-page";
 
 import classes from "./content-page-list.module.css";

@@ -1,4 +1,4 @@
-import { pocketbase } from "@/services/pocketbase";
+import { pocketbase } from "@/services/pocketbase.ts";
 import type {
   ContentPageFormValues,
   ContentPageListRecord,
@@ -7,12 +7,12 @@ import type {
   MenuItemRecord,
   RelatedOption,
   RelatedType,
-} from "@/types/content-page";
+} from "@/types/content-page.ts";
+import {PAGE_BLOCK_COLLECTIONS} from "@/constants/content-constants.ts";
 
 const CONTENT_PAGES_COLLECTION = "content_page";
 const ENTITIES_COLLECTION = "entities";
 const MENU_ITEMS_COLLECTION = "menu_items";
-const PAGE_BLOCK_COLLECTIONS = ["file_block", "rtf_block", "diagram_block"];
 
 function encodeRelation(type: RelatedType, id: string) {
   return `${type}:${id}`;
