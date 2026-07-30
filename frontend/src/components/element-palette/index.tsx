@@ -4,6 +4,7 @@ import { ImageIcon } from "@phosphor-icons/react/dist/csr/Image";
 import ElementPreviewCard from "@/components/element-preview-card";
 
 import classes from "./element-palette.module.css";
+import { ContentPageBlocksEnum } from "@/enums/content-pages-enum.ts";
 
 export default function ElementPalette() {
   return (
@@ -12,10 +13,10 @@ export default function ElementPalette() {
         Elementos
       </Title>
       <Stack gap="md">
-        <ElementPreviewCard label="Imagens" muted>
+        <ElementPreviewCard label="Imagens" muted blockType={ContentPageBlocksEnum.FILE_BLOCK}>
           <ImageIcon aria-hidden size={36} weight="regular" />
         </ElementPreviewCard>
-        <ElementPreviewCard label="Texto (RTF)">
+        <ElementPreviewCard label="Texto (RTF)" blockType={ContentPageBlocksEnum.RTF_BLOCK}>
           <Text fw={700} fz="md">
             Lorem Ipsum
           </Text>
