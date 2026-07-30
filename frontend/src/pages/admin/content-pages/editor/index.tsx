@@ -14,11 +14,13 @@ import {
   listRelatedOptions,
 } from "@/services/content-pages/metadata.ts";
 import type {
+  ContentPageBlocksValues,
   ContentPageFormValues,
   RelatedOption,
 } from "@/types/content-page";
 
 import classes from "./content-page-editor.module.css";
+import { getContentPageBlocks } from "@/services/content-pages/content-page-blocks.ts";
 
 const AUTOSAVE_ERROR_NOTIFICATION_ID = "content-page-autosave-error";
 
@@ -27,6 +29,7 @@ export default function ContentPageEditor() {
   const navigate = useNavigate();
   const [relatedOptions, setRelatedOptions] = useState<RelatedOption[]>([]);
   const [initialValues, setInitialValues] = useState<ContentPageFormValues>();
+  const [contentPageBlocks, setContentPageBlocks] = useState<ContentPageBlocksValues>({});
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
@@ -61,12 +64,14 @@ export default function ContentPageEditor() {
     setIsLoading(true);
 
     try {
-      const [options, page] = await Promise.all([
+      const [options, contentPageBlocks, page] = await Promise.all([
         listRelatedOptions(),
+        pageId ? getContentPageBlocks(pageId) : Promise.resolve(null),
         pageId ? getContentPageEditorData(pageId) : Promise.resolve(null),
       ]);
 
       setRelatedOptions(options);
+      setContentPageBlocks(contentPageBlocks ?? {})
       setInitialValues(
         page
           ? { relation: page.relation, title: page.page.title }
@@ -124,6 +129,8 @@ export default function ContentPageEditor() {
           {!isLoading && !error && initialValues && (
             <ContentPageForm
               key={`${initialValues.title}:${initialValues.relation}`}
+              blocks={contentPageBlocks}
+              onUpdateBlocks={(updated) => setContentPageBlocks(updated)}
               initialValues={initialValues}
               relatedOptions={relatedOptions}
               onChange={queueSave}
