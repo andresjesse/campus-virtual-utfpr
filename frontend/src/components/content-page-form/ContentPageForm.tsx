@@ -1,4 +1,4 @@
-import { Select, TextInput } from "@mantine/core";
+import {Box, Select, Stack, TextInput} from "@mantine/core";
 import { useState } from "react";
 
 import type {
@@ -7,6 +7,7 @@ import type {
 } from "@/types/content-page";
 
 import classes from "./content-page-form.module.css";
+import BlocksList from "@/components/content-page-form/BlocksList.tsx";
 
 type ContentPageFormProps = {
   initialValues?: ContentPageFormValues;
@@ -37,8 +38,9 @@ export default function ContentPageForm({
       : undefined;
 
   return (
-    <div className={classes.form}>
-      <div className={classes.metadata}>
+    <Stack h="100%" gap={0}>
+      <Box className={classes.metadata} flex="0 0 auto">
+        {/* TODO: Consider componentizing this to reduce lines */}
         <TextInput
           label="Título da Página"
           placeholder="Título da página"
@@ -73,7 +75,16 @@ export default function ContentPageForm({
             label: classes.selectLabel,
           }}
         />
-      </div>
-    </div>
+      </Box >
+      <Box
+        flex="1 1 0"
+        mih={0}
+        style={{ overflowY: "auto" }}
+        ml="lg"
+        mr="lg"
+      >
+        <BlocksList />
+      </Box>
+    </Stack>
   );
 }
