@@ -5,9 +5,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 
 import FeedbackState from "@/components/feedback-state";
-import DeletePageDialog from "@/components/delete-page-dialog";
 import PageSearch from "@/components/page-search";
-import PageTable from "@/components/page-table";
+import PageTable from "@/components/page-table/PageTable.tsx";
 import {
   deleteContentPage,
   listContentPages,
@@ -16,6 +15,7 @@ import type { ContentPageListRecord } from "@/types/content-page";
 
 import classes from "./content-page-list.module.css";
 import {getContentPageErrorMessage} from "@/helpers/content-pages-service-helper.ts";
+import DialogBox from "@/components/DialogBox.tsx";
 
 export default function ContentPageList() {
   const navigate = useNavigate();
@@ -127,11 +127,17 @@ export default function ContentPageList() {
         )}
       </section>
 
-      <DeletePageDialog
+      <DialogBox
         opened={Boolean(pageToDelete)}
-        pageTitle={pageToDelete?.title}
+        firstMessage={`Deseja realmente excluir permanentemente a página ${pageToDelete?.title ?? 'Sem Título?'}`}
+        secondMessage="Todos os blocos relacionados serão automaticamente excluídos."
         loading={Boolean(deletingPageId)}
         onCancel={() => {
+          if (!deletingPageId) {
+            setPageToDelete(null);
+          }
+        }}
+        onClose={() => {
           if (!deletingPageId) {
             setPageToDelete(null);
           }
