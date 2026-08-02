@@ -1,4 +1,5 @@
 import * as React from "react";
+import {Box} from "@mantine/core";
 
 type DroppableContainerProps = {
   children: React.ReactNode,
@@ -18,8 +19,14 @@ export default function DroppableContainer({ children, handleDrop }: DroppableCo
   }
 
   return (
-    <div onDrop={onDrop} onDragOver={onDragOver}>
-      { children }
-    </div>
+    <Box
+      flex="1 1 0"
+      mih={0}
+      style={{ overflowY: "auto" }}
+      onDrop={onDrop}
+      onDragOver={onDragOver}
+    >
+      {children}
+    </Box>
   )
 }
