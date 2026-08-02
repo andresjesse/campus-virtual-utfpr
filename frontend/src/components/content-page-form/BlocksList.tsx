@@ -15,7 +15,7 @@ export default function BlocksList() {
   const { pageId } = useParams();
 
   const [blocksMetadata, setBlocksMetadata] = useState<GroupedContentPageBlockMetadata>();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
   const fetchBlocksMetadata = useCallback(async () => {
