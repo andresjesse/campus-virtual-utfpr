@@ -22,6 +22,7 @@ export default function DroppableContainer({ children, handleDrop }: DroppableCo
     <Box
       flex="1 1 0"
       mih={0}
+      h="100%"
       style={{ overflowY: "auto" }}
       onDrop={onDrop}
       onDragOver={onDragOver}
