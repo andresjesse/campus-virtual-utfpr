@@ -2,7 +2,7 @@ import { MantineProvider } from '@mantine/core'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
-import ContentPageForm from '@/components/content-page-form'
+import ContentPageForm from '@/components/content-page-form/ContentPageForm.tsx'
 
 function renderForm(onChange = jest.fn()) {
   render(
