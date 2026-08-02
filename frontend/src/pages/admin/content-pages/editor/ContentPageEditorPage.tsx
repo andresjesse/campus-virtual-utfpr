@@ -4,32 +4,29 @@ import { CaretDoubleLeftIcon } from "@phosphor-icons/react/dist/csr/CaretDoubleL
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 
-import ContentPageForm from "@/components/content-page-form";
-import ElementPalette from "@/components/element-palette";
+import ContentPageForm from "@/components/content-page-form/ContentPageForm.tsx";
+import ElementPalette from "@/components/element-palette/ElementPalette.tsx";
 import FeedbackState from "@/components/feedback-state";
 import { useContentPageAutosave } from "@/hooks/use-content-page-autosave";
 import {
   getContentPageEditorData,
-  getContentPageErrorMessage,
   listRelatedOptions,
-} from "@/services/content-pages/metadata.ts";
+} from "@/services/content-page-service.ts";
 import type {
-  ContentPageBlocksValues,
   ContentPageFormValues,
   RelatedOption,
 } from "@/types/content-page";
 
 import classes from "./content-page-editor.module.css";
-import { getContentPageBlocks } from "@/services/content-pages/content-page-blocks.ts";
+import {getContentPageErrorMessage} from "@/helpers/content-pages-service-helper.ts";
 
 const AUTOSAVE_ERROR_NOTIFICATION_ID = "content-page-autosave-error";
 
-export default function ContentPageEditor() {
+export default function ContentPageEditorPage() {
   const { pageId } = useParams();
   const navigate = useNavigate();
   const [relatedOptions, setRelatedOptions] = useState<RelatedOption[]>([]);
   const [initialValues, setInitialValues] = useState<ContentPageFormValues>();
-  const [contentPageBlocks, setContentPageBlocks] = useState<ContentPageBlocksValues>({});
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
@@ -64,14 +61,12 @@ export default function ContentPageEditor() {
     setIsLoading(true);
 
     try {
-      const [options, contentPageBlocks, page] = await Promise.all([
+      const [options, page] = await Promise.all([
         listRelatedOptions(),
-        pageId ? getContentPageBlocks(pageId) : Promise.resolve(null),
         pageId ? getContentPageEditorData(pageId) : Promise.resolve(null),
       ]);
 
       setRelatedOptions(options);
-      setContentPageBlocks(contentPageBlocks ?? {})
       setInitialValues(
         page
           ? { relation: page.relation, title: page.page.title }
@@ -129,8 +124,6 @@ export default function ContentPageEditor() {
           {!isLoading && !error && initialValues && (
             <ContentPageForm
               key={`${initialValues.title}:${initialValues.relation}`}
-              blocks={contentPageBlocks}
-              onUpdateBlocks={(updated) => setContentPageBlocks(updated)}
               initialValues={initialValues}
               relatedOptions={relatedOptions}
               onChange={queueSave}
