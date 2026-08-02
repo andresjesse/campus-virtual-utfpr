@@ -1,7 +1,7 @@
 import { Stack, Text, Title } from "@mantine/core";
 import { ImageIcon } from "@phosphor-icons/react/dist/csr/Image";
 
-import ElementPreviewCard from "@/components/element-preview-card";
+import ElementPreviewCard from "@/components/element-preview/element-preview-card/ElementPreviewCard.tsx";
 
 import classes from "./element-palette.module.css";
 import { ContentPageBlocksEnum } from "@/enums/content-pages-enum.ts";
