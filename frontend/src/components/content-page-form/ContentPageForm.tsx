@@ -80,8 +80,6 @@ export default function ContentPageForm({
         flex="1 1 0"
         mih={0}
         style={{ overflowY: "auto" }}
-        ml="lg"
-        mr="lg"
       >
         <BlocksList />
       </Box>

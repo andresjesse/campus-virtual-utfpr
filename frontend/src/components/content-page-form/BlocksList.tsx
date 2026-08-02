@@ -66,7 +66,7 @@ export default function BlocksList() {
 
   return (
     <DroppableContainer handleDrop={onDropNewBlock} >
-      <Box className={classes.blocksList} pt="lg">
+      <Box className={classes.blocksList} pt="lg" ml="lg" mr="lg">
         { blocksMetadata?.rtf_block?.map((metadata) => (
           <BlockDisplay metadata={metadata} />
         )) }
