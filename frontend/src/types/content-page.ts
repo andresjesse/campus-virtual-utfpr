@@ -1,34 +1,37 @@
 import type { RecordModel } from "pocketbase";
 
-export type RtfBlockValue = {
-  title: string;
-  content: string;
-}
-
-export type DiagramBlockValue = {
-  title: string;
-  content: string;
-}
-
-export type FileBlockValue = {
-  title: string;
-  content: string;
-}
-
 export type ContentPageFormValues = {
   relation: string;
   title: string;
 };
 
-export type ContentPageBlocksValues = {
-  rtfBlocks?: RtfBlockValue[];
-  diagramBlocks?: DiagramBlockValue[];
-  fileBlocks?: FileBlockValue[];
-} | undefined;
+export type ContentPageBlockValue = string | string[];
+
+export type ContentPageBlockMetadata = {
+  id?: string;
+  title: string;
+  collectionName: string;
+  created?: string;
+  updated?: string;
+}
+
+export type GroupedContentPageBlockMetadata = {
+  rtf_block?: ContentPageBlockMetadata[];
+  diagram_block?: ContentPageBlockMetadata[];
+  file_block?: ContentPageBlockMetadata[];
+}
 
 export type EntityRecord = RecordModel & {
   slug: string;
 };
+
+export type ContentPageBlockRecord = RecordModel & {
+  id?: string;
+  content?: string | string[];
+  created?: string;
+  updated?: string;
+  page?: string;
+}
 
 export type ContentPageRecord = RecordModel & {
   entity: string;
