@@ -1,35 +1,28 @@
-import { pocketbase } from "@/services/pocketbase.ts";
+import {pocketbase} from "@/services/pocketbase.ts";
 import type {
+  ContentPageBlockMetadata, ContentPageBlockRecord, ContentPageBlockValue,
   ContentPageFormValues,
   ContentPageListRecord,
   ContentPageRecord,
   EntityRecord,
   MenuItemRecord,
   RelatedOption,
-  RelatedType,
 } from "@/types/content-page.ts";
 import {PAGE_BLOCK_COLLECTIONS} from "@/constants/content-constants.ts";
+import {encodeRelation, parseRelation} from "@/helpers/content-pages-service-helper.ts";
+import {ContentPageBlocksEnum, type ContentPageBlockType} from "@/enums/content-pages-enum.ts";
+
+// #####################################################################
+// #### == #### == #### COLLECTION NAMES #### == #### == #### == #### ==
+// #####################################################################
 
 const CONTENT_PAGES_COLLECTION = "content_page";
 const ENTITIES_COLLECTION = "entities";
 const MENU_ITEMS_COLLECTION = "menu_items";
 
-function encodeRelation(type: RelatedType, id: string) {
-  return `${type}:${id}`;
-}
-
-function parseRelation(relation: string) {
-  const separator = relation.indexOf(":");
-
-  if (separator < 1) {
-    throw new Error("Selecione um elemento relacionado válido.");
-  }
-
-  return {
-    id: relation.slice(separator + 1),
-    type: relation.slice(0, separator) as RelatedType,
-  };
-}
+// #####################################################################
+// #### == #### == #### CONTENT PAGES #### == #### == #### == #### == ##
+// #####################################################################
 
 async function listPageMenuItems(pageId?: string) {
   return pocketbase
@@ -184,55 +177,77 @@ export async function deleteContentPage(id: string) {
     .delete(id, { requestKey: null });
 }
 
-export function getContentPageErrorMessage(error: unknown) {
-  if (typeof error !== "object" || error === null) {
-    return "Não foi possível concluir a operação. Tente novamente.";
-  }
+// #####################################################################
+// #### == #### == #### PAGE BLOCKS #### == #### == #### == #### == ####
+// #####################################################################
 
-  const response =
-    "response" in error &&
-    typeof error.response === "object" &&
-    error.response !== null
-      ? error.response
-      : null;
-  const responseMessage =
-    response &&
-    "message" in response &&
-    typeof response.message === "string"
-      ? response.message.trim()
-      : "";
+export async function getBlockContent(
+  blockId: string,
+  collectionName: ContentPageBlockType
+): Promise<ContentPageBlockValue> {
+  return await pocketbase
+    .collection(collectionName).getOne<ContentPageBlockRecord>(blockId, {
+      fields: "content",
+      requestKey: null,
+    }).then((data) => { return data.content! })
+}
 
-  if (
-    responseMessage &&
-    /[áàâãéêíóôõúç]|\b(página|modelo|item|relacionad[ao])\b/i.test(
-      responseMessage,
-    )
-  ) {
-    return responseMessage;
-  }
+// export async function getRtfBlockContent(blockId: string): Promise<RtfBlockValue> {
+//   return await pocketbase
+//     .collection(ContentPageBlocksEnum.RTF_BLOCK).getOne(blockId, {
+//       filter: "content",
+//       requestKey: null,
+//     })
+// }
+//
+// export async function getDiagramBlocksContent(blockId: string): Promise<DiagramBlockValue> {
+//   return await pocketbase
+//     .collection(ContentPageBlocksEnum.DIAGRAM_BLOCK).getOne(blockId, {
+//       filter: "content",
+//       requestKey: null,
+//     })
+// }
+//
+// export async function getFileBlocksContent(blockId: string): Promise<FileBlockValue> {
+//   return await pocketbase
+//     .collection(ContentPageBlocksEnum.FILE_BLOCK).getOne(blockId, {
+//       filter: "content",
+//       requestKey: null,
+//     })
+// }
 
-  const status =
-    "status" in error && typeof error.status === "number" ? error.status : 0;
+export async function getRtfBlocksMetadata(
+  pageId: string,
+  withTimestamps: boolean
+): Promise<ContentPageBlockMetadata[]> {
+  return await pocketbase
+    .collection(ContentPageBlocksEnum.RTF_BLOCK).getFullList<ContentPageBlockMetadata>({
+      filter: `page="${pageId}"`,
+      fields: `id,title,collectionName${withTimestamps ? `,created,updated` : ''}`,
+      requestKey: null
+    })
+}
 
-  if (status === 400) {
-    return "Verifique os dados informados e tente novamente.";
-  }
+export async function getDiagramBlocksMetadata(
+  pageId: string,
+  withTimestamps: boolean
+): Promise<ContentPageBlockMetadata[]> {
+  return await pocketbase
+    .collection(ContentPageBlocksEnum.DIAGRAM_BLOCK).getFullList<ContentPageBlockMetadata>({
+      filter: `page="${pageId}"`,
+      fields: `id,title,collectionName${withTimestamps ? `,created,updated` : ''}`,
+      requestKey: null
+    })
+}
 
-  if (status === 401) {
-    return "Sua sessão expirou. Entre novamente para continuar.";
-  }
-
-  if (status === 403) {
-    return "Você não tem permissão para alterar esta página.";
-  }
-
-  if (status === 404) {
-    return "A página ou o elemento relacionado não foi encontrado.";
-  }
-
-  if (status >= 500) {
-    return "O servidor não conseguiu salvar a página. Tente novamente mais tarde.";
-  }
-
-  return "Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.";
+export async function getFileBlocksMetadata(
+  pageId: string,
+  withTimestamps: boolean
+): Promise<ContentPageBlockMetadata[]> {
+  return await pocketbase
+    .collection(ContentPageBlocksEnum.FILE_BLOCK).getFullList<ContentPageBlockMetadata>({
+      filter: `page="${pageId}"`,
+      fields: `id,title,collectionName${withTimestamps ? `,created,updated` : ''}`,
+      requestKey: null
+    })
 }
