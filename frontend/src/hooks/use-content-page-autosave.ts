@@ -2,10 +2,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
   createContentPage,
-  getContentPageErrorMessage,
   updateContentPage,
-} from "@/services/content-pages/metadata.ts";
+} from "@/services/content-page-service.ts";
 import type { ContentPageFormValues } from "@/types/content-page";
+import {getContentPageErrorMessage} from "@/helpers/content-pages-service-helper.ts";
 
 export type AutosaveStatus = "error" | "saved" | "saving";
 
