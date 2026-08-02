@@ -1,19 +1,50 @@
-import {Flex, Space, Title} from "@mantine/core";
+import {ActionIcon, Flex, Space, Title} from "@mantine/core";
 import {TrashIcon} from "@phosphor-icons/react/dist/csr/Trash";
 import {NotePencilIcon} from "@phosphor-icons/react";
+import type {ContentPageBlockMetadata} from "@/types/content-page.ts";
 
 type RtfBlockDisplayHeaderProps = {
-  title: string
+  metadata: ContentPageBlockMetadata
 }
 
-export default function BlockDisplayHeader({ title }: RtfBlockDisplayHeaderProps) {
+export default function BlockDisplayHeader({ metadata }: RtfBlockDisplayHeaderProps) {
+
+
   return (
     <Flex mb="xs" pb="0" flex={1} justify="space-between">
-      <Title order={4}>{title}</Title>
+      <Title order={4}>{metadata.title}</Title>
       <Flex align="center">
-        <NotePencilIcon size={20} />
+        <ActionIcon
+          aria-label={`Excluir conteúdo"}`}
+          color="blue"
+          variant="subtle"
+          size="md"
+          loading={false}
+          onClick={(event) => {
+            event.stopPropagation();
+            return;
+          }}
+          onKeyDown={(event) => event.stopPropagation()}
+        >
+          <NotePencilIcon size={18} />
+        </ActionIcon>
+
         <Space w="sm" />
-        <TrashIcon size={20} />
+
+        <ActionIcon
+          aria-label={`Excluir conteúdo"}`}
+          color="red"
+          variant="subtle"
+          size="md"
+          loading={false}
+          onClick={(event) => {
+            event.stopPropagation();
+            return;
+          }}
+          onKeyDown={(event) => event.stopPropagation()}
+        >
+          <TrashIcon aria-hidden size={18} />
+        </ActionIcon>
       </Flex>
     </Flex>
   );

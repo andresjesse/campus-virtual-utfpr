@@ -33,7 +33,7 @@ export default function BlockDisplay({ metadata }: RtfBlockProps) {
 
   return (
     <Box mb="xl">
-      <BlockDisplayHeader title={metadata.title} />
+      <BlockDisplayHeader metadata={metadata} />
       <BlockDisplayBody isLoading={isLoading} content={blockData} />
     </Box>
   )
