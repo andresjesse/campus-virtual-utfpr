@@ -1,19 +1,21 @@
-import { Button, Group, Modal, Text } from "@mantine/core";
+import {Button, Group, Modal, type ModalProps, Text} from "@mantine/core";
 
 type DeletePageDialogProps = {
   loading: boolean;
   onCancel: () => void;
   onConfirm: () => void;
   opened: boolean;
-  pageTitle?: string;
-};
+  firstMessage?: string,
+  secondMessage?: string,
+} & ModalProps;
 
-export default function DeletePageDialog({
+export default function DialogBox({
   loading,
   onCancel,
   onConfirm,
   opened,
-  pageTitle,
+  firstMessage,
+  secondMessage
 }: DeletePageDialogProps) {
   return (
     <Modal
@@ -26,12 +28,8 @@ export default function DeletePageDialog({
       title="Excluir página"
       size="sm"
     >
-      <Text size="sm">
-        Deseja excluir permanentemente a página “{pageTitle || "Sem título"}”?
-      </Text>
-      <Text size="xs" c="dimmed" mt="xs">
-        Os blocos associados também serão removidos. Esta ação não pode ser desfeita.
-      </Text>
+      <Text size="sm">{firstMessage}</Text>
+      <Text size="xs" c="dimmed" mt="xs">{secondMessage}</Text>
       <Group justify="flex-end" mt="lg">
         <Button
           size="xs"
