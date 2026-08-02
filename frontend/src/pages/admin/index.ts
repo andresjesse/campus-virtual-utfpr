@@ -3,7 +3,7 @@ import ContentPageList from "@/pages/admin/content-pages/list/ContentPageListPag
 import AdminPlaceholder from "@/pages/admin/placeholder";
 
 export const Admin = {
-  ContentPageEditor,
+  ContentPageEditor: ContentPageEditorPage,
   ContentPageList,
   Placeholder: AdminPlaceholder,
 };

@@ -9,13 +9,13 @@ import DeletePageDialog from "@/components/delete-page-dialog";
 import PageSearch from "@/components/page-search";
 import PageTable from "@/components/page-table";
 import {
-  getContentPageErrorMessage,
   deleteContentPage,
   listContentPages,
-} from "@/services/content-pages/metadata.ts";
+} from "@/services/content-page-service.ts";
 import type { ContentPageListRecord } from "@/types/content-page";
 
 import classes from "./content-page-list.module.css";
+import {getContentPageErrorMessage} from "@/helpers/content-pages-service-helper.ts";
 
 export default function ContentPageList() {
   const navigate = useNavigate();
