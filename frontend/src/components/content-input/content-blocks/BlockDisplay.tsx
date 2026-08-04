@@ -8,9 +8,10 @@ import {Box} from "@mantine/core";
 
 type RtfBlockProps = {
   metadata: ContentPageBlockMetadata
+  onDelete: () => Promise<void>
 }
 
-export default function BlockDisplay({ metadata }: RtfBlockProps) {
+export default function BlockDisplay({ metadata, onDelete }: RtfBlockProps) {
   const [blockData, setBlockData] = useState<ContentPageBlockValue>()
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
@@ -33,7 +34,7 @@ export default function BlockDisplay({ metadata }: RtfBlockProps) {
 
   return (
     <Box mb="xl">
-      <BlockDisplayHeader metadata={metadata} />
+      <BlockDisplayHeader metadata={metadata} onDelete={onDelete} />
       <BlockDisplayBody isLoading={isLoading} content={blockData} />
     </Box>
   )

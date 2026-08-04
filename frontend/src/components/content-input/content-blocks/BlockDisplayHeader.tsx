@@ -5,24 +5,23 @@ import type {ContentPageBlockMetadata} from "@/types/content-page.ts";
 
 type RtfBlockDisplayHeaderProps = {
   metadata: ContentPageBlockMetadata
+  onDelete: () => Promise<void>
 }
 
-export default function BlockDisplayHeader({ metadata }: RtfBlockDisplayHeaderProps) {
-
-
+export default function BlockDisplayHeader({ metadata, onDelete }: RtfBlockDisplayHeaderProps) {
   return (
     <Flex mb="xs" pb="0" flex={1} justify="space-between">
       <Title order={4}>{metadata.title}</Title>
       <Flex align="center">
         <ActionIcon
-          aria-label={`Excluir conteúdo"}`}
+          aria-label={`Editar conteúdo"}`}
           color="blue"
           variant="subtle"
           size="md"
           loading={false}
           onClick={(event) => {
             event.stopPropagation();
-            return;
+            return
           }}
           onKeyDown={(event) => event.stopPropagation()}
         >
@@ -39,7 +38,7 @@ export default function BlockDisplayHeader({ metadata }: RtfBlockDisplayHeaderPr
           loading={false}
           onClick={(event) => {
             event.stopPropagation();
-            return;
+            onDelete();
           }}
           onKeyDown={(event) => event.stopPropagation()}
         >

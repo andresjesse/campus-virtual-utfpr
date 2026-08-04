@@ -5,11 +5,13 @@ import BlockDisplay from "@/components/content-input/content-blocks/BlockDisplay
 import classes from "@/components/content-page-form/content-page-form.module.css";
 import {ContentPageBlocksEnum, type ContentPageBlockType} from "@/enums/content-pages-enum.ts";
 import DroppableContainer from "@/containers/DroppableContainer.tsx";
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useContext, useEffect, useState} from "react";
 import {useParams} from "react-router";
 import {getAllContentBlocksMetadata} from "@/helpers/content-pages-service-helper.ts";
 import FeedbackState from "@/components/feedback-state";
 import { Box } from "@mantine/core";
+import {DialogContext} from "@/contexts/dialog-context.ts";
+import {deleteBlockContent} from "@/services/content-page-service.ts";
 
 export default function BlocksList() {
   const { pageId } = useParams();
@@ -17,6 +19,8 @@ export default function BlocksList() {
   const [blocksMetadata, setBlocksMetadata] = useState<GroupedContentPageBlockMetadata>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+
+  const dialogBox = useContext(DialogContext);
 
   const fetchBlocksMetadata = useCallback(async () => {
     if (!pageId) return;
@@ -39,6 +43,7 @@ export default function BlocksList() {
     void fetchBlocksMetadata();
   }, [fetchBlocksMetadata]);
 
+
   function onDropNewBlock(blockType: string) {
     const typedBlockType = blockType as ContentPageBlockType;
     const newBlocks: GroupedContentPageBlockMetadata = {
@@ -49,6 +54,18 @@ export default function BlocksList() {
       ]
     }
     setBlocksMetadata(newBlocks);
+  }
+
+  async function handleDelete(id: string, title: string, collectionName: string) {
+    const hasConfirmed = await dialogBox!.confirm({
+      title: "Excluir Bloco",
+      firstMessage: `Deseja mesmo excluir o bloco ${title ?? "Sem título"}?`,
+      secondMessage: "Esta ação não pode ser desfeita."
+    })
+
+    if (!hasConfirmed) return;
+
+    await deleteBlockContent(id, collectionName as ContentPageBlockType)
   }
 
   if (isLoading) {
@@ -68,7 +85,10 @@ export default function BlocksList() {
     <DroppableContainer handleDrop={onDropNewBlock} >
       <Box className={classes.blocksList} pt="lg" ml="lg" mr="lg">
         { blocksMetadata?.rtf_block?.map((metadata) => (
-          <BlockDisplay metadata={metadata} />
+          <BlockDisplay
+            metadata={metadata}
+            onDelete={() => handleDelete(metadata.id!, metadata.title, metadata.collectionName)}
+          />
         )) }
       </Box>
     </DroppableContainer>
