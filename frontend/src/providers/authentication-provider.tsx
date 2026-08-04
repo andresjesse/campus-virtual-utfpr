@@ -9,8 +9,7 @@ import type {
   AuthenticationState,
   UserRecord,
 } from "@/types/authentication";
-
-const USERS_COLLECTION = "users";
+import {USERS_COLLECTION} from "@/constants/user-constants.ts";
 
 type AuthenticationProviderProps = PropsWithChildren<{
   pocketbaseClient?: PocketBase;
@@ -108,8 +107,8 @@ export function AuthenticationProvider({
   );
 
   return (
-    <AuthenticationContext.Provider value={contextValue}>
+    <AuthenticationContext value={contextValue}>
       {children}
-    </AuthenticationContext.Provider>
+    </AuthenticationContext>
   );
 }
