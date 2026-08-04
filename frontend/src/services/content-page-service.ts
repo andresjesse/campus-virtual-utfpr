@@ -182,39 +182,23 @@ export async function deleteContentPage(id: string) {
 // #####################################################################
 
 export async function getBlockContent(
-  blockId: string,
+  id: string,
   collectionName: ContentPageBlockType
 ): Promise<ContentPageBlockValue> {
   return await pocketbase
-    .collection(collectionName).getOne<ContentPageBlockRecord>(blockId, {
+    .collection(collectionName).getOne<ContentPageBlockRecord>(id, {
       fields: "content",
       requestKey: null,
     }).then((data) => { return data.content! })
 }
 
-// export async function getRtfBlockContent(blockId: string): Promise<RtfBlockValue> {
-//   return await pocketbase
-//     .collection(ContentPageBlocksEnum.RTF_BLOCK).getOne(blockId, {
-//       filter: "content",
-//       requestKey: null,
-//     })
-// }
-//
-// export async function getDiagramBlocksContent(blockId: string): Promise<DiagramBlockValue> {
-//   return await pocketbase
-//     .collection(ContentPageBlocksEnum.DIAGRAM_BLOCK).getOne(blockId, {
-//       filter: "content",
-//       requestKey: null,
-//     })
-// }
-//
-// export async function getFileBlocksContent(blockId: string): Promise<FileBlockValue> {
-//   return await pocketbase
-//     .collection(ContentPageBlocksEnum.FILE_BLOCK).getOne(blockId, {
-//       filter: "content",
-//       requestKey: null,
-//     })
-// }
+export async function deleteBlockContent(
+  id: string,
+  collectionName: ContentPageBlockType
+): Promise<boolean> {
+  return await pocketbase
+    .collection(collectionName).delete(id, { requestKey: null });
+}
 
 export async function getRtfBlocksMetadata(
   pageId: string,
