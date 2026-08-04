@@ -10,6 +10,7 @@ import { AuthenticationProvider } from "@/providers/authentication-provider";
 import { theme } from "@/theme";
 
 import { Router } from "./router";
+import DialogProvider from "@/providers/dialog-provider.tsx";
 
 const root = document.getElementById("root");
 
@@ -21,7 +22,9 @@ ReactDOM.createRoot(root).render(
   <MantineProvider defaultColorScheme="dark" theme={theme}>
     <Notifications />
     <AuthenticationProvider>
-      <Router />
+      <DialogProvider>
+        <Router />
+      </DialogProvider>
     </AuthenticationProvider>
   </MantineProvider>,
 );

@@ -1,13 +1,6 @@
-import {Button, Group, Modal, type ModalProps, Text} from "@mantine/core";
-
-type DeletePageDialogProps = {
-  loading: boolean;
-  onCancel: () => void;
-  onConfirm: () => void;
-  opened: boolean;
-  firstMessage?: string,
-  secondMessage?: string,
-} & ModalProps;
+import {Button, Group, Modal, Text} from "@mantine/core";
+import type { DialogPropsValue } from "@/types/user-feedback.ts";
+import {useEffect} from "react";
 
 export default function DialogBox({
   loading,
@@ -15,8 +8,13 @@ export default function DialogBox({
   onConfirm,
   opened,
   firstMessage,
-  secondMessage
-}: DeletePageDialogProps) {
+  secondMessage,
+  title
+}: DialogPropsValue) {
+  useEffect(() => {
+    console.log("RENDERED!")
+  }, [])
+
   return (
     <Modal
       centered
@@ -25,7 +23,7 @@ export default function DialogBox({
       closeOnClickOutside={!loading}
       closeOnEscape={!loading}
       withCloseButton={!loading}
-      title="Excluir página"
+      title={title}
       size="sm"
     >
       <Text size="sm">{firstMessage}</Text>
