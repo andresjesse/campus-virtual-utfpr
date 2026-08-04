@@ -6,11 +6,10 @@ import { MantineProvider } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
 import ReactDOM from "react-dom/client";
 
-import { AuthenticationProvider } from "@/providers/authentication-provider";
 import { theme } from "@/theme";
 
 import { Router } from "./router";
-import DialogProvider from "@/providers/dialog-provider.tsx";
+import ProvidersGroup from "@/components/ProvidersGroup.tsx";
 
 const root = document.getElementById("root");
 
@@ -21,10 +20,8 @@ if (!root) {
 ReactDOM.createRoot(root).render(
   <MantineProvider defaultColorScheme="dark" theme={theme}>
     <Notifications />
-    <AuthenticationProvider>
-      <DialogProvider>
-        <Router />
-      </DialogProvider>
-    </AuthenticationProvider>
+    <ProvidersGroup>
+      <Router />
+    </ProvidersGroup>
   </MantineProvider>,
 );
