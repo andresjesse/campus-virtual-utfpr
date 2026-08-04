@@ -1,6 +1,5 @@
 import {Button, Group, Modal, Text} from "@mantine/core";
 import type { DialogPropsValue } from "@/types/user-feedback.ts";
-import {useEffect} from "react";
 
 export default function DialogBox({
   loading,
@@ -11,10 +10,6 @@ export default function DialogBox({
   secondMessage,
   title
 }: DialogPropsValue) {
-  useEffect(() => {
-    console.log("RENDERED!")
-  }, [])
-
   return (
     <Modal
       centered
