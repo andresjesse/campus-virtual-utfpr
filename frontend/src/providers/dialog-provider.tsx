@@ -1,4 +1,4 @@
-import {type PropsWithChildren, useCallback, useEffect, useState} from 'react';
+import {type PropsWithChildren, useCallback, useMemo, useState} from 'react';
 import {DialogContext} from "@/contexts/dialog-context.ts";
 import type { DialogOptions } from "@/types/user-feedback.ts";
 import DialogBox from "@/components/DialogBox.tsx";
@@ -11,55 +11,39 @@ type QueueEntry = {
 }
 
 export default function DialogProvider({ children }: DialogProviderProps) {
-  const [dialogQueue, setDialogQueue] = useState<QueueEntry[]>([])
-  const [currentDialog, setCurrentDialog] = useState<DialogOptions | null>(null)
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [dialogQueue, setDialogQueue] = useState<QueueEntry[]>([]);
 
-  const handleNextDialog = useCallback((async () => {
-    try {
-      setIsLoading(true)
-      setCurrentDialog(dialogQueue.shift()?.dialog ?? null)
-    } finally {
-      setIsLoading(false)
-    }
-  }), [dialogQueue])
+  const currentEntry = dialogQueue[0] ?? null;
 
-  const confirm = async (newDialog: DialogOptions) => {
+  const confirm = useCallback((dialog: DialogOptions) => {
     return new Promise<boolean>((resolve) => {
-      setDialogQueue((queue) => [
-        ...queue,
-        { dialog: newDialog, resolve: resolve}
-      ])
-    })
-  }
+      setDialogQueue((queue) => [...queue, { dialog, resolve }]);
+    });
+  }, []);
 
   const finish = (confirmed: boolean) => {
-    const currentEntry = dialogQueue[0]
-    currentEntry?.resolve(confirmed);
-    setDialogQueue((queue) => queue.slice(1))
-    setCurrentDialog(null)
-  }
+    if (!currentEntry) return;
 
-  useEffect(() => {
-    if (currentDialog || dialogQueue.length < 1) return;
+    currentEntry.resolve(confirmed);
+    setDialogQueue((queue) => queue.slice(1));
+  };
 
-    void handleNextDialog()
-  }, [dialogQueue, handleNextDialog, currentDialog]);
+  const contextValue = useMemo(() => ({ confirm }), [confirm]);
 
   return (
-    <DialogContext value={{ confirm }}>
-      { currentDialog && (
+    <DialogContext value={contextValue}>
+      {children}
+
+      {currentEntry && (
         <DialogBox
-          {...currentDialog}
-          loading={isLoading}
-          opened={!!currentDialog}
+          {...currentEntry.dialog}
+          loading={false}
+          opened
           onClose={() => finish(false)}
           onCancel={() => finish(false)}
           onConfirm={() => finish(true)}
         />
-      ) }
-
-      { children }
+      )}
     </DialogContext>
   );
 }
