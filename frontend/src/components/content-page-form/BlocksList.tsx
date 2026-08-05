@@ -65,7 +65,17 @@ export default function BlocksList() {
 
     if (!hasConfirmed) return;
 
-    await deleteBlockContent(id, collectionName as ContentPageBlockType)
+    try {
+      await deleteBlockContent(id, collectionName as ContentPageBlockType)
+    } finally {
+      setBlocksMetadata((currentVal) => {
+        return {
+        ...currentVal,
+          [collectionName as ContentPageBlockType]: currentVal?.[collectionName as ContentPageBlockType]
+            ?.filter((el) => el.id !== id)
+        }
+      })
+    }
   }
 
   if (isLoading) {
@@ -86,6 +96,7 @@ export default function BlocksList() {
       <Box className={classes.blocksList} pt="lg" ml="lg" mr="lg">
         { blocksMetadata?.rtf_block?.map((metadata) => (
           <BlockDisplay
+            key={metadata.id}
             metadata={metadata}
             onDelete={() => handleDelete(metadata.id!, metadata.title, metadata.collectionName)}
           />
