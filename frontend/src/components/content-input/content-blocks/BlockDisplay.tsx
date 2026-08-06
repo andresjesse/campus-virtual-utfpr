@@ -1,40 +1,22 @@
 import BlockDisplayHeader from "@/components/content-input/content-blocks/BlockDisplayHeader.tsx";
-import type {ContentPageBlockMetadata, ContentPageBlockValue} from "@/types/content-page.ts";
-import {useCallback, useEffect, useState} from "react";
-import {getBlockContent} from "@/services/content-page-service.ts";
-import type {ContentPageBlockType} from "@/enums/content-pages-enum.ts";
+import type { ContentPageBlockMetadata } from "@/types/content-page.ts";
 import BlockDisplayBody from "@/components/content-input/content-blocks/rtf-block/BlockDisplayBody.tsx";
 import {Box} from "@mantine/core";
+import useContentBlockData from "@/hooks/content-blocks/useContentBlockData.tsx";
+import type {ContentPageBlockType} from "@/enums/content-pages-enum.ts";
 
 type RtfBlockProps = {
   metadata: ContentPageBlockMetadata
   onDelete: () => Promise<void>
+  onEdit: (blockId: string, collectionName: ContentPageBlockType) => void
 }
 
-export default function BlockDisplay({ metadata, onDelete }: RtfBlockProps) {
-  const [blockData, setBlockData] = useState<ContentPageBlockValue>()
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-
-  const fetchBlockContent = useCallback(async () => {
-    if (!metadata.id) return;
-    setIsLoading(false)
-
-    try {
-      setBlockData(
-        await getBlockContent(metadata.id, metadata.collectionName as ContentPageBlockType)
-      )
-    } finally {
-      setIsLoading(false)
-    }
-  }, [metadata.id, metadata.collectionName])
-
-  useEffect(() => {
-    void fetchBlockContent()
-  }, [fetchBlockContent])
+export default function BlockDisplay({ metadata, onDelete, onEdit }: RtfBlockProps) {
+  const { blockData, isLoading } = useContentBlockData(metadata);
 
   return (
     <Box mb="xl">
-      <BlockDisplayHeader metadata={metadata} onDelete={onDelete} />
+      <BlockDisplayHeader metadata={metadata} onDelete={onDelete} onEdit={onEdit} />
       <BlockDisplayBody isLoading={isLoading} content={blockData} />
     </Box>
   )
