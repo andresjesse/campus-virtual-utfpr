@@ -25,8 +25,6 @@ export default function useContentBlockData(metadata: ContentPageBlockMetadata) 
   ) => {
     setIsLoading(true)
 
-    console.log({ ...metadata, content: newContent })
-
     try {
       await upsertBlockContentApi(
         { ...metadata, content: newContent },

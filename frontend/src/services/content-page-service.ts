@@ -204,7 +204,6 @@ export async function upsertBlockContent(
   record: Omit<ContentPageBlockRecord, 'collectionId'>,
 ): Promise<boolean> {
   if (record.id) {
-    console.log(JSON.stringify(record));
     return await pocketbase
       .collection(record.collectionName).update(record.id, { ...record }, { requestKey: null });
   }
