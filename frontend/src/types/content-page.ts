@@ -13,6 +13,7 @@ export type ContentPageBlockMetadata = {
   collectionName: string;
   created?: string;
   updated?: string;
+  page?: string;
 }
 
 export type GroupedContentPageBlockMetadata = {
@@ -27,6 +28,7 @@ export type EntityRecord = RecordModel & {
 
 export type ContentPageBlockRecord = RecordModel & {
   id?: string;
+  title?: string;
   content?: string | string[];
   created?: string;
   updated?: string;

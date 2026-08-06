@@ -4,7 +4,7 @@ import type {
 } from "@/types/content-page.ts";
 import BlockDisplay from "@/components/content-input/content-blocks/BlockDisplay.tsx";
 import classes from "@/components/content-page-form/content-page-form.module.css";
-import {ContentPageBlocksEnum, type ContentPageBlockType} from "@/enums/content-pages-enum.ts";
+import { type ContentPageBlockType } from "@/enums/content-pages-enum.ts";
 import DroppableContainer from "@/containers/DroppableContainer.tsx";
 import {useCallback, useContext, useEffect, useRef, useState} from "react";
 import {useParams} from "react-router";
@@ -50,19 +50,26 @@ export default function BlocksList() {
   }, [fetchBlocksMetadata]);
 
   function onDropNewBlock(blockType: string) {
-    const typedBlockType = blockType as ContentPageBlockType;
-    const newBlocks: GroupedContentPageBlockMetadata = {
-      ...blocksMetadata,
-      [typedBlockType]: [
-        ...(blocksMetadata?.[typedBlockType] ?? []),
-        { title: "Título provisório", collectionName: ContentPageBlocksEnum.RTF_BLOCK }
-      ]
+    // const typedBlockType = blockType as ContentPageBlockType;
+    // const newBlock =
+    // const newBlocks: GroupedContentPageBlockMetadata = {
+    //   ...blocksMetadata,
+    //   [typedBlockType]: [
+    //     ...(blocksMetadata?.[typedBlockType] ?? []),
+    //     newBlock
+    //   ]
+    // }
+    // setBlocksMetadata(newBlocks);
+    selectedContentBlock.current = {
+      title: "Título provisório",
+      collectionName: blockType as ContentPageBlockType,
     }
-    setBlocksMetadata(newBlocks);
+    setIsModalOpen(true);
   }
 
   function updateContentBlocks() {
     setIsModalOpen(false);
+    selectedContentBlock.current = undefined
     void fetchBlocksMetadata();
   }
 
@@ -142,7 +149,7 @@ export default function BlocksList() {
       </DroppableContainer>
 
       <ContentBlockEditModal
-        blockMetadata={selectedContentBlock.current!}
+        blockMetadata={{ ...selectedContentBlock.current!, page: pageId  }}
         onUpdate={updateContentBlocks}
         opened={isModalOpen}
         onClose={() => setIsModalOpen(false)}

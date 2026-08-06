@@ -8,7 +8,7 @@ export default function useContentBlockData(metadata: ContentPageBlockMetadata) 
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const fetchBlockContent = useCallback(async () => {
-    if (!metadata.id) return;
+    if (!metadata?.id) return;
     setIsLoading(true)
 
     try {
@@ -20,17 +20,20 @@ export default function useContentBlockData(metadata: ContentPageBlockMetadata) 
     }
   }, [metadata])
 
-  const upsertBlockContent = async (newContent: ContentPageBlockValue) => {
-    if (!metadata.id) return;
+  const upsertBlockContent = async (
+    newContent: ContentPageBlockValue
+  ) => {
     setIsLoading(true)
+
+    console.log({ ...metadata, content: newContent })
 
     try {
       await upsertBlockContentApi(
-        metadata.id,
-        metadata.collectionName as ContentPageBlockType,
-        { ...metadata, content: newContent }
+        { ...metadata, content: newContent },
       )
       setBlockData(newContent)
+    } catch (error) {
+      console.error(error)
     } finally {
       setIsLoading(false)
     }
