@@ -4,9 +4,10 @@ import StarterKit from "@tiptap/starter-kit";
 
 type RtfBlockEditorProps = {
   content?: string,
+  onChange: (value: string) => void,
 }
 
-export default function RtfBlockEditor({ content }: RtfBlockEditorProps) {
+export default function RtfBlockEditor({ content, onChange }: RtfBlockEditorProps) {
   const editor = useEditor({
     shouldRerenderOnTransaction: true,
     extensions: [
@@ -14,6 +15,9 @@ export default function RtfBlockEditor({ content }: RtfBlockEditorProps) {
     ],
     editable: true,
     content: content,
+    onUpdate: ({ editor }) => {
+      onChange(editor.getHTML());
+    },
   });
 
   return (
