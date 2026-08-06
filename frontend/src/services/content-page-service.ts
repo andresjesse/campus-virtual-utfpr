@@ -11,6 +11,7 @@ import type {
 import {PAGE_BLOCK_COLLECTIONS} from "@/constants/content-constants.ts";
 import {encodeRelation, parseRelation} from "@/helpers/content-pages-service-helper.ts";
 import {ContentPageBlocksEnum, type ContentPageBlockType} from "@/enums/content-pages-enum.ts";
+import { rowExists } from "@/services/helper-service.ts";
 
 // #####################################################################
 // #### == #### == #### COLLECTION NAMES #### == #### == #### == #### ==
@@ -198,6 +199,20 @@ export async function deleteBlockContent(
 ): Promise<boolean> {
   return await pocketbase
     .collection(collectionName).delete(id, { requestKey: null });
+}
+
+export async function upsertBlockContent(
+  id: string,
+  collectionName: ContentPageBlockType,
+  content: Omit<ContentPageBlockRecord, 'collectionId'>
+): Promise<boolean> {
+  const canUpdate = await rowExists(id, collectionName);
+  if (canUpdate) {
+    return await pocketbase
+      .collection(collectionName).update(id, content, { requestKey: null });
+  }
+  return await pocketbase
+    .collection(collectionName).create(content)
 }
 
 export async function getRtfBlocksMetadata(
