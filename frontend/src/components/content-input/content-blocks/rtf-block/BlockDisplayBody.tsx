@@ -8,20 +8,18 @@ type BlockDisplayBodyProps = {
 }
 
 export default function BlockDisplayBody({ isLoading, content }: BlockDisplayBodyProps) {
+  if (isLoading) {
+    return <FeedbackState title="Carregando conteúdo..." />
+  }
+
   return (
-    <div>
-      { isLoading ? (
-        <FeedbackState title="Carregando conteúdo..." />
-      ) : (
-        <Box bd="2px solid white" bdrs="4px">
-          <Typography px="md" py="xs">
-            <Box
-              style={{ wordBreak: "break-all" }}
-              dangerouslySetInnerHTML={{ __html: content ?? '<p>Conteúdo provisório</p>' }}>
-            </Box>
-          </Typography>
+    <Box bd="2px solid white" bdrs="4px">
+      <Typography px="md" py="xs">
+        <Box
+          style={{ wordBreak: "break-all" }}
+          dangerouslySetInnerHTML={{ __html: content ?? '<p>Conteúdo provisório</p>' }}>
         </Box>
-      ) }
-    </div>
+      </Typography>
+    </Box>
   );
 }
