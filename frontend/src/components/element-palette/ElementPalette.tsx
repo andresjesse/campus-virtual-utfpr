@@ -22,9 +22,6 @@ export default function ElementPalette() {
           </Text>
         </ElementPreviewCard>
       </Stack>
-      <Text c="dimmed" size="xs" mt="md" ta="center">
-        Elementos de conteúdo estarão disponíveis em uma próxima etapa.
-      </Text>
     </aside>
   );
 }
