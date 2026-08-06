@@ -1,0 +1,1 @@
+export const VIRTUAL_MAP_COLLECTIONS = ["entities", "mesh"] as const;

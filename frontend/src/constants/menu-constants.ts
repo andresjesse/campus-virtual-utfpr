@@ -1,0 +1,1 @@
+export const MENU_COLLECTIONS = ["menu_items", "menu_categories"] as const;

@@ -9,7 +9,7 @@ import type {
   AuthenticationState,
   UserRecord,
 } from "@/types/authentication";
-import {USERS_COLLECTION} from "@/constants/user-constants.ts";
+import {USER_COLLECTION} from "@/constants/user-constants.ts";
 
 type AuthenticationProviderProps = PropsWithChildren<{
   pocketbaseClient?: PocketBase;
@@ -21,7 +21,7 @@ function readAuthenticationState(
 ): AuthenticationState {
   const isAuthenticated =
     pocketbaseClient.authStore.isValid &&
-    pocketbaseClient.authStore.record?.collectionName === USERS_COLLECTION;
+    pocketbaseClient.authStore.record?.collectionName === USER_COLLECTION;
 
   return {
     isAuthenticated,
@@ -60,7 +60,7 @@ export function AuthenticationProvider({
       if (pocketbaseClient.authStore.isValid) {
         try {
           await pocketbaseClient
-            .collection<UserRecord>(USERS_COLLECTION)
+            .collection<UserRecord>(USER_COLLECTION)
             .authRefresh();
         } catch {
           pocketbaseClient.authStore.clear();
@@ -85,7 +85,7 @@ export function AuthenticationProvider({
   const authenticate = useCallback(
     async (email: string, password: string) => {
       const authenticationResponse = await pocketbaseClient
-        .collection<UserRecord>(USERS_COLLECTION)
+        .collection<UserRecord>(USER_COLLECTION)
         .authWithPassword(email.trim(), password);
 
       return authenticationResponse.record;
