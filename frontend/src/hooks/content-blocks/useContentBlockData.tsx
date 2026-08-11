@@ -18,16 +18,14 @@ export default function useContentBlockData(metadata: ContentPageBlockMetadata) 
     } finally {
       setIsLoading(false)
     }
-  }, [metadata])
+  }, [metadata?.collectionName, metadata?.id])
 
-  const upsertBlockContent = async (
-    newContent: ContentPageBlockValue
-  ) => {
+  const upsertBlockContent = async (newContent: ContentPageBlockValue) => {
     setIsLoading(true)
 
     try {
       await upsertBlockContentApi(
-        { ...metadata, content: newContent },
+        { ...metadata, title: metadata.title.trim(), content: newContent },
       )
       setBlockData(newContent)
     } catch (error) {

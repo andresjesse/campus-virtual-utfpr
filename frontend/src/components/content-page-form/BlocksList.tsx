@@ -13,7 +13,7 @@ import FeedbackState from "@/components/feedback-state";
 import { Box } from "@mantine/core";
 import {DialogContext} from "@/contexts/dialog-context.ts";
 import {deleteBlockContent} from "@/services/content-page-service.ts";
-import ContentBlockEditModal from "@/components/content-input/content-blocks/modal/ContentBlockEditModal.tsx";
+import ContentBlockEditOverlay from "@/components/content-input/content-blocks/overlay/ContentBlockEditOverlay.tsx";
 import {notifications} from "@mantine/notifications";
 
 export default function BlocksList() {
@@ -153,7 +153,7 @@ export default function BlocksList() {
         </Box>
       </DroppableContainer>
 
-      <ContentBlockEditModal
+      <ContentBlockEditOverlay
         key={`${selectedContentBlock.current?.collectionName}-${selectedContentBlock.current?.id ?? "new"}`}
         blockMetadata={{ ...selectedContentBlock.current!, page: pageId  }}
         onUpdate={updateContentBlocks}
