@@ -73,6 +73,11 @@ export default function BlocksList() {
     void fetchBlocksMetadata();
   }
 
+  function closeContentBlockModal() {
+    setIsModalOpen(false);
+    selectedContentBlock.current = undefined;
+  }
+
   async function handleDelete(id: string, title: string, collectionName: string) {
     const hasConfirmed = await dialogBox!.confirm({
       title: "Excluir Bloco",
@@ -149,10 +154,11 @@ export default function BlocksList() {
       </DroppableContainer>
 
       <ContentBlockEditModal
+        key={`${selectedContentBlock.current?.collectionName}-${selectedContentBlock.current?.id ?? "new"}`}
         blockMetadata={{ ...selectedContentBlock.current!, page: pageId  }}
         onUpdate={updateContentBlocks}
         opened={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={closeContentBlockModal}
       />
     </Box>
   )
