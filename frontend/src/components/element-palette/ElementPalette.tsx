@@ -1,5 +1,4 @@
 import { Stack, Text, Title } from "@mantine/core";
-import { ImageIcon } from "@phosphor-icons/react/dist/csr/Image";
 
 import ElementPreviewCard from "@/components/element-preview/element-preview-card/ElementPreviewCard.tsx";
 
