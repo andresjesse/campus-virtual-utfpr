@@ -22,6 +22,7 @@
     "@tiptap/pm": "^3.29.2",
     "@tiptap/react": "^3.29.2",
     "@tiptap/starter-kit": "^3.29.2",
+    "dompurify": "^3.4.13",
     "pocketbase": "^0.26.8",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
