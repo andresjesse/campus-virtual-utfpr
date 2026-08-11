@@ -1,8 +1,8 @@
 import {
   canAccessAdminCapability,
   getAdminCapabilities,
-} from '@/helpers/authorization/admin-permissions'
-import { createUserRecord } from '../mocks/pocketbase'
+} from '@/helpers/authorization/admin-permissions.ts'
+import { createUserRecord } from '../../mocks/pocketbase.ts'
 
 describe('admin permissions', () => {
   it('limits editors to pages and menu management', () => {
