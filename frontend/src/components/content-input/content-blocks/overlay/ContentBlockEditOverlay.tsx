@@ -13,14 +13,14 @@ import RtfBlockEditor from "@/components/content-input/content-blocks/rtf-block/
 import {CheckIcon} from "@phosphor-icons/react";
 import {useEffect, useRef, useState} from "react";
 import {UTFPR_YELLOW} from "@/theme.ts";
-import classes from "./content-block-edit-modal.module.css";
+import classes from "./content-block-edit-overlay.module.css";
 
 type ContentBlockEditModalProps = {
   blockMetadata: ContentPageBlockMetadata;
   onUpdate: () => void;
 } & ModalProps
 
-export default function ContentBlockEditModal({
+export default function ContentBlockEditOverlay({
   blockMetadata,
   onUpdate,
   opened,
