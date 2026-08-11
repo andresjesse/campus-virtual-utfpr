@@ -11,6 +11,7 @@ import type {
 import {PAGE_BLOCK_COLLECTIONS} from "@/constants/content-constants.ts";
 import {encodeRelation, parseRelation} from "@/helpers/content-pages-service-helper.ts";
 import {ContentPageBlocksEnum, type ContentPageBlockType} from "@/enums/content-pages-enum.ts";
+import sanitizeRichText from "@/helpers/sanitize-rich-text.ts";
 
 // #####################################################################
 // #### == #### == #### COLLECTION NAMES #### == #### == #### == #### ==
@@ -203,12 +204,22 @@ export async function deleteBlockContent(
 export async function upsertBlockContent(
   record: Omit<ContentPageBlockRecord, 'collectionId'>,
 ): Promise<boolean> {
-  if (record.id) {
+  const sanitizedRecord = record.collectionName === ContentPageBlocksEnum.RTF_BLOCK
+    && typeof record.content === "string"
+    ? { ...record, content: sanitizeRichText(record.content) }
+    : record;
+
+  if (sanitizedRecord.id) {
     return await pocketbase
-      .collection(record.collectionName).update(record.id, { ...record }, { requestKey: null });
+      .collection(sanitizedRecord.collectionName).update(
+        sanitizedRecord.id,
+        { ...sanitizedRecord },
+        { requestKey: null },
+      );
   }
-  return await pocketbase
-    .collection(record.collectionName).create({ ...record })
+  return await pocketbase.collection(sanitizedRecord.collectionName).create({
+    ...sanitizedRecord,
+  });
 }
 
 export async function getRtfBlocksMetadata(
