@@ -1,6 +1,8 @@
 import type {ContentPageBlockValue} from "@/types/content-page.ts";
 import FeedbackState from "@/components/feedback-state";
 import {Box, Typography} from "@mantine/core";
+import sanitizeRichText from "@/helpers/sanitize-rich-text.ts";
+import {useMemo} from "react";
 
 type BlockDisplayBodyProps = {
   isLoading: boolean;
@@ -8,6 +10,15 @@ type BlockDisplayBodyProps = {
 }
 
 export default function BlockDisplayBody({ isLoading, content }: BlockDisplayBodyProps) {
+  const richTextContent = typeof content === "string"
+    ? content
+    : "<p>Conteúdo provisório</p>";
+
+  const sanitizedContent = useMemo(
+    () => sanitizeRichText(richTextContent),
+    [richTextContent],
+  );
+
   if (isLoading) {
     return <FeedbackState title="Carregando conteúdo..." />
   }
@@ -17,7 +28,7 @@ export default function BlockDisplayBody({ isLoading, content }: BlockDisplayBod
       <Typography px="md" py="xs">
         <Box
           style={{ wordBreak: "break-all" }}
-          dangerouslySetInnerHTML={{ __html: content ?? '<p>Conteúdo provisório</p>' }}>
+          dangerouslySetInnerHTML={{ __html: sanitizedContent }}>
         </Box>
       </Typography>
     </Box>
