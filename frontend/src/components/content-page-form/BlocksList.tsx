@@ -89,7 +89,6 @@ export default function BlocksList() {
 
     try {
       await deleteBlockContent(id, collectionName as ContentPageBlockType)
-    } finally {
       setBlocksMetadata((currentVal) => {
         return {
         ...currentVal,
@@ -97,6 +96,12 @@ export default function BlocksList() {
             ?.filter((el) => el.id !== id)
         }
       })
+    } catch {
+      notifications.show({
+        color: "red",
+        title: "Não foi possível excluir o bloco.",
+        message: "Tente novamente.",
+      });
     }
   }
 
