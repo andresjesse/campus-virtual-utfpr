@@ -3,6 +3,7 @@ import { upsertBlockContent } from '@/services/content-page-service.ts'
 const mockCreate = jest.fn()
 const mockUpdate = jest.fn()
 const mockCollection = jest.fn((_name: string) => ({
+  _name: _name,
   create: mockCreate,
   update: mockUpdate,
 }))
