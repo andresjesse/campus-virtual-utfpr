@@ -1,4 +1,7 @@
-import {RichTextEditor} from "@mantine/tiptap";
+import {Link, RichTextEditor} from "@mantine/tiptap";
+import Subscript from "@tiptap/extension-subscript";
+import Superscript from "@tiptap/extension-superscript";
+import TextAlign from "@tiptap/extension-text-align";
 import {useEditor} from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import {useEffect} from "react";
@@ -13,6 +16,10 @@ export default function RtfBlockEditor({ content, onChange }: RtfBlockEditorProp
     shouldRerenderOnTransaction: true,
     extensions: [
       StarterKit.configure({ link: false }),
+      Link,
+      Subscript,
+      Superscript,
+      TextAlign.configure({ types: ["heading", "paragraph"] }),
     ],
     editable: true,
     content: content,

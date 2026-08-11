@@ -2121,6 +2121,21 @@
   resolved "https://registry.yarnpkg.com/@tiptap/extension-strike/-/extension-strike-3.29.2.tgz#fe17b6140955e8f45c7ad32c66539891be934441"
   integrity sha512-aEvLAbddUQZ+FukCreV3q4G2HfNI+odE7E9U+wbq6XsSWKyo8/pDu1muz+TFKNre4blSMOQ3JQmw5UeHDKy+fg==
 
+"@tiptap/extension-subscript@3.29.2":
+  version "3.29.2"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-subscript/-/extension-subscript-3.29.2.tgz#c768cbc2c35d0a8b5697489d9d894c753bd73d61"
+  integrity sha512-3fpp1B2kZWBfmVYZ1ak3yFWiKR3eV9GR/vYGPDMrkZoTdG9LKylRAJs3Fk2gDgTtOPmbrtilGQjl2o55RuoGxw==
+
+"@tiptap/extension-superscript@3.29.2":
+  version "3.29.2"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-superscript/-/extension-superscript-3.29.2.tgz#08903fc8d02095c89034a8d1f156ac6a0b11cbb5"
+  integrity sha512-/bPgdY7zUHtvToHizvzR6Yf4uIWO35cKj9EZsl/vyFb2mXyJ3a2mysCZgZq+5uvhZS/16eNNKOcezlkayhhkMA==
+
+"@tiptap/extension-text-align@3.29.2":
+  version "3.29.2"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-text-align/-/extension-text-align-3.29.2.tgz#60ac64334432703caf1bd90fcd3f08a1d6374c2a"
+  integrity sha512-205FF87zjUEh79n6dgVy9SMj1P+rNserHMqPd8lF7YS2TOWikXPG4PFuQHWXXCYzaCvQXAiATSAyPXXmUWUvaQ==
+
 "@tiptap/extension-text@^3.29.2":
   version "3.29.2"
   resolved "https://registry.yarnpkg.com/@tiptap/extension-text/-/extension-text-3.29.2.tgz#7f590043b9044bd7cbc478c65e211bc3f2538335"
