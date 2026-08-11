@@ -1,6 +1,7 @@
 import {RichTextEditor} from "@mantine/tiptap";
 import {useEditor} from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import {useEffect} from "react";
 
 type RtfBlockEditorProps = {
   content?: string,
@@ -20,9 +21,14 @@ export default function RtfBlockEditor({ content, onChange }: RtfBlockEditorProp
     },
   });
 
+  useEffect(() => {
+    if (!editor || editor.getHTML() === content) return;
+
+    editor.commands.setContent(content ?? "", { emitUpdate: false });
+  }, [content, editor]);
+
   return (
-    <section>
-      <RichTextEditor editor={editor}>
+    <RichTextEditor editor={editor}>
         <RichTextEditor.Toolbar sticky stickyOffset="var(--docs-header-height)">
           <RichTextEditor.ControlsGroup>
             <RichTextEditor.Bold />
@@ -69,7 +75,6 @@ export default function RtfBlockEditor({ content, onChange }: RtfBlockEditorProp
         </RichTextEditor.Toolbar>
 
         <RichTextEditor.Content />
-      </RichTextEditor>
-    </section>
+    </RichTextEditor>
   )
 }
