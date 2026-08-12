@@ -1,8 +1,8 @@
 module.exports = {
   clearMocks: true,
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1',
     '\\.module\\.css$': '<rootDir>/tests/style-mock.cjs',
+    '^@/(.*)$': '<rootDir>/src/$1',
   },
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
   testEnvironment: 'jsdom',

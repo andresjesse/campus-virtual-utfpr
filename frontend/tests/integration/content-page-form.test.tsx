@@ -2,7 +2,12 @@ import { MantineProvider } from '@mantine/core'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
-import ContentPageForm from '@/components/content-page-form'
+import ContentPageForm from '@/components/content-page-form/ContentPageForm.tsx'
+
+jest.mock('@/components/content-page-form/BlocksList.tsx', () => ({
+  __esModule: true,
+  default: () => null,
+}))
 
 function renderForm(onChange = jest.fn()) {
   render(
@@ -24,7 +29,7 @@ describe('ContentPageForm', () => {
 
     await user.click(screen.getByLabelText('Título da Página'))
     await user.tab()
-    await user.click(screen.getByRole('textbox', { name: 'Elemento Relacionado' }))
+    await user.click(screen.getByRole('combobox', { name: 'Elemento Relacionado' }))
     await user.tab()
 
     expect(screen.getByLabelText('Título da Página')).toHaveAttribute(
@@ -32,7 +37,7 @@ describe('ContentPageForm', () => {
       'true',
     )
     expect(
-      screen.getByRole('textbox', { name: 'Elemento Relacionado' }),
+      screen.getByRole('combobox', { name: 'Elemento Relacionado' }),
     ).toHaveAttribute('aria-invalid', 'true')
     expect(screen.queryByText('Informe o título')).not.toBeInTheDocument()
     expect(screen.queryByText('Selecione um elemento')).not.toBeInTheDocument()
@@ -45,7 +50,7 @@ describe('ContentPageForm', () => {
 
     await user.type(screen.getByLabelText('Título da Página'), '  Bloco A  ')
     await user.click(
-      screen.getByRole('textbox', { name: 'Elemento Relacionado' }),
+      screen.getByRole('combobox', { name: 'Elemento Relacionado' }),
     )
     await user.keyboard('[ArrowDown][Enter]')
 

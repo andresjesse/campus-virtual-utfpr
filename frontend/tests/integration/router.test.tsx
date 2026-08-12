@@ -7,7 +7,7 @@ import { Router } from '@/router'
 import { createAuthenticationContextValue } from '../mocks/authentication'
 import { createUserRecord } from '../mocks/pocketbase'
 
-jest.mock('@/services/content-pages', () => ({
+jest.mock('@/services/content-page-service.ts', () => ({
   getContentPageErrorMessage: () => 'Request failed',
   listContentPages: jest.fn(async () => []),
 }))

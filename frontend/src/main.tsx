@@ -1,14 +1,15 @@
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
+import '@mantine/tiptap/styles.css';
 
 import { MantineProvider } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
 import ReactDOM from "react-dom/client";
 
-import { AuthenticationProvider } from "@/providers/authentication-provider";
 import { theme } from "@/theme";
 
 import { Router } from "./router";
+import ProvidersGroup from "@/components/ProvidersGroup.tsx";
 
 const root = document.getElementById("root");
 
@@ -19,8 +20,8 @@ if (!root) {
 ReactDOM.createRoot(root).render(
   <MantineProvider defaultColorScheme="dark" theme={theme}>
     <Notifications />
-    <AuthenticationProvider>
+    <ProvidersGroup>
       <Router />
-    </AuthenticationProvider>
+    </ProvidersGroup>
   </MantineProvider>,
 );

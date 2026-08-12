@@ -1,21 +1,22 @@
 import { Button, Group } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { PlusIcon } from "@phosphor-icons/react/dist/csr/Plus";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import { useNavigate } from "react-router";
 
 import FeedbackState from "@/components/feedback-state";
-import DeletePageDialog from "@/components/delete-page-dialog";
 import PageSearch from "@/components/page-search";
-import PageTable from "@/components/page-table";
+import PageTable from "@/components/page-table/PageTable.tsx";
 import {
-  getContentPageErrorMessage,
   deleteContentPage,
   listContentPages,
-} from "@/services/content-pages";
+} from "@/services/content-page-service.ts";
 import type { ContentPageListRecord } from "@/types/content-page";
 
 import classes from "./content-page-list.module.css";
+import {getContentPageErrorMessage} from "@/helpers/content-pages-service-helper.ts";
+import {DialogContext} from "@/contexts/dialog-context.ts";
+
 
 export default function ContentPageList() {
   const navigate = useNavigate();
@@ -24,7 +25,8 @@ export default function ContentPageList() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [deletingPageId, setDeletingPageId] = useState<string | null>(null);
-  const [pageToDelete, setPageToDelete] = useState<ContentPageListRecord | null>(null);
+
+  const dialogBox = useContext(DialogContext)
 
   const loadPages = useCallback(async () => {
     setError("");
@@ -39,10 +41,6 @@ export default function ContentPageList() {
     }
   }, []);
 
-  useEffect(() => {
-    void loadPages();
-  }, [loadPages]);
-
   const filteredPages = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase("pt-BR");
 
@@ -53,7 +51,16 @@ export default function ContentPageList() {
       : pages;
   }, [pages, query]);
 
-  async function handleDelete(page: ContentPageListRecord) {
+  const handleDelete
+    = useCallback(async (page: ContentPageListRecord) => {
+    const confirmDelete = await dialogBox!.confirm({
+      title: "Excluir página",
+      firstMessage: `Deseja realmente excluir permanentemente a página ${page?.title ?? 'Sem Título'}?`,
+      secondMessage: "Todos os blocos relacionados serão automaticamente excluídos.",
+    })
+
+    if (!confirmDelete) return;
+
     setDeletingPageId(page.id);
 
     try {
@@ -74,9 +81,12 @@ export default function ContentPageList() {
       });
     } finally {
       setDeletingPageId(null);
-      setPageToDelete(null);
     }
-  }
+  }, [dialogBox]);
+
+  useEffect(() => {
+    void loadPages();
+  }, [loadPages]);
 
   return (
     <main className={classes.page}>
@@ -122,26 +132,10 @@ export default function ContentPageList() {
           <PageTable
             pages={filteredPages}
             deletingPageId={deletingPageId}
-            onDelete={setPageToDelete}
+            onDelete={(page) => handleDelete(page)}
           />
         )}
       </section>
-
-      <DeletePageDialog
-        opened={Boolean(pageToDelete)}
-        pageTitle={pageToDelete?.title}
-        loading={Boolean(deletingPageId)}
-        onCancel={() => {
-          if (!deletingPageId) {
-            setPageToDelete(null);
-          }
-        }}
-        onConfirm={() => {
-          if (pageToDelete) {
-            void handleDelete(pageToDelete);
-          }
-        }}
-      />
     </main>
   );
 }

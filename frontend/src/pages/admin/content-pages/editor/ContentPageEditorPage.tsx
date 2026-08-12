@@ -4,25 +4,25 @@ import { CaretDoubleLeftIcon } from "@phosphor-icons/react/dist/csr/CaretDoubleL
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 
-import ContentPageForm from "@/components/content-page-form";
-import ElementPalette from "@/components/element-palette";
+import ContentPageForm from "@/components/content-page-form/ContentPageForm.tsx";
+import ElementPalette from "@/components/element-palette/ElementPalette.tsx";
 import FeedbackState from "@/components/feedback-state";
 import { useContentPageAutosave } from "@/hooks/use-content-page-autosave";
 import {
   getContentPageEditorData,
-  getContentPageErrorMessage,
   listRelatedOptions,
-} from "@/services/content-pages";
+} from "@/services/content-page-service.ts";
 import type {
   ContentPageFormValues,
   RelatedOption,
 } from "@/types/content-page";
 
 import classes from "./content-page-editor.module.css";
+import {getContentPageErrorMessage} from "@/helpers/content-pages-service-helper.ts";
 
 const AUTOSAVE_ERROR_NOTIFICATION_ID = "content-page-autosave-error";
 
-export default function ContentPageEditor() {
+export default function ContentPageEditorPage() {
   const { pageId } = useParams();
   const navigate = useNavigate();
   const [relatedOptions, setRelatedOptions] = useState<RelatedOption[]>([]);
@@ -38,6 +38,7 @@ export default function ContentPageEditor() {
   );
 
   const handleAutosaveError = useCallback((message: string) => {
+    // TODO: Move this to a helper.
     const notification = {
       id: AUTOSAVE_ERROR_NOTIFICATION_ID,
       autoClose: 8000,

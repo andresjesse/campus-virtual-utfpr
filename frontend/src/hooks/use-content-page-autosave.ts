@@ -2,10 +2,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
   createContentPage,
-  getContentPageErrorMessage,
   updateContentPage,
-} from "@/services/content-pages";
+} from "@/services/content-page-service.ts";
 import type { ContentPageFormValues } from "@/types/content-page";
+import {getContentPageErrorMessage} from "@/helpers/content-pages-service-helper.ts";
+import {AUTOSAVE_DELAY} from "@/constants/operation-constants.ts";
 
 export type AutosaveStatus = "error" | "saved" | "saving";
 
@@ -14,8 +15,6 @@ type UseContentPageAutosaveOptions = {
   onError: (message: string) => void;
   pageId?: string;
 };
-
-const AUTOSAVE_DELAY = 1200;
 
 export function useContentPageAutosave({
   onCreated,
