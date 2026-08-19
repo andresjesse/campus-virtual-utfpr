@@ -1,7 +1,7 @@
 .palette {
   padding: 0.9rem;
-  color: #f3f3f3;
-  background: var(--admin-sidebar);
+  color: var(--app-text-primary);
+  background: var(--app-surface-sidebar);
 }
 
 @media (max-width: 62rem) {

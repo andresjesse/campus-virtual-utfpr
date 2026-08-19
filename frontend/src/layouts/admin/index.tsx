@@ -7,10 +7,11 @@ import { Outlet } from "react-router";
 import AdminBrand from "@/components/admin-brand";
 import AdminNavigation from "@/components/admin-navigation";
 import AdminUserSummary from "@/components/admin-user-summary";
+import { getStorageKey } from "@/config/branding";
 
 import classes from "./admin-layout.module.css";
 
-const SIDEBAR_STORAGE_KEY = "campus-virtual:admin-sidebar-collapsed";
+const SIDEBAR_STORAGE_KEY = getStorageKey("admin-sidebar-collapsed");
 
 export default function AdminLayout() {
   const [opened, { toggle }] = useDisclosure();

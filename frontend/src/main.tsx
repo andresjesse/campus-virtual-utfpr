@@ -7,11 +7,15 @@ import { Notifications } from "@mantine/notifications";
 import ReactDOM from "react-dom/client";
 
 import { theme } from "@/theme";
+import { applyBranding } from "@/config/apply-branding";
+import { branding } from "@/config/branding";
 
 import { Router } from "./router";
 import ProvidersGroup from "@/components/ProvidersGroup.tsx";
 
 const root = document.getElementById("root");
+
+applyBranding(branding);
 
 if (!root) {
   throw new Error("Root element not found");

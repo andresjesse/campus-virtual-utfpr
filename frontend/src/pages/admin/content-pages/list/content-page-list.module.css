@@ -21,7 +21,7 @@
   flex: 0 0 auto;
   margin-inline-start: auto;
   min-width: 9.25rem;
-  color: var(--admin-yellow);
+  color: var(--app-brand-primary);
   border-width: 2px;
 }
 
@@ -34,7 +34,7 @@
   max-width: none;
   margin-inline: auto;
   padding-top: 1.25rem;
-  border-top: 1px solid #626262;
+  border-top: 1px solid var(--app-border-default);
 }
 
 @media (max-width: 48rem) {

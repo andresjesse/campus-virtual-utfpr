@@ -22,7 +22,7 @@ export default function FeedbackState({
         {!loading && <Title order={4}>{title}</Title>}
         {description && <Text size="sm" c="dimmed">{description}</Text>}
         {actionLabel && onAction && (
-          <Button size="xs" color="yellow" variant="outline" onClick={onAction}>
+          <Button size="xs" color="brand" variant="outline" onClick={onAction}>
             {actionLabel}
           </Button>
         )}
