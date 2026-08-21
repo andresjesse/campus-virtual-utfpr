@@ -16,6 +16,8 @@ import ProvidersGroup from "@/components/ProvidersGroup.tsx";
 
 const root = document.getElementById("root");
 
+document.body.style.background = import.meta.env.VITE_BRAND_LOADING_COLOR;
+
 applyBranding(branding);
 
 if (!root) {
