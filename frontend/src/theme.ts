@@ -1,22 +1,26 @@
 import { ActionIcon, Button, createTheme, Loader } from "@mantine/core";
 
-export const UTFPR_YELLOW = "#fdc003";
+import { branding } from "@/config/branding";
 
 export const theme = createTheme({
+  primaryColor: "brand",
+  colors: {
+    brand: branding.colors.brand.palette,
+  },
   components: {
     ActionIcon: ActionIcon.extend({
       defaultProps: {
-        loaderProps: { color: UTFPR_YELLOW },
+        loaderProps: { color: "brand" },
       },
     }),
     Button: Button.extend({
       defaultProps: {
-        loaderProps: { color: UTFPR_YELLOW },
+        loaderProps: { color: "brand" },
       },
     }),
     Loader: Loader.extend({
       defaultProps: {
-        color: UTFPR_YELLOW,
+        color: "brand",
       },
     }),
   },

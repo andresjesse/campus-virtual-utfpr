@@ -12,6 +12,7 @@ import {
 import { useAuthentication } from "@/hooks/use-authentication";
 
 import classes from "./admin-navigation.module.css";
+import {branding} from "@/config/branding.ts";
 
 type NavigationItem = {
   capability: AdminCapability;
@@ -69,6 +70,8 @@ function AdminNavigationItem({
           <Icon aria-hidden size={15} weight="regular" />
         </span>
       }
+      variant="filled"
+      color={branding.colors.surface.interactive}
       className={`${classes.link} ${collapsed ? classes.collapsed : ""}`}
     />
   );

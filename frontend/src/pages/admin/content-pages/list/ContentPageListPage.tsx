@@ -96,7 +96,7 @@ export default function ContentPageList() {
         </div>
         <Button
           variant="outline"
-          color="yellow"
+          color="brand"
           size="sm"
           leftSection={<PlusIcon aria-hidden size={16} />}
           onClick={() => navigate("/admin/pages/new")}

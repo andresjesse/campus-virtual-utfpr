@@ -1,13 +1,13 @@
 .user {
   width: 100%;
   padding: 0;
-  color: #f3f3f3;
+  color: var(--app-text-primary);
   border-radius: 0.4rem;
   overflow: hidden;
 }
 
 .user:hover {
-  background: #333;
+  background: var(--app-surface-interactive-hover);
 }
 
 .user :global(.mantine-Avatar-root) {

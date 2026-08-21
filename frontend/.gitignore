@@ -26,3 +26,6 @@ playwright-artifacts
 *.njsproj
 *.sln
 *.sw?
+
+# Environment files
+.env

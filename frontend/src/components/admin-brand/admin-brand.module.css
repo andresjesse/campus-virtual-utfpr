@@ -1,5 +1,8 @@
 .brand {
-  color: #a6a7ab;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--app-text-muted);
   font-size: clamp(1.35rem, 1.75vw, 1.8rem);
   font-weight: 700;
   letter-spacing: -0.04em;
@@ -7,6 +10,11 @@
 }
 
 .brand span {
-  color: var(--admin-yellow);
+  color: var(--app-brand-primary);
   font-weight: 800;
+}
+
+.logo {
+  width: 1.75rem;
+  height: 1.75rem;
 }

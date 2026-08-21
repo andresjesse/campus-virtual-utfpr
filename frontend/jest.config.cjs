@@ -2,6 +2,7 @@ module.exports = {
   clearMocks: true,
   moduleNameMapper: {
     '\\.module\\.css$': '<rootDir>/tests/style-mock.cjs',
+    '^@/mocks/(.*)$': '<rootDir>/tests/mocks/$1',
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],

@@ -27,7 +27,7 @@
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  background: var(--admin-surface);
+  background: var(--app-surface-panel);
   border-radius: 1.5rem 1.5rem 0 0;
 }
 

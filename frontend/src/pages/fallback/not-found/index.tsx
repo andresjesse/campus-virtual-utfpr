@@ -11,8 +11,6 @@ import {
 import { ArrowLeftIcon, MapTrifoldIcon} from "@phosphor-icons/react";
 import { Link } from "react-router";
 
-import { UTFPR_YELLOW } from "@/theme";
-
 export default function NotFound() {
   return (
     <Center component="main" mih="100dvh" px="md" py="xl">
@@ -29,7 +27,7 @@ export default function NotFound() {
               size={72}
               radius="xl"
               variant="light"
-              color="yellow"
+              color="brand"
               aria-hidden="true"
             >
               <MapTrifoldIcon size={38} weight="duotone" />
@@ -39,7 +37,7 @@ export default function NotFound() {
               fw={900}
               fz={{ base: 72, sm: 96 }}
               lh={0.8}
-              c={UTFPR_YELLOW}
+              c="var(--app-brand-primary)"
               aria-hidden="true"
             >
               404
@@ -59,7 +57,7 @@ export default function NotFound() {
               component={Link}
               to="/"
               leftSection={<ArrowLeftIcon size={18} />}
-              color="yellow"
+              color="brand"
               variant="outline"
               size="md"
             >

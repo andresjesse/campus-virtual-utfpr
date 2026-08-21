@@ -12,7 +12,6 @@ import FeedbackState from "@/components/feedback-state";
 import RtfBlockEditor from "@/components/content-input/content-blocks/rtf-block/RtfBlockEditor.tsx";
 import {CheckIcon} from "@phosphor-icons/react";
 import {useEffect, useRef, useState} from "react";
-import {UTFPR_YELLOW} from "@/theme.ts";
 import classes from "./content-block-edit-overlay.module.css";
 
 type ContentBlockEditModalProps = {
@@ -86,7 +85,7 @@ export default function ContentBlockEditOverlay({
               <Group justify="flex-end">
                 <Button
                   variant="outline"
-                  color={UTFPR_YELLOW}
+                  color="brand"
                   size="sm"
                   loading={isLoading}
                   leftSection={<CheckIcon aria-hidden size={16} />}

@@ -27,7 +27,8 @@
     /* Path alias */
     "baseUrl": "./",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@/mocks/*": ["tests/mocks/*"]
     }
   },
   "include": ["src"]

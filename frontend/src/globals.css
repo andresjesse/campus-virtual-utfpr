@@ -1,0 +1,21 @@
+:root {
+  --app-brand-primary: initial;
+  --app-brand-primary-hover: initial;
+  --app-brand-on-primary: initial;
+  --app-surface-page: initial;
+  --app-surface-header: initial;
+  --app-surface-sidebar: initial;
+  --app-surface-panel: initial;
+  --app-surface-interactive: initial;
+  --app-surface-interactive-hover: initial;
+  --app-border-default: initial;
+  --app-border-strong: initial;
+  --app-text-primary: initial;
+  --app-text-muted: initial;
+  --app-text-subtle: initial;
+  --app-feedback-success: initial;
+  --app-feedback-warning: initial;
+  --app-feedback-error: initial;
+  --app-feedback-info: initial;
+  --app-login-background: initial;
+}
