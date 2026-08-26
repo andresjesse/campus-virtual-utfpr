@@ -27,7 +27,29 @@ Para testes e controle de qualidade de código:
 - React Testing Library
 - Playwright
 
-## Rodando a aplicação
+## Levantando a aplicação
+
+> [!NOTE]
+> Os comandos utilizados levam em consideração um SO baseado em Linux.
+
+> [!TIP]
+> O processo está explicado com mais detalhes na Wiki, seção "Começando."
+
+### Preenchendo o arquivo `.env`
+
+Uma cópia do arquivo `.env` está localizada dentro do diretório `/frontend`. Para criar uma cópia para o seu projeto, execute (dentro da pasta mencionada e):
+```
+cp .env.example .env
+```
+
+Em seguida, altere os dados conforme necessidade.
+
+### Alterando configurações operacionais e de estilo (opcional)
+
+As configurações operacionais e de estilo da aplicação se encontram em `src/config/branding.ts`. Para alterá-las, basta modificar os dados dentro deste arquivo. Esse arquivo reúne tanto elementos que ditam características visuais (como paletas de cores) como variáveis operacionais, como o _namespace_ do local storage.
+
+## Subindo a aplicação
+
 Para iniciar a aplicação, basta utilizar o `docker compose` para levantar os contêineres:
 
 ````bash
@@ -44,6 +66,7 @@ O painel administrativo do PocketBase:
 
 - [http://localhost:8080/\_/](http://localhost:8080/_/)
 
+### Migrations
 
 As _snapshots_ do banco de dados são aplicados automaticamente assim que o sistema é iniciado.
 Caso isto não ocorra, entre no contêiner do backend, navegue até a pasta `/pb` e execute o 
@@ -80,7 +103,28 @@ For testing and code quality control:
 - React Testing Library
 - Playwright
 
-## Running the Application
+## Setting Up the Application
+
+> [!NOTE]
+> The commands used assume a Linux-based operating system.
+
+> [!TIP]
+> The process is explained in more detail in the Wiki, "Getting Started" section.
+
+### Filling in the `.env` file
+
+A copy of the `.env` file is located inside the `/frontend` directory. To create a copy for your project, run (inside the aforementioned directory):
+```
+cp .env.example .env
+```
+
+Then, change the data as needed.
+
+### Changing operational and style settings (optional)
+
+The application's operational and style settings are located in `src/config/branding.ts`. To change them, simply modify the data inside this file. This file brings together both elements that dictate visual characteristics (such as color palettes) and operational variables, such as the local storage namespace.
+
+## Starting the Application
 To spin up the application, simply use `docker compose` to launch the containers:
 
 ```bash
@@ -94,6 +138,8 @@ The application:
 
 The PocketBase Admin Dashboard:
 - [http://localhost:8080/_/](http://localhost:8080/_/)
+
+### Migrations
 
 Database snapshots are automatically applied when the system starts. If they fail to run, log into the backend container, navigate to the `/pb` directory, and execute the following command:
 
