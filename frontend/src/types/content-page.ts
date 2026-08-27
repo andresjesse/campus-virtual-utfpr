@@ -16,6 +16,7 @@ export type ContentPageBlockMetadata = {
   page?: string;
 }
 
+// TODO: Align this with the single source or truth on content-constants
 export type GroupedContentPageBlockMetadata = {
   rtf_block?: ContentPageBlockMetadata[];
   diagram_block?: ContentPageBlockMetadata[];
