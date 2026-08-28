@@ -15,7 +15,7 @@ jest.mock('@/services/content-page-service.ts', () => ({
 }))
 
 jest.mock(
-  '@/components/content-input/content-blocks/rtf-block/RtfBlockEditor.tsx',
+  '@/components/content-input/content-blocks/overlay/rtf-block/RtfBlockEditor.tsx',
   () => ({
     __esModule: true,
     default: ({

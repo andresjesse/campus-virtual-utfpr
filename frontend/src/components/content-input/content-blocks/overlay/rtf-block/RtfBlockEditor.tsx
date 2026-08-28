@@ -5,13 +5,9 @@ import TextAlign from "@tiptap/extension-text-align";
 import {useEditor} from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import {useEffect} from "react";
+import type {BlockEditorProps} from "@/components/content-input/content-blocks/overlay/registry.ts";
 
-type RtfBlockEditorProps = {
-  content?: string,
-  onChange: (value: string) => void,
-}
-
-export default function RtfBlockEditor({ content, onChange }: RtfBlockEditorProps) {
+export default function RtfBlockEditor({ content, onChange }: BlockEditorProps) {
   const editor = useEditor({
     shouldRerenderOnTransaction: true,
     extensions: [

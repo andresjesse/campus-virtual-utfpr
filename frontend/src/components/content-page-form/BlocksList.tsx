@@ -15,6 +15,7 @@ import {DialogContext} from "@/contexts/dialog-context.ts";
 import {deleteBlockContent} from "@/services/content-page-service.ts";
 import ContentBlockEditOverlay from "@/components/content-input/content-blocks/overlay/ContentBlockEditOverlay.tsx";
 import {notifications} from "@mantine/notifications";
+import {PAGE_BLOCK_COLLECTIONS} from "@/constants/content-constants.ts";
 
 export default function BlocksList() {
   const { pageId } = useParams();
@@ -50,16 +51,6 @@ export default function BlocksList() {
   }, [fetchBlocksMetadata]);
 
   function onDropNewBlock(blockType: string) {
-    // const typedBlockType = blockType as ContentPageBlockType;
-    // const newBlock =
-    // const newBlocks: GroupedContentPageBlockMetadata = {
-    //   ...blocksMetadata,
-    //   [typedBlockType]: [
-    //     ...(blocksMetadata?.[typedBlockType] ?? []),
-    //     newBlock
-    //   ]
-    // }
-    // setBlocksMetadata(newBlocks);
     selectedContentBlock.current = {
       title: "Título provisório",
       collectionName: blockType as ContentPageBlockType,
@@ -144,17 +135,19 @@ export default function BlocksList() {
     >
       <DroppableContainer handleDrop={onDropNewBlock} >
         <Box className={classes.blocksList} pt="lg" ml="lg" mr="lg">
-          { blocksMetadata?.rtf_block?.map((metadata) => (
-            <BlockDisplay
-              key={metadata.id}
-              metadata={metadata}
-              onDelete={() => handleDelete(metadata.id!, metadata.title, metadata.collectionName)}
-              onEdit={(
-                blockId: string,
-                collectionName: ContentPageBlockType
-              ) => openModal(blockId, collectionName)}
-            />
-          )) }
+          { PAGE_BLOCK_COLLECTIONS.flatMap((collectionName) => (
+              blocksMetadata?.[collectionName] ?? []).map((metadata) => (
+              <BlockDisplay
+                key={metadata.id}
+                metadata={metadata}
+                onDelete={() => handleDelete(metadata.id!, metadata.title, metadata.collectionName)}
+                onEdit={(
+                  blockId: string,
+                  collectionName: ContentPageBlockType
+                ) => openModal(blockId, collectionName)}
+              />
+            ))
+          )}
         </Box>
       </DroppableContainer>
 

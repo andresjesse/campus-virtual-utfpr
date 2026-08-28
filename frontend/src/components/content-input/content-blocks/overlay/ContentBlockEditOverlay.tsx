@@ -9,10 +9,11 @@ import {
 import type {ContentPageBlockMetadata, ContentPageBlockValue} from "@/types/content-page.ts";
 import useContentBlockData from "@/hooks/content-blocks/useContentBlockData.tsx";
 import FeedbackState from "@/components/feedback-state";
-import RtfBlockEditor from "@/components/content-input/content-blocks/rtf-block/RtfBlockEditor.tsx";
 import {CheckIcon} from "@phosphor-icons/react";
 import {useEffect, useRef, useState} from "react";
 import classes from "./content-block-edit-overlay.module.css";
+import {CONTENT_BLOCK_EDITOR_OVERLAY_BODY} from "@/components/content-input/content-blocks/overlay/registry.ts";
+import type {ContentPageBlockType} from "@/enums/content-pages-enum.ts";
 
 type ContentBlockEditModalProps = {
   blockMetadata: ContentPageBlockMetadata;
@@ -31,6 +32,9 @@ export default function ContentBlockEditOverlay({
   const [draftMetadata, setDraftMetadata] = useState(blockMetadata);
   const { blockData, isLoading, upsertBlockContent } = useContentBlockData(draftMetadata);
   const content = useRef<ContentPageBlockValue>(blockData);
+
+  const EditorBody
+    = CONTENT_BLOCK_EDITOR_OVERLAY_BODY[blockMetadata.collectionName as ContentPageBlockType];
 
   useEffect(() => {
     content.current = blockData;
@@ -63,6 +67,7 @@ export default function ContentBlockEditOverlay({
             <FeedbackState title="Carregando conteúdo..." loading />
           ) : (
             <Stack gap="lg">
+              {/* TODO: Use the same component as the page metadata title*/}
               <TextInput
                 label="Título"
                 placeholder="Digite um título"
@@ -76,8 +81,8 @@ export default function ContentBlockEditOverlay({
                   input: classes.titleInput,
                 }}
               />
-              {/* Fixed as RTF for now. */}
-              <RtfBlockEditor
+
+              <EditorBody
                 content={blockData as string}
                 onChange={(value) => content.current = value}
               />
