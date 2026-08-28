@@ -3,7 +3,6 @@ import {
   Group,
   Modal,
   Stack,
-  TextInput,
   type ModalProps,
 } from "@mantine/core";
 import type {ContentPageBlockMetadata, ContentPageBlockValue} from "@/types/content-page.ts";
@@ -11,7 +10,7 @@ import useContentBlockData from "@/hooks/content-blocks/useContentBlockData.tsx"
 import FeedbackState from "@/components/feedback-state";
 import {CheckIcon} from "@phosphor-icons/react";
 import {useEffect, useRef, useState} from "react";
-import classes from "./content-block-edit-overlay.module.css";
+import TitleInput from "@/components/text-input/TitleInput.tsx";
 import {CONTENT_BLOCK_EDITOR_OVERLAY_BODY} from "@/components/content-input/content-blocks/overlay/registry.ts";
 import type {ContentPageBlockType} from "@/enums/content-pages-enum.ts";
 
@@ -67,8 +66,7 @@ export default function ContentBlockEditOverlay({
             <FeedbackState title="Carregando conteúdo..." loading />
           ) : (
             <Stack gap="lg">
-              {/* TODO: Use the same component as the page metadata title*/}
-              <TextInput
+              <TitleInput
                 label="Título"
                 placeholder="Digite um título"
                 value={draftMetadata.title}
@@ -77,9 +75,6 @@ export default function ContentBlockEditOverlay({
                   setDraftMetadata((current) => ({ ...current, title }));
                 }}
                 disabled={isLoading}
-                classNames={{
-                  input: classes.titleInput,
-                }}
               />
 
               <EditorBody
