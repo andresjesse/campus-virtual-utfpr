@@ -2,10 +2,15 @@ import { Flex, Image } from "@mantine/core";
 import {branding} from "@/config/branding.ts";
 
 type FilesPreviewProps = {
-  content: string[];
+  content?: string | string[];
 }
 
 export default function FilesPreviewSection({ content }: FilesPreviewProps) {
+  const displayableContent = Array.isArray(content) ? content : [content];
+
+  const filteredContent = displayableContent
+    .filter((fileUrl): fileUrl is string => !!fileUrl && fileUrl.trim().length > 0);
+
   return (
     <section>
       <Flex
@@ -15,7 +20,7 @@ export default function FilesPreviewSection({ content }: FilesPreviewProps) {
         wrap="wrap"
         gap={16}
       >
-        { content.map((fileUrl) => (
+        {filteredContent.map((fileUrl) => (
           <Image
             src={fileUrl}
             key={fileUrl}

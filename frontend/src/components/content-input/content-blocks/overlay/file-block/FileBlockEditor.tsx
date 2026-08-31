@@ -8,7 +8,7 @@ export default function FileBlockEditor({ content, onChange }: BlockEditorProps)
     <section>
       <DropzoneSection />
       <Space h="lg" />
-      <FilesPreviewSection content={content as string[]} />
+      <FilesPreviewSection content={content} />
     </section>
   );
 }
