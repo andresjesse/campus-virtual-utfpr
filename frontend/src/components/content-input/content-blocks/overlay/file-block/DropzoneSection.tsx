@@ -7,7 +7,7 @@ import type {DragEvent} from "react";
 import {FILE_BLOCK_MAX_SIZE_IN_BYTES, FILE_BLOCK_MIME_TYPES} from "@/constants/content-constants.ts";
 import {branding} from "@/config/branding.ts";
 
-type DropzonesSectionProps = {}
+type DropzoneSectionProps = {}
 
 type DragStatus = 'none' | 'accept' | 'reject';
 
@@ -23,7 +23,7 @@ const getDragStatus = (event: DragEvent<HTMLElement>): DragStatus => {
   return 'accept';
 };
 
-export default function DropzoneSection({}: DropzonesSectionProps) {
+export default function DropzoneSection({}: DropzoneSectionProps) {
   const {hovered, ref} = useHover<HTMLDivElement>();
   const [dragActive, setDragActive] = useState(false);
   const [dragStatus, setDragStatus] = useState<DragStatus>('none');
