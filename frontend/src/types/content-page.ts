@@ -5,7 +5,7 @@ export type ContentPageFormValues = {
   title: string;
 };
 
-export type ContentPageBlockValue = string | string[];
+export type ContentPageBlockValue = string | string[] | File[];
 
 export type ContentPageBlockMetadata = {
   id?: string;
@@ -29,7 +29,7 @@ export type EntityRecord = RecordModel & {
 export type ContentPageBlockRecord = RecordModel & {
   id?: string;
   title?: string;
-  content?: string | string[];
+  content?: ContentPageBlockValue;
   created?: string;
   updated?: string;
   page?: string;

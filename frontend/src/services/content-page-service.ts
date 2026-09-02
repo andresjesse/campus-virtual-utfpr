@@ -204,24 +204,42 @@ export async function deleteBlockContent(
 }
 
 export async function upsertBlockContent(
-  record: Omit<ContentPageBlockRecord, 'collectionId'>,
-): Promise<boolean> {
-  const sanitizedRecord = record.collectionName === ContentPageBlocksEnum.RTF_BLOCK
-    && typeof record.content === "string"
-    ? { ...record, content: sanitizeRichText(record.content) }
-    : record;
+  record: Omit<ContentPageBlockRecord, 'collectionId'>
+): Promise<boolean>  {
+  const recordToSave = prepareRecordToSave(record);
 
-  if (sanitizedRecord.id) {
+  if (record.id) {
     return await pocketbase
-      .collection(sanitizedRecord.collectionName).update(
-        sanitizedRecord.id,
-        { ...sanitizedRecord },
+      .collection(record.collectionName).update(
+        record.id,
+        { ...recordToSave },
         { requestKey: null },
       );
   }
-  return await pocketbase.collection(sanitizedRecord.collectionName).create({
-    ...sanitizedRecord,
+  return await pocketbase.collection(record.collectionName).create({
+    ...recordToSave,
   });
+}
+
+function prepareRecordToSave(record: Omit<ContentPageBlockRecord, 'collectionId'>) {
+  if (record.collectionName === ContentPageBlocksEnum.RTF_BLOCK && typeof record.content === "string") {
+    return { ...record, content: sanitizeRichText(record.content) };
+  }
+
+  if (record.collectionName === ContentPageBlocksEnum.FILE_BLOCK) {
+    const files = Array.isArray(record.content)
+      ? record.content.filter((item): item is File => item instanceof File)
+      : [];
+    const baseRecord = { title: record.title, page: record.page };
+
+    if (record.id) {
+      return files.length > 0 ? { ...baseRecord, 'content+': files } : baseRecord;
+    }
+
+    return { ...baseRecord, content: files };
+  }
+
+  return record;
 }
 
 export async function getRtfBlocksMetadata(
