@@ -7,7 +7,9 @@ import type {DragEvent} from "react";
 import {FILE_BLOCK_MAX_SIZE_IN_BYTES, FILE_BLOCK_MIME_TYPES} from "@/constants/content-constants.ts";
 import {branding} from "@/config/branding.ts";
 
-type DropzoneSectionProps = {}
+type DropzoneSectionProps = {
+  onDrop: (files: File[]) => void;
+}
 
 type DragStatus = 'none' | 'accept' | 'reject';
 
@@ -23,7 +25,7 @@ const getDragStatus = (event: DragEvent<HTMLElement>): DragStatus => {
   return 'accept';
 };
 
-export default function DropzoneSection({}: DropzoneSectionProps) {
+export default function DropzoneSection({ onDrop }: DropzoneSectionProps) {
   const {hovered, ref} = useHover<HTMLDivElement>();
   const [dragActive, setDragActive] = useState(false);
   const [dragStatus, setDragStatus] = useState<DragStatus>('none');
@@ -47,11 +49,16 @@ export default function DropzoneSection({}: DropzoneSectionProps) {
     }
   };
 
-  const handleDrop = () => {
+  const resetDropState = () => {
     dragDepth.current = 0;
     setDragActive(false);
     setDragStatus('none');
   };
+
+  const handleAcceptedDrop = (files: File[]) => {
+    resetDropState()
+    onDrop(files);
+  }
 
   const isHighlighted = hovered || dragActive;
   const showUpload = isHighlighted && dragStatus !== 'reject';
@@ -62,11 +69,11 @@ export default function DropzoneSection({}: DropzoneSectionProps) {
     <Dropzone
       ref={ref}
       onDrop={(files) => {
-        handleDrop();
+        handleAcceptedDrop(files);
         console.log('accepted files', files);
       }}
       onReject={(files) => {
-        handleDrop();
+        resetDropState();
         console.log('rejected files', files);
       }}
       onDragEnter={handleDragEnter}
