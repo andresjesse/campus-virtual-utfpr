@@ -18,6 +18,7 @@ import {
   getEmptyContentNotification,
   isBlockContentEmpty,
 } from "@/helpers/content-block-validation.ts";
+import messages from "@/constants/messages.json";
 
 type ContentBlockEditModalProps = {
   blockMetadata: ContentPageBlockMetadata;
@@ -34,6 +35,7 @@ export default function ContentBlockEditOverlay({
   ...props
 }: ContentBlockEditModalProps) {
   const [draftMetadata, setDraftMetadata] = useState(blockMetadata);
+  const [isSaving, setIsSaving] = useState(false);
   const { blockData, isLoading, upsertBlockContent } = useContentBlockData(draftMetadata);
   const content = useRef<ContentPageBlockValue>(blockData);
 
@@ -55,6 +57,7 @@ export default function ContentBlockEditOverlay({
       return;
     }
 
+    setIsSaving(true);
     try {
       await upsertBlockContent(content.current);
       onUpdate();
@@ -70,6 +73,9 @@ export default function ContentBlockEditOverlay({
         title: "Falha ao atualizar o conteúdo",
         message: "Não foi possível atualizar o conteúdo. Os dados permanecem os mesmos."
       })
+    }
+    finally {
+      setIsSaving(false);
     }
   };
 
@@ -110,21 +116,32 @@ export default function ContentBlockEditOverlay({
                 content={blockData}
                 onChange={(value) => content.current = value}
               />
-
-              <Group justify="flex-end">
-                <Button
-                  variant="outline"
-                  color="brand"
-                  size="sm"
-                  loading={isLoading}
-                  leftSection={<CheckIcon aria-hidden size={16} />}
-                  onClick={() => void handleUpdate()}
-                >
-                  Salvar
-                </Button>
-              </Group>
             </Stack>
           )}
+
+          <Group
+            justify="flex-end"
+            mt="lg"
+            style={{
+              position: 'sticky',
+              bottom: 0,
+              zIndex: 1,
+              paddingTop: 8,
+              paddingBottom: 8,
+              backgroundColor: 'var(--mantine-color-body)',
+            }}
+          >
+            <Button
+              variant="outline"
+              color="brand"
+              size="sm"
+              loading={isSaving}
+              leftSection={<CheckIcon aria-hidden size={16} />}
+              onClick={() => void handleUpdate()}
+            >
+              {messages.block.editor.save}
+            </Button>
+          </Group>
         </Modal.Body>
       </Modal.Content>
     </Modal.Root>

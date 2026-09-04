@@ -97,6 +97,10 @@ describe('ContentBlockEditOverlay', () => {
     expect(screen.getByLabelText('Carregando conteúdo...')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: '' })).not.toBeInTheDocument()
 
+    const saveButton = screen.getByRole('button', { name: 'Salvar' })
+    expect(saveButton).toBeInTheDocument()
+    expect(saveButton).toBeEnabled()
+
     await user.keyboard('{Escape}')
     expect(onClose).not.toHaveBeenCalled()
 

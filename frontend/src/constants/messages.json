@@ -1,5 +1,8 @@
 {
   "block": {
+    "editor": {
+      "save": "Salvar"
+    },
     "empty": {
       "title": "Bloco sem conteúdo",
       "create": "É preciso adicionar conteúdo para criar um bloco.",
