@@ -58,17 +58,25 @@ function deferred<T>() {
   return { promise, resolve, reject }
 }
 
+const newBlockMetadata: ContentPageBlockMetadata = {
+  title: '',
+  collectionName: 'rtf_block',
+  page: 'page-id',
+}
+
 function renderOverlay({
   onClose = jest.fn(),
   onUpdate = jest.fn(),
+  blockMetadata: metadataOverride = metadata,
 }: {
   onClose?: jest.Mock
   onUpdate?: jest.Mock
+  blockMetadata?: ContentPageBlockMetadata
 } = {}) {
   render(
     <MantineProvider>
       <ContentBlockEditOverlay
-        blockMetadata={metadata}
+        blockMetadata={metadataOverride}
         opened
         onClose={onClose}
         onUpdate={onUpdate}
@@ -177,6 +185,52 @@ describe('ContentBlockEditOverlay', () => {
     expect(screen.getByLabelText('Conteúdo')).toHaveValue(
       '<p>Existing content</p>',
     )
+    expect(onUpdate).not.toHaveBeenCalled()
+
+    notificationsShowMock.mockRestore()
+  })
+
+  it('blocks saving a new block without content and shows a friendly notification', async () => {
+    const user = userEvent.setup()
+    const notificationsShowMock = jest
+      .spyOn(notifications, 'show')
+      .mockImplementation()
+    const { onUpdate } = renderOverlay({ blockMetadata: newBlockMetadata })
+
+    await user.click(screen.getByRole('button', { name: 'Salvar' }))
+
+    await waitFor(() => {
+      expect(notificationsShowMock).toHaveBeenCalledWith({
+        color: 'yellow',
+        title: 'Bloco sem conteúdo',
+        message: 'É preciso adicionar conteúdo para criar um bloco.',
+      })
+    })
+    expect(upsertBlockContentApiMock).not.toHaveBeenCalled()
+    expect(onUpdate).not.toHaveBeenCalled()
+    expect(screen.getByLabelText('Conteúdo')).toBeInTheDocument()
+
+    notificationsShowMock.mockRestore()
+  })
+
+  it('blocks saving an existing block emptied of content', async () => {
+    const user = userEvent.setup()
+    const notificationsShowMock = jest
+      .spyOn(notifications, 'show')
+      .mockImplementation()
+    getBlockContentMock.mockResolvedValue('')
+    const { onUpdate } = renderOverlay()
+
+    await user.click(await screen.findByRole('button', { name: 'Salvar' }))
+
+    await waitFor(() => {
+      expect(notificationsShowMock).toHaveBeenCalledWith({
+        color: 'yellow',
+        title: 'Bloco sem conteúdo',
+        message: 'O bloco de texto não pode ficar vazio.',
+      })
+    })
+    expect(upsertBlockContentApiMock).not.toHaveBeenCalled()
     expect(onUpdate).not.toHaveBeenCalled()
 
     notificationsShowMock.mockRestore()

@@ -14,6 +14,10 @@ import TitleInput from "@/components/text-input/TitleInput.tsx";
 import {CONTENT_BLOCK_EDITOR_OVERLAY_BODY} from "@/components/content-input/content-blocks/overlay/registry.ts";
 import {type ContentPageBlockType} from "@/enums/content-pages-enum.ts";
 import {notifications} from "@mantine/notifications";
+import {
+  getEmptyContentNotification,
+  isBlockContentEmpty,
+} from "@/helpers/content-block-validation.ts";
 
 type ContentBlockEditModalProps = {
   blockMetadata: ContentPageBlockMetadata;
@@ -41,6 +45,16 @@ export default function ContentBlockEditOverlay({
   }, [blockData, blockMetadata.collectionName]);
 
   const handleUpdate = async () => {
+    const isNewBlock = !draftMetadata.id;
+    if (isBlockContentEmpty(blockMetadata.collectionName, content.current)) {
+      const { title, message } = getEmptyContentNotification(
+        blockMetadata.collectionName,
+        isNewBlock,
+      );
+      notifications.show({ color: "yellow", title, message });
+      return;
+    }
+
     try {
       await upsertBlockContent(content.current);
       onUpdate();
