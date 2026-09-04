@@ -31,25 +31,129 @@ describe('upsertBlockContent', () => {
     expect(mockUpdate).not.toHaveBeenCalled()
   })
 
-  it('updates a block with an id in the selected collection', async () => {
-    mockUpdate.mockResolvedValue(true)
-    const block = {
-      id: 'block-id',
-      title: 'Existing file block',
+  it('creates a file block uploading all dropped files', async () => {
+    mockCreate.mockResolvedValue(true)
+    const files = [new File(['a'], 'a.png'), new File(['b'], 'b.jpg')]
+
+    await upsertBlockContent({
+      title: 'New files',
       collectionName: 'file_block',
       page: 'page-id',
-      content: ['file-id'],
-    }
+      content: { newFiles: files, deletedUrls: [] },
+    })
 
-    await expect(upsertBlockContent(block)).resolves.toBe(true)
+    expect(mockCollection).toHaveBeenCalledWith('file_block')
+    expect(mockCreate).toHaveBeenCalledWith({
+      title: 'New files',
+      page: 'page-id',
+      content: files,
+    })
+    expect(mockUpdate).not.toHaveBeenCalled()
+  })
+
+  it('appends the dropped files to an existing file block keeping the previous ones', async () => {
+    mockUpdate.mockResolvedValue(true)
+    const files = [new File(['c'], 'c.png')]
+
+    await upsertBlockContent({
+      id: 'block-id',
+      title: 'Existing files',
+      collectionName: 'file_block',
+      page: 'page-id',
+      content: { newFiles: files, deletedUrls: [] },
+    })
 
     expect(mockCollection).toHaveBeenCalledWith('file_block')
     expect(mockUpdate).toHaveBeenCalledWith(
       'block-id',
-      block,
+      {
+        title: 'Existing files',
+        page: 'page-id',
+        'content+': files,
+      },
       { requestKey: null },
     )
     expect(mockCreate).not.toHaveBeenCalled()
+  })
+
+  it('deletes the marked existing files on save', async () => {
+    mockUpdate.mockResolvedValue(true)
+
+    await upsertBlockContent({
+      id: 'block-id',
+      title: 'Deleting',
+      collectionName: 'file_block',
+      page: 'page-id',
+      content: {
+        newFiles: [],
+        deletedUrls: [
+          'http://localhost/api/files/c/r/existing.png',
+          'http://localhost/api/files/c/r/second.jpg',
+        ],
+      },
+    })
+
+    expect(mockUpdate).toHaveBeenCalledWith(
+      'block-id',
+      {
+        title: 'Deleting',
+        page: 'page-id',
+        'content-': ['existing.png', 'second.jpg'],
+      },
+      { requestKey: null },
+    )
+  })
+
+  it('appends new files and deletes the marked ones in the same save', async () => {
+    mockUpdate.mockResolvedValue(true)
+    const files = [new File(['d'], 'd.png')]
+
+    await upsertBlockContent({
+      id: 'block-id',
+      title: 'Both',
+      collectionName: 'file_block',
+      page: 'page-id',
+      content: {
+        newFiles: files,
+        deletedUrls: ['http://localhost/api/files/c/r/existing.png'],
+      },
+    })
+
+    expect(mockUpdate).toHaveBeenCalledWith(
+      'block-id',
+      {
+        title: 'Both',
+        page: 'page-id',
+        'content+': files,
+        'content-': ['existing.png'],
+      },
+      { requestKey: null },
+    )
+  })
+
+  it('keeps the existing files when saving a file block without changes', async () => {
+    mockUpdate.mockResolvedValue(true)
+
+    await upsertBlockContent({
+      id: 'block-id',
+      title: 'Renamed',
+      collectionName: 'file_block',
+      page: 'page-id',
+      content: {
+        newFiles: [],
+        deletedUrls: [],
+        urls: ['http://localhost/api/files/c/r/existing.png'],
+      },
+    })
+
+    expect(mockUpdate).toHaveBeenCalledWith(
+      'block-id',
+      {
+        title: 'Renamed',
+        page: 'page-id',
+      },
+      { requestKey: null },
+    )
   })
 
   it('sanitizes rich-text HTML before creating the block', async () => {

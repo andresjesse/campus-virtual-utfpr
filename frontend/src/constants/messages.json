@@ -1,0 +1,25 @@
+{
+  "block": {
+    "editor": {
+      "save": "Salvar"
+    },
+    "empty": {
+      "title": "Bloco sem conteúdo",
+      "create": "É preciso adicionar conteúdo para criar um bloco.",
+      "update": "O bloco de texto não pode ficar vazio."
+    },
+    "file": {
+      "empty": {
+        "title": "Bloco sem arquivos",
+        "create": "É preciso adicionar pelo menos um arquivo para criar um bloco.",
+        "update": "O bloco precisa ter pelo menos um arquivo."
+      }
+    }
+  },
+  "files": {
+    "preview": {
+      "showMore": "Ver mais",
+      "showLess": "Ver menos"
+    }
+  }
+}

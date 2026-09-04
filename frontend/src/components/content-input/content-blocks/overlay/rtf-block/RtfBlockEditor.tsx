@@ -5,13 +5,11 @@ import TextAlign from "@tiptap/extension-text-align";
 import {useEditor} from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import {useEffect} from "react";
+import type {BlockEditorProps} from "@/components/content-input/content-blocks/overlay/registry.ts";
 
-type RtfBlockEditorProps = {
-  content?: string,
-  onChange: (value: string) => void,
-}
+export default function RtfBlockEditor({ content, onChange }: BlockEditorProps) {
+  const htmlContent = typeof content === "string" ? content : "";
 
-export default function RtfBlockEditor({ content, onChange }: RtfBlockEditorProps) {
   const editor = useEditor({
     shouldRerenderOnTransaction: true,
     extensions: [
@@ -22,17 +20,17 @@ export default function RtfBlockEditor({ content, onChange }: RtfBlockEditorProp
       TextAlign.configure({ types: ["heading", "paragraph"] }),
     ],
     editable: true,
-    content: content,
+    content: htmlContent,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
   });
 
   useEffect(() => {
-    if (!editor || editor.getHTML() === content) return;
+    if (!editor || editor.getHTML() === htmlContent) return;
 
-    editor.commands.setContent(content ?? "", { emitUpdate: false });
-  }, [content, editor]);
+    editor.commands.setContent(htmlContent, { emitUpdate: false });
+  }, [htmlContent, editor]);
 
   return (
     <RichTextEditor editor={editor}>

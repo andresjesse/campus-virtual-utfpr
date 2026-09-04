@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import ContentBlockEditOverlay from '@/components/content-input/content-blocks/overlay/ContentBlockEditOverlay.tsx'
+import { notifications } from '@mantine/notifications'
 import {
   getBlockContent,
   upsertBlockContent as upsertBlockContentApi,
@@ -15,7 +16,7 @@ jest.mock('@/services/content-page-service.ts', () => ({
 }))
 
 jest.mock(
-  '@/components/content-input/content-blocks/rtf-block/RtfBlockEditor.tsx',
+  '@/components/content-input/content-blocks/overlay/rtf-block/RtfBlockEditor.tsx',
   () => ({
     __esModule: true,
     default: ({
@@ -57,17 +58,25 @@ function deferred<T>() {
   return { promise, resolve, reject }
 }
 
+const newBlockMetadata: ContentPageBlockMetadata = {
+  title: '',
+  collectionName: 'rtf_block',
+  page: 'page-id',
+}
+
 function renderOverlay({
   onClose = jest.fn(),
   onUpdate = jest.fn(),
+  blockMetadata: metadataOverride = metadata,
 }: {
   onClose?: jest.Mock
   onUpdate?: jest.Mock
+  blockMetadata?: ContentPageBlockMetadata
 } = {}) {
   render(
     <MantineProvider>
       <ContentBlockEditOverlay
-        blockMetadata={metadata}
+        blockMetadata={metadataOverride}
         opened
         onClose={onClose}
         onUpdate={onUpdate}
@@ -87,6 +96,10 @@ describe('ContentBlockEditOverlay', () => {
 
     expect(screen.getByLabelText('Carregando conteúdo...')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: '' })).not.toBeInTheDocument()
+
+    const saveButton = screen.getByRole('button', { name: 'Salvar' })
+    expect(saveButton).toBeInTheDocument()
+    expect(saveButton).toBeEnabled()
 
     await user.keyboard('{Escape}')
     expect(onClose).not.toHaveBeenCalled()
@@ -154,24 +167,76 @@ describe('ContentBlockEditOverlay', () => {
     expect(onUpdate).toHaveBeenCalledTimes(1)
   })
 
-  it('recovers the controls after a failed save', async () => {
+  it('recovers the controls and keeps the overlay open after a failed save', async () => {
     const user = userEvent.setup()
-    const error = new Error('Save failed')
-    const consoleError = jest.spyOn(console, 'error').mockImplementation()
+    const notificationsShowMock = jest
+      .spyOn(notifications, 'show')
+      .mockImplementation()
     getBlockContentMock.mockResolvedValue('<p>Existing content</p>')
-    upsertBlockContentApiMock.mockRejectedValue(error)
+    upsertBlockContentApiMock.mockRejectedValue(new Error('Save failed'))
     const { onUpdate } = renderOverlay()
 
     const saveButton = await screen.findByRole('button', { name: 'Salvar' })
     await user.click(saveButton)
 
     await waitFor(() => expect(saveButton).toBeEnabled())
-    expect(consoleError).toHaveBeenCalledWith(error)
+    expect(notificationsShowMock).toHaveBeenCalledWith({
+      color: 'red',
+      title: 'Falha ao atualizar o conteúdo',
+      message:
+        'Não foi possível atualizar o conteúdo. Os dados permanecem os mesmos.',
+    })
     expect(screen.getByLabelText('Conteúdo')).toHaveValue(
       '<p>Existing content</p>',
     )
-    expect(onUpdate).toHaveBeenCalledTimes(1)
+    expect(onUpdate).not.toHaveBeenCalled()
 
-    consoleError.mockRestore()
+    notificationsShowMock.mockRestore()
+  })
+
+  it('blocks saving a new block without content and shows a friendly notification', async () => {
+    const user = userEvent.setup()
+    const notificationsShowMock = jest
+      .spyOn(notifications, 'show')
+      .mockImplementation()
+    const { onUpdate } = renderOverlay({ blockMetadata: newBlockMetadata })
+
+    await user.click(screen.getByRole('button', { name: 'Salvar' }))
+
+    await waitFor(() => {
+      expect(notificationsShowMock).toHaveBeenCalledWith({
+        color: 'yellow',
+        title: 'Bloco sem conteúdo',
+        message: 'É preciso adicionar conteúdo para criar um bloco.',
+      })
+    })
+    expect(upsertBlockContentApiMock).not.toHaveBeenCalled()
+    expect(onUpdate).not.toHaveBeenCalled()
+    expect(screen.getByLabelText('Conteúdo')).toBeInTheDocument()
+
+    notificationsShowMock.mockRestore()
+  })
+
+  it('blocks saving an existing block emptied of content', async () => {
+    const user = userEvent.setup()
+    const notificationsShowMock = jest
+      .spyOn(notifications, 'show')
+      .mockImplementation()
+    getBlockContentMock.mockResolvedValue('')
+    const { onUpdate } = renderOverlay()
+
+    await user.click(await screen.findByRole('button', { name: 'Salvar' }))
+
+    await waitFor(() => {
+      expect(notificationsShowMock).toHaveBeenCalledWith({
+        color: 'yellow',
+        title: 'Bloco sem conteúdo',
+        message: 'O bloco de texto não pode ficar vazio.',
+      })
+    })
+    expect(upsertBlockContentApiMock).not.toHaveBeenCalled()
+    expect(onUpdate).not.toHaveBeenCalled()
+
+    notificationsShowMock.mockRestore()
   })
 })

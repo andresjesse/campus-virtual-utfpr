@@ -9,9 +9,10 @@ import type {
   RelatedOption,
 } from "@/types/content-page.ts";
 import {PAGE_BLOCK_COLLECTIONS} from "@/constants/content-constants.ts";
-import {encodeRelation, parseRelation} from "@/helpers/content-pages-service-helper.ts";
+import {encodeRelation, generateFilesUrl, parseRelation} from "@/helpers/content-pages-service-helper.ts";
 import {ContentPageBlocksEnum, type ContentPageBlockType} from "@/enums/content-pages-enum.ts";
 import sanitizeRichText from "@/helpers/sanitize-rich-text.ts";
+import {getFilenameFromUrl} from "@/helpers/file-upload-helper.ts";
 
 // #####################################################################
 // #### == #### == #### COLLECTION NAMES #### == #### == #### == #### ==
@@ -188,9 +189,17 @@ export async function getBlockContent(
 ): Promise<ContentPageBlockValue> {
   return await pocketbase
     .collection(collectionName).getOne<ContentPageBlockRecord>(id, {
-      fields: "content",
       requestKey: null,
-    }).then((data) => { return data.content! })
+    }).then((data) => {
+      if (collectionName === ContentPageBlocksEnum.FILE_BLOCK) {
+        return {
+          newFiles: [],
+          deletedUrls: [],
+          urls: generateFilesUrl(data, pocketbase),
+        };
+      }
+      return data.content!
+    })
 }
 
 export async function deleteBlockContent(
@@ -202,24 +211,51 @@ export async function deleteBlockContent(
 }
 
 export async function upsertBlockContent(
-  record: Omit<ContentPageBlockRecord, 'collectionId'>,
-): Promise<boolean> {
-  const sanitizedRecord = record.collectionName === ContentPageBlocksEnum.RTF_BLOCK
-    && typeof record.content === "string"
-    ? { ...record, content: sanitizeRichText(record.content) }
-    : record;
+  record: Omit<ContentPageBlockRecord, 'collectionId'>
+): Promise<boolean>  {
+  const recordToSave = prepareRecordToSave(record);
 
-  if (sanitizedRecord.id) {
+  if (record.id) {
     return await pocketbase
-      .collection(sanitizedRecord.collectionName).update(
-        sanitizedRecord.id,
-        { ...sanitizedRecord },
+      .collection(record.collectionName).update(
+        record.id,
+        { ...recordToSave },
         { requestKey: null },
       );
   }
-  return await pocketbase.collection(sanitizedRecord.collectionName).create({
-    ...sanitizedRecord,
+  return await pocketbase.collection(record.collectionName).create({
+    ...recordToSave,
   });
+}
+
+function prepareRecordToSave(record: Omit<ContentPageBlockRecord, 'collectionId'>) {
+  if (record.collectionName === ContentPageBlocksEnum.RTF_BLOCK && typeof record.content === "string") {
+    return { ...record, content: sanitizeRichText(record.content) };
+  }
+
+  if (record.collectionName === ContentPageBlocksEnum.FILE_BLOCK) {
+    const { newFiles, deletedUrls } = getFileBlockChanges(record.content);
+    const baseRecord = { title: record.title, page: record.page };
+
+    if (record.id) {
+      return {
+        ...baseRecord,
+        ...(newFiles.length > 0 ? { 'content+': newFiles } : {}),
+        ...(deletedUrls.length > 0 ? { 'content-': deletedUrls.map(getFilenameFromUrl) } : {}),
+      };
+    }
+
+    return { ...baseRecord, content: newFiles };
+  }
+
+  return record;
+}
+
+function getFileBlockChanges(content: ContentPageBlockRecord['content']) {
+  if (content && typeof content === "object" && !Array.isArray(content)) {
+    return { newFiles: content.newFiles, deletedUrls: content.deletedUrls };
+  }
+  return { newFiles: [] as File[], deletedUrls: [] as string[] };
 }
 
 export async function getRtfBlocksMetadata(

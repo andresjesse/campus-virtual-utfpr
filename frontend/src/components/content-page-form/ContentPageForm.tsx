@@ -1,4 +1,4 @@
-import {Box, Select, Stack, TextInput} from "@mantine/core";
+import {Box, Select, Stack} from "@mantine/core";
 import { useState } from "react";
 
 import type {
@@ -8,6 +8,7 @@ import type {
 
 import classes from "./content-page-form.module.css";
 import BlocksList from "@/components/content-page-form/BlocksList.tsx";
+import TitleInput from "@/components/text-input/TitleInput.tsx";
 
 type ContentPageFormProps = {
   initialValues?: ContentPageFormValues;
@@ -40,8 +41,7 @@ export default function ContentPageForm({
   return (
     <Stack h="100%" gap={0}>
       <Box className={classes.metadata} flex="0 0 auto">
-        {/* TODO: Consider componentizing this to reduce lines */}
-        <TextInput
+        <TitleInput
           label="Título da Página"
           placeholder="Título da página"
           value={values.title}
@@ -55,7 +55,6 @@ export default function ContentPageForm({
               title: event.currentTarget.value,
             })
           }
-          classNames={{ label: classes.titleLabel, input: classes.titleInput }}
         />
         <Select
           searchable

@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useState} from "react";
 import type {ContentPageBlockMetadata, ContentPageBlockValue} from "@/types/content-page.ts";
 import {getBlockContent, upsertBlockContent as upsertBlockContentApi} from "@/services/content-page-service.ts";
-import type {ContentPageBlockType} from "@/enums/content-pages-enum.ts";
+import {ContentPageBlocksEnum, type ContentPageBlockType} from "@/enums/content-pages-enum.ts";
 
 export default function useContentBlockData(metadata: ContentPageBlockMetadata) {
   const [blockData, setBlockData] = useState<ContentPageBlockValue>("")
@@ -27,10 +27,14 @@ export default function useContentBlockData(metadata: ContentPageBlockMetadata) 
       await upsertBlockContentApi(
         { ...metadata, title: metadata.title.trim(), content: newContent },
       )
-      setBlockData(newContent)
-    } catch (error) {
-      console.error(error)
-    } finally {
+
+      if (metadata.collectionName === ContentPageBlocksEnum.FILE_BLOCK) {
+        await fetchBlockContent()
+      } else {
+        setBlockData(newContent)
+      }
+    }
+    finally {
       setIsLoading(false)
     }
   }

@@ -1,9 +1,14 @@
-import type { GroupedContentPageBlockMetadata, RelatedType } from "@/types/content-page.ts";
+import type {
+  ContentPageBlockRecord,
+  GroupedContentPageBlockMetadata,
+  RelatedType
+} from "@/types/content-page.ts";
 import {
   getDiagramBlocksMetadata,
   getFileBlocksMetadata,
   getRtfBlocksMetadata
 } from "@/services/content-page-service.ts";
+import type PocketBase from "pocketbase";
 
 export function encodeRelation(type: RelatedType, id: string) {
   return `${type}:${id}`;
@@ -91,5 +96,17 @@ export async function getAllContentBlocksMetadata(
       entry[0].collectionName,
       entry
     ])
+  )
+}
+
+export function generateFilesUrl(
+  fileRecord: ContentPageBlockRecord,
+  pocketBaseInstance: PocketBase
+): string[]
+{
+  const filePaths = fileRecord.content as unknown as string[];
+
+  return filePaths.map((filePath) =>
+    pocketBaseInstance.files.getURL(fileRecord, filePath)
   )
 }

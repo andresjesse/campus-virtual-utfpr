@@ -1,15 +1,10 @@
-import type {ContentPageBlockValue} from "@/types/content-page.ts";
 import FeedbackState from "@/components/feedback-state";
 import {Box, Typography} from "@mantine/core";
 import sanitizeRichText from "@/helpers/sanitize-rich-text.ts";
 import {useMemo} from "react";
+import type {BlockDisplayBodyProps} from "@/components/content-input/content-blocks/registry.ts";
 
-type BlockDisplayBodyProps = {
-  isLoading: boolean;
-  content?: ContentPageBlockValue
-}
-
-export default function BlockDisplayBody({ isLoading, content }: BlockDisplayBodyProps) {
+export default function RtfBlockDisplayBody({ isLoading, content }: BlockDisplayBodyProps) {
   const richTextContent = typeof content === "string"
     ? content
     : "<p>Conteúdo provisório</p>";

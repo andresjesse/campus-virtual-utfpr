@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from 'react'
 import { render } from '@testing-library/react'
 
-import RtfBlockEditor from '@/components/content-input/content-blocks/rtf-block/RtfBlockEditor.tsx'
+import RtfBlockEditor from '@/components/content-input/content-blocks/overlay/rtf-block/RtfBlockEditor.tsx'
 import { useEditor } from '@tiptap/react'
 
 jest.mock('@mantine/tiptap', () => {
