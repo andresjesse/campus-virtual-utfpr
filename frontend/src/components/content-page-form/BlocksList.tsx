@@ -87,6 +87,11 @@ export default function BlocksList() {
             ?.filter((el) => el.id !== id)
         }
       })
+      notifications.show({
+        color: "green",
+        title: "Bloco excluído.",
+        message: "O bloco foi excluído corretamente.",
+      });
     } catch {
       notifications.show({
         color: "red",
