@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import ContentBlockEditOverlay from '@/components/content-input/content-blocks/overlay/ContentBlockEditOverlay.tsx'
+import { notifications } from '@mantine/notifications'
 import {
   getBlockContent,
   upsertBlockContent as upsertBlockContentApi,
@@ -154,24 +155,30 @@ describe('ContentBlockEditOverlay', () => {
     expect(onUpdate).toHaveBeenCalledTimes(1)
   })
 
-  it('recovers the controls after a failed save', async () => {
+  it('recovers the controls and keeps the overlay open after a failed save', async () => {
     const user = userEvent.setup()
-    const error = new Error('Save failed')
-    const consoleError = jest.spyOn(console, 'error').mockImplementation()
+    const notificationsShowMock = jest
+      .spyOn(notifications, 'show')
+      .mockImplementation()
     getBlockContentMock.mockResolvedValue('<p>Existing content</p>')
-    upsertBlockContentApiMock.mockRejectedValue(error)
+    upsertBlockContentApiMock.mockRejectedValue(new Error('Save failed'))
     const { onUpdate } = renderOverlay()
 
     const saveButton = await screen.findByRole('button', { name: 'Salvar' })
     await user.click(saveButton)
 
     await waitFor(() => expect(saveButton).toBeEnabled())
-    expect(consoleError).toHaveBeenCalledWith(error)
+    expect(notificationsShowMock).toHaveBeenCalledWith({
+      color: 'red',
+      title: 'Falha ao atualizar o conteúdo',
+      message:
+        'Não foi possível atualizar o conteúdo. Os dados permanecem os mesmos.',
+    })
     expect(screen.getByLabelText('Conteúdo')).toHaveValue(
       '<p>Existing content</p>',
     )
-    expect(onUpdate).toHaveBeenCalledTimes(1)
+    expect(onUpdate).not.toHaveBeenCalled()
 
-    consoleError.mockRestore()
+    notificationsShowMock.mockRestore()
   })
 })

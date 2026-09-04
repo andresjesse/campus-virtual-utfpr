@@ -13,6 +13,7 @@ import {useEffect, useRef, useState} from "react";
 import TitleInput from "@/components/text-input/TitleInput.tsx";
 import {CONTENT_BLOCK_EDITOR_OVERLAY_BODY} from "@/components/content-input/content-blocks/overlay/registry.ts";
 import type {ContentPageBlockType} from "@/enums/content-pages-enum.ts";
+import {notifications} from "@mantine/notifications";
 
 type ContentBlockEditModalProps = {
   blockMetadata: ContentPageBlockMetadata;
@@ -40,8 +41,22 @@ export default function ContentBlockEditOverlay({
   }, [blockData]);
 
   const handleUpdate = async () => {
-    await upsertBlockContent(content.current);
-    onUpdate();
+    try {
+      await upsertBlockContent(content.current);
+      onUpdate();
+      notifications.show({
+        color: "green",
+        title: "Conteúdo atualizado",
+        message: "O conteúdo foi atualizado com sucesso."
+      })
+    }
+    catch {
+      notifications.show({
+        color: "red",
+        title: "Falha ao atualizar o conteúdo",
+        message: "Não foi possível atualizar o conteúdo. Os dados permanecem os mesmos."
+      })
+    }
   };
 
   return (

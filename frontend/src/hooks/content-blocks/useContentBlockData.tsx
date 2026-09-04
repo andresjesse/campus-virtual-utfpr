@@ -28,9 +28,8 @@ export default function useContentBlockData(metadata: ContentPageBlockMetadata) 
         { ...metadata, title: metadata.title.trim(), content: newContent },
       )
       setBlockData(newContent)
-    } catch (error) {
-      console.error(error)
-    } finally {
+    }
+    finally {
       setIsLoading(false)
     }
   }

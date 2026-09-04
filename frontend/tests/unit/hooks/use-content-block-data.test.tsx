@@ -84,7 +84,6 @@ describe('useContentBlockData', () => {
 
   it('keeps the previous content and clears loading when saving fails', async () => {
     const error = new Error('Save failed')
-    const consoleError = jest.spyOn(console, 'error').mockImplementation()
     getBlockContentMock.mockResolvedValue('<p>Existing content</p>')
     upsertBlockContentApiMock.mockRejectedValue(error)
 
@@ -95,13 +94,12 @@ describe('useContentBlockData', () => {
     })
 
     await act(async () => {
-      await result.current.upsertBlockContent('<p>Unsaved content</p>')
+      await expect(
+        result.current.upsertBlockContent('<p>Unsaved content</p>'),
+      ).rejects.toThrow('Save failed')
     })
 
-    expect(consoleError).toHaveBeenCalledWith(error)
     expect(result.current.blockData).toBe('<p>Existing content</p>')
     expect(result.current.isLoading).toBe(false)
-
-    consoleError.mockRestore()
   })
 })
