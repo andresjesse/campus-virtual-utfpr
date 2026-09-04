@@ -87,7 +87,7 @@ export const branding: Branding = {
     feedback: {
       success: "#40c057",
       warning: "#ffd43b",
-      error: "#ff8787",
+      error: "#fa5252",
       info: "#3c9dff",
     },
   },

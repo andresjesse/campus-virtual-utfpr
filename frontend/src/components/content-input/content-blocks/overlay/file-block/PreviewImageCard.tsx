@@ -20,13 +20,14 @@ export default function PreviewImageCard({ src, marked, onToggle }: PreviewImage
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={() => onToggle(src)}
+      bdrs="md"
       style={{
         cursor: 'pointer',
-        borderRadius: 'var(--mantine-radius-sm)',
         transition: 'transform 150ms ease, box-shadow 150ms ease',
         transform: hovered ? 'translateY(-3px) scale(1.03)' : 'translateY(0) scale(1)',
         boxShadow: hovered ? '0 8px 20px rgba(0, 0, 0, 0.4)' : 'none',
         border: `2px solid ${marked ? branding.colors.feedback.error : 'transparent'}`,
+        backgroundColor: `${branding.colors.surface.interactive}`
       }}
     >
       <Image
@@ -39,6 +40,7 @@ export default function PreviewImageCard({ src, marked, onToggle }: PreviewImage
         style={{
           transition: 'opacity 150ms ease',
           opacity: marked ? 0.45 : 1,
+          filter: hovered ? "blur(.8px)" : undefined,
         }}
       />
 
@@ -59,7 +61,7 @@ export default function PreviewImageCard({ src, marked, onToggle }: PreviewImage
           aria-hidden
           size={28}
           weight={marked ? 'fill' : 'regular'}
-          color={marked ? 'var(--mantine-color-red-6)' : branding.colors.text.subtle}
+          color={branding.colors.feedback.error}
         />
       </Box>
     </Box>
