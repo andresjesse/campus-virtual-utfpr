@@ -12,7 +12,7 @@ import {CheckIcon} from "@phosphor-icons/react";
 import {useEffect, useRef, useState} from "react";
 import TitleInput from "@/components/text-input/TitleInput.tsx";
 import {CONTENT_BLOCK_EDITOR_OVERLAY_BODY} from "@/components/content-input/content-blocks/overlay/registry.ts";
-import type {ContentPageBlockType} from "@/enums/content-pages-enum.ts";
+import {type ContentPageBlockType} from "@/enums/content-pages-enum.ts";
 import {notifications} from "@mantine/notifications";
 
 type ContentBlockEditModalProps = {
@@ -38,7 +38,7 @@ export default function ContentBlockEditOverlay({
 
   useEffect(() => {
     content.current = blockData;
-  }, [blockData]);
+  }, [blockData, blockMetadata.collectionName]);
 
   const handleUpdate = async () => {
     try {
@@ -93,7 +93,7 @@ export default function ContentBlockEditOverlay({
               />
 
               <EditorBody
-                content={blockData as string}
+                content={blockData}
                 onChange={(value) => content.current = value}
               />
 

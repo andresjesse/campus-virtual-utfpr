@@ -1,11 +1,13 @@
-import { Flex, Image } from "@mantine/core";
-import {branding} from "@/config/branding.ts";
+import { Flex } from "@mantine/core";
+import PreviewImageCard from "@/components/content-input/content-blocks/overlay/file-block/PreviewImageCard.tsx";
 
 type FilesPreviewProps = {
   content?: string | string[];
+  markedUrls?: string[];
+  onToggleDelete?: (url: string) => void;
 }
 
-export default function FilesPreviewSection({ content }: FilesPreviewProps) {
+export default function FilesPreviewSection({ content, markedUrls = [], onToggleDelete }: FilesPreviewProps) {
   const displayableContent = Array.isArray(content) ? content : [content];
 
   const filteredContent = displayableContent
@@ -21,14 +23,11 @@ export default function FilesPreviewSection({ content }: FilesPreviewProps) {
         gap={16}
       >
         {filteredContent.map((fileUrl) => (
-          <Image
-            src={fileUrl}
+          <PreviewImageCard
             key={fileUrl}
-            h={120}
-            w={120}
-            radius="sm"
-            fit="contain"
-            bd={`1px solid ${branding.colors.text.muted}`}
+            src={fileUrl}
+            marked={markedUrls.includes(fileUrl)}
+            onToggle={onToggleDelete ?? (() => undefined)}
           />
         ))}
       </Flex>

@@ -6,7 +6,7 @@ import DiagramBlockEditor from "@/components/content-input/content-blocks/overla
 import type {ContentPageBlockValue} from "@/types/content-page.ts";
 
 export type BlockEditorProps = {
-  content?: string | string[],
+  content?: ContentPageBlockValue,
   onChange: (value: ContentPageBlockValue) => void,
 }
 

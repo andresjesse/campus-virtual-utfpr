@@ -14,6 +14,15 @@ export const FILE_UPLOAD_REJECTION_NOTIFICATION = {
 const FILE_TOO_LARGE = "file-too-large";
 const FILE_INVALID_TYPE = "file-invalid-type";
 
+export function getFilenameFromUrl(url: string): string {
+  try {
+    const filename = new URL(url).pathname.split("/").pop();
+    return filename ? decodeURIComponent(filename) : "";
+  } catch {
+    return "";
+  }
+}
+
 export function getFileRejectionMessage(
   rejection: FileRejection,
   limits: FileUploadLimits,

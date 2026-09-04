@@ -104,7 +104,7 @@ export function generateFilesUrl(
   pocketBaseInstance: PocketBase
 ): string[]
 {
-  const filePaths = fileRecord.content as string[];
+  const filePaths = fileRecord.content as unknown as string[];
 
   return filePaths.map((filePath) =>
     pocketBaseInstance.files.getURL(fileRecord, filePath)

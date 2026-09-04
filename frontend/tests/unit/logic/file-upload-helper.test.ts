@@ -2,6 +2,7 @@ import {
   buildFileRejectionNotification,
   FILE_UPLOAD_REJECTION_NOTIFICATION,
   getFileRejectionMessage,
+  getFilenameFromUrl,
 } from '@/helpers/file-upload-helper.ts'
 import type { FileRejection } from 'react-dropzone'
 
@@ -42,6 +43,24 @@ describe('file-upload-helper', () => {
           limits,
         ),
       ).toBe('"x.txt" — Too many files')
+    })
+  })
+
+  describe('getFilenameFromUrl', () => {
+    it('extracts the filename from a PocketBase file URL', () => {
+      expect(
+        getFilenameFromUrl('http://localhost/api/files/pbc_123/abc123/my_image.png'),
+      ).toBe('my_image.png')
+    })
+
+    it('decodes URL-encoded filenames', () => {
+      expect(
+        getFilenameFromUrl('http://localhost/api/files/pbc_123/abc123/my%20image.png'),
+      ).toBe('my image.png')
+    })
+
+    it('returns an empty string for invalid URLs', () => {
+      expect(getFilenameFromUrl('not-a-url')).toBe('')
     })
   })
 

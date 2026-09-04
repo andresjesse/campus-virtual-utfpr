@@ -5,7 +5,13 @@ export type ContentPageFormValues = {
   title: string;
 };
 
-export type ContentPageBlockValue = string | string[] | File[];
+export type FileBlockContentValue = {
+  newFiles: File[];
+  deletedUrls: string[];
+  urls: string[];
+};
+
+export type ContentPageBlockValue = string | FileBlockContentValue;
 
 export type ContentPageBlockMetadata = {
   id?: string;

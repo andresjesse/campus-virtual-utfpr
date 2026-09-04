@@ -12,6 +12,7 @@ import {PAGE_BLOCK_COLLECTIONS} from "@/constants/content-constants.ts";
 import {encodeRelation, generateFilesUrl, parseRelation} from "@/helpers/content-pages-service-helper.ts";
 import {ContentPageBlocksEnum, type ContentPageBlockType} from "@/enums/content-pages-enum.ts";
 import sanitizeRichText from "@/helpers/sanitize-rich-text.ts";
+import {getFilenameFromUrl} from "@/helpers/file-upload-helper.ts";
 
 // #####################################################################
 // #### == #### == #### COLLECTION NAMES #### == #### == #### == #### ==
@@ -190,7 +191,13 @@ export async function getBlockContent(
     .collection(collectionName).getOne<ContentPageBlockRecord>(id, {
       requestKey: null,
     }).then((data) => {
-      if (collectionName === ContentPageBlocksEnum.FILE_BLOCK) return generateFilesUrl(data, pocketbase)
+      if (collectionName === ContentPageBlocksEnum.FILE_BLOCK) {
+        return {
+          newFiles: [],
+          deletedUrls: [],
+          urls: generateFilesUrl(data, pocketbase),
+        };
+      }
       return data.content!
     })
 }
@@ -227,19 +234,28 @@ function prepareRecordToSave(record: Omit<ContentPageBlockRecord, 'collectionId'
   }
 
   if (record.collectionName === ContentPageBlocksEnum.FILE_BLOCK) {
-    const files = Array.isArray(record.content)
-      ? record.content.filter((item): item is File => item instanceof File)
-      : [];
+    const { newFiles, deletedUrls } = getFileBlockChanges(record.content);
     const baseRecord = { title: record.title, page: record.page };
 
     if (record.id) {
-      return files.length > 0 ? { ...baseRecord, 'content+': files } : baseRecord;
+      return {
+        ...baseRecord,
+        ...(newFiles.length > 0 ? { 'content+': newFiles } : {}),
+        ...(deletedUrls.length > 0 ? { 'content-': deletedUrls.map(getFilenameFromUrl) } : {}),
+      };
     }
 
-    return { ...baseRecord, content: files };
+    return { ...baseRecord, content: newFiles };
   }
 
   return record;
+}
+
+function getFileBlockChanges(content: ContentPageBlockRecord['content']) {
+  if (content && typeof content === "object" && !Array.isArray(content)) {
+    return { newFiles: content.newFiles, deletedUrls: content.deletedUrls };
+  }
+  return { newFiles: [] as File[], deletedUrls: [] as string[] };
 }
 
 export async function getRtfBlocksMetadata(
