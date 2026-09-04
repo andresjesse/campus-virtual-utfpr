@@ -28,6 +28,7 @@ export default function FilesPreviewSection({ content, markedUrls = [], onToggle
             src={fileUrl}
             marked={markedUrls.includes(fileUrl)}
             onToggle={onToggleDelete ?? (() => undefined)}
+            interactive={true}
           />
         ))}
       </Flex>

@@ -6,10 +6,15 @@ import PreviewImageCard from '@/components/content-input/content-blocks/overlay/
 
 const src = 'http://localhost/api/files/c/r/image.png'
 
-function renderCard({ marked = false, onToggle = jest.fn() } = {}) {
+function renderCard({ marked = false, onToggle = jest.fn(), interactive = true } = {}) {
   const { container: root } = render(
     <MantineProvider>
-      <PreviewImageCard src={src} marked={marked} onToggle={onToggle} />
+      <PreviewImageCard
+        src={src}
+        marked={marked}
+        onToggle={onToggle}
+        interactive={interactive}
+      />
     </MantineProvider>,
   )
   const img = root.querySelector('img')!
