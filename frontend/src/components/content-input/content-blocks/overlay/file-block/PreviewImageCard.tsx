@@ -54,7 +54,7 @@ export default function PreviewImageCard({ src, marked, onToggle }: PreviewImage
           pointerEvents: 'none',
           transition: 'opacity 150ms ease',
           opacity: marked || hovered ? 1 : 0,
-          background: marked ? 'rgba(255, 0, 0, 0.08)' : 'transparent',
+          background: 'transparent',
         }}
       >
         <TrashIcon
