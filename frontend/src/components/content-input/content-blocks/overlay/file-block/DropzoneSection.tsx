@@ -1,10 +1,13 @@
 import {Dropzone} from "@mantine/dropzone";
 import {Group, Text} from "@mantine/core";
 import {useHover} from "@mantine/hooks";
+import {notifications} from "@mantine/notifications";
 import {ImageIcon, UploadSimpleIcon, XIcon} from "@phosphor-icons/react";
 import {useRef, useState} from "react";
 import type {DragEvent} from "react";
+import type {FileRejection} from "react-dropzone";
 import {FILE_BLOCK_MAX_SIZE_IN_BYTES, FILE_BLOCK_MIME_TYPES} from "@/constants/content-constants.ts";
+import {buildFileRejectionNotification} from "@/helpers/file-upload-helper.ts";
 import {branding} from "@/config/branding.ts";
 
 type DropzoneSectionProps = {
@@ -60,6 +63,16 @@ export default function DropzoneSection({ onDrop }: DropzoneSectionProps) {
     onDrop(files);
   }
 
+  const handleRejectedDrop = (fileRejections: FileRejection[]) => {
+    resetDropState();
+    notifications.show(
+      buildFileRejectionNotification(fileRejections, {
+        maxSizeInBytes: FILE_BLOCK_MAX_SIZE_IN_BYTES,
+        allowedMimeTypes: FILE_BLOCK_MIME_TYPES,
+      }),
+    );
+  }
+
   const isHighlighted = hovered || dragActive;
   const showUpload = isHighlighted && dragStatus !== 'reject';
   const showReject = dragStatus === 'reject';
@@ -72,10 +85,7 @@ export default function DropzoneSection({ onDrop }: DropzoneSectionProps) {
         handleAcceptedDrop(files);
         console.log('accepted files', files);
       }}
-      onReject={(files) => {
-        resetDropState();
-        console.log('rejected files', files);
-      }}
+      onReject={handleRejectedDrop}
       onDragEnter={handleDragEnter}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
