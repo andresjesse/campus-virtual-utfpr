@@ -1,6 +1,6 @@
 import {ContentPageBlocksEnum} from "@/enums/content-pages-enum.ts";
 import type {ContentPageBlockValue} from "@/types/content-page.ts";
-import {BLOCK_EMPTY_MESSAGES} from "@/constants/messages-constants.ts";
+import messages from "@/constants/messages.json";
 
 export function isBlockContentEmpty(
   collectionName: string,
@@ -23,17 +23,20 @@ export function isBlockContentEmpty(
     .trim() === "";
 }
 
+const EMPTY_CONTENT_MESSAGES: Record<string, { title: string; create: string; update: string }> = {
+  [ContentPageBlocksEnum.FILE_BLOCK]: messages.block.file.empty,
+  [ContentPageBlocksEnum.RTF_BLOCK]: messages.block.empty,
+};
+
 export function getEmptyContentNotification(
   collectionName: string,
   isNewBlock: boolean,
 ) {
-  const messages =
-    collectionName === ContentPageBlocksEnum.FILE_BLOCK
-      ? BLOCK_EMPTY_MESSAGES.FILE
-      : BLOCK_EMPTY_MESSAGES.RTF;
+  const emptyMessages =
+    EMPTY_CONTENT_MESSAGES[collectionName] ?? EMPTY_CONTENT_MESSAGES[ContentPageBlocksEnum.RTF_BLOCK];
 
   return {
-    title: messages.title,
-    message: isNewBlock ? messages.create : messages.update,
+    title: emptyMessages.title,
+    message: isNewBlock ? emptyMessages.create : emptyMessages.update,
   };
 }

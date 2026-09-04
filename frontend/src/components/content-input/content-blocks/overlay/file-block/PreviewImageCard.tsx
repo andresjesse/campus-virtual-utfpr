@@ -2,6 +2,7 @@ import {Box, Image} from "@mantine/core";
 import {TrashIcon} from "@phosphor-icons/react/dist/csr/Trash";
 import {useState} from "react";
 import {branding} from "@/config/branding.ts";
+import {FILE_PREVIEW_CARD_SIZE} from "@/constants/content-constants.ts";
 
 type PreviewImageCardProps = {
   src: string;
@@ -15,8 +16,8 @@ export default function PreviewImageCard({ src, marked = false, onToggle, intera
 
   return (
     <Box
-      h={120}
-      w={120}
+      h={FILE_PREVIEW_CARD_SIZE}
+      w={FILE_PREVIEW_CARD_SIZE}
       pos="relative"
       onMouseEnter={() => { if (interactive) setHovered(true) }}
       onMouseLeave={() => { if (interactive) setHovered(false) }}

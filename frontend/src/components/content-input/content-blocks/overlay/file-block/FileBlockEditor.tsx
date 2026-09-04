@@ -66,6 +66,7 @@ export default function FileBlockEditor({ content, onChange }: BlockEditorProps)
         content={previewUrls}
         markedUrls={deletionMarked}
         onToggleDelete={handleToggleDelete}
+        interactive={true}
       />
     </section>
   );
