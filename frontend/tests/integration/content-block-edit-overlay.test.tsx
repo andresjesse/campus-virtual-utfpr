@@ -68,15 +68,21 @@ function renderOverlay({
   onClose = jest.fn(),
   onUpdate = jest.fn(),
   blockMetadata: metadataOverride = metadata,
+  pageTitle = 'Page title',
+  pageRelation = 'entity:entity-a',
 }: {
   onClose?: jest.Mock
   onUpdate?: jest.Mock
   blockMetadata?: ContentPageBlockMetadata
+  pageTitle?: string
+  pageRelation?: string
 } = {}) {
   render(
     <MantineProvider>
       <ContentBlockEditOverlay
         blockMetadata={metadataOverride}
+        pageTitle={pageTitle}
+        pageRelation={pageRelation}
         opened
         onClose={onClose}
         onUpdate={onUpdate}
@@ -232,6 +238,77 @@ describe('ContentBlockEditOverlay', () => {
         color: 'yellow',
         title: 'Bloco sem conteúdo',
         message: 'O bloco de texto não pode ficar vazio.',
+      })
+    })
+    expect(upsertBlockContentApiMock).not.toHaveBeenCalled()
+    expect(onUpdate).not.toHaveBeenCalled()
+
+    notificationsShowMock.mockRestore()
+  })
+
+  it('blocks saving when the page title is missing', async () => {
+    const user = userEvent.setup()
+    const notificationsShowMock = jest
+      .spyOn(notifications, 'show')
+      .mockImplementation()
+    getBlockContentMock.mockResolvedValue('<p>Content</p>')
+    const { onUpdate } = renderOverlay({ pageTitle: '  ' })
+
+    await user.click(await screen.findByRole('button', { name: 'Salvar' }))
+
+    await waitFor(() => {
+      expect(notificationsShowMock).toHaveBeenCalledWith({
+        color: 'yellow',
+        title: 'Página incompleta',
+        message: 'Preencha o título da página antes de salvar o bloco.',
+      })
+    })
+    expect(upsertBlockContentApiMock).not.toHaveBeenCalled()
+    expect(onUpdate).not.toHaveBeenCalled()
+
+    notificationsShowMock.mockRestore()
+  })
+
+  it('blocks saving when the page relation is missing', async () => {
+    const user = userEvent.setup()
+    const notificationsShowMock = jest
+      .spyOn(notifications, 'show')
+      .mockImplementation()
+    getBlockContentMock.mockResolvedValue('<p>Content</p>')
+    const { onUpdate } = renderOverlay({ pageRelation: '' })
+
+    await user.click(await screen.findByRole('button', { name: 'Salvar' }))
+
+    await waitFor(() => {
+      expect(notificationsShowMock).toHaveBeenCalledWith({
+        color: 'yellow',
+        title: 'Página incompleta',
+        message:
+          'Selecione o elemento relacionado antes de salvar o bloco.',
+      })
+    })
+    expect(upsertBlockContentApiMock).not.toHaveBeenCalled()
+    expect(onUpdate).not.toHaveBeenCalled()
+
+    notificationsShowMock.mockRestore()
+  })
+
+  it('blocks saving when the page title and relation are missing', async () => {
+    const user = userEvent.setup()
+    const notificationsShowMock = jest
+      .spyOn(notifications, 'show')
+      .mockImplementation()
+    getBlockContentMock.mockResolvedValue('<p>Content</p>')
+    const { onUpdate } = renderOverlay({ pageTitle: '', pageRelation: '' })
+
+    await user.click(await screen.findByRole('button', { name: 'Salvar' }))
+
+    await waitFor(() => {
+      expect(notificationsShowMock).toHaveBeenCalledWith({
+        color: 'yellow',
+        title: 'Página incompleta',
+        message:
+          'Preencha o título da página e selecione o elemento relacionado antes de salvar o bloco.',
       })
     })
     expect(upsertBlockContentApiMock).not.toHaveBeenCalled()
