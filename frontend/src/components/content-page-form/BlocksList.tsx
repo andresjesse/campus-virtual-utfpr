@@ -17,7 +17,13 @@ import ContentBlockEditOverlay from "@/components/content-input/content-blocks/o
 import {notifications} from "@mantine/notifications";
 import {PAGE_BLOCK_COLLECTIONS} from "@/constants/content-constants.ts";
 
-export default function BlocksList() {
+export default function BlocksList({
+  pageTitle,
+  pageRelation,
+}: {
+  pageTitle: string;
+  pageRelation: string;
+}) {
   const { pageId } = useParams();
 
   const [blocksMetadata, setBlocksMetadata] = useState<GroupedContentPageBlockMetadata>();
@@ -159,6 +165,8 @@ export default function BlocksList() {
       <ContentBlockEditOverlay
         key={`${selectedContentBlock.current?.collectionName}-${selectedContentBlock.current?.id ?? "new"}`}
         blockMetadata={{ ...selectedContentBlock.current!, page: pageId  }}
+        pageTitle={pageTitle}
+        pageRelation={pageRelation}
         onUpdate={updateContentBlocks}
         opened={isModalOpen}
         onClose={closeContentBlockModal}

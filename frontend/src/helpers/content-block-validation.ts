@@ -40,3 +40,29 @@ export function getEmptyContentNotification(
     message: isNewBlock ? emptyMessages.create : emptyMessages.update,
   };
 }
+
+export function isPageMetadataReady(
+  pageTitle: string,
+  pageRelation: string,
+): boolean {
+  return Boolean(pageTitle.trim() && pageRelation);
+}
+
+export function getPageMetadataNotification(
+  pageTitle: string,
+  pageRelation: string,
+) {
+  const missingTitle = !pageTitle.trim();
+  const missingRelation = !pageRelation;
+
+  const message = missingTitle && missingRelation
+    ? messages.block.page.missingFields.both
+    : missingTitle
+      ? messages.block.page.missingFields.title
+      : messages.block.page.missingFields.relation;
+
+  return {
+    title: messages.block.page.missingFieldsTitle,
+    message,
+  };
+}
