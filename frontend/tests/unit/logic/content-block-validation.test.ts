@@ -1,9 +1,12 @@
 import {
   getEmptyContentNotification,
+  getPageMetadataNotification,
   isBlockContentEmpty,
+  isPageMetadataReady,
 } from '@/helpers/content-block-validation.ts'
 import { ContentPageBlocksEnum } from '@/enums/content-pages-enum.ts'
 import type { FileBlockContentValue } from '@/types/content-page.ts'
+import messages from '@/constants/messages.json'
 
 describe('isBlockContentEmpty', () => {
   describe('RTF block', () => {
@@ -127,6 +130,44 @@ describe('getEmptyContentNotification', () => {
     ).toEqual({
       title: 'Bloco sem arquivos',
       message: 'O bloco precisa ter pelo menos um arquivo.',
+    })
+  })
+})
+
+describe('isPageMetadataReady', () => {
+  it.each([
+    ['empty title', '', 'entity:id'],
+    ['whitespace title', '   ', 'entity:id'],
+    ['empty relation', 'Page title', ''],
+    ['both empty', '', ''],
+  ])('treats %s as not ready', (_, title, relation) => {
+    expect(isPageMetadataReady(title, relation)).toBe(false)
+  })
+
+  it('treats filled title and relation as ready', () => {
+    expect(isPageMetadataReady('Page title', 'entity:id')).toBe(true)
+  })
+})
+
+describe('getPageMetadataNotification', () => {
+  it('mentions only the title when the relation is present', () => {
+    expect(getPageMetadataNotification('', 'entity:id')).toEqual({
+      title: messages.block.page.missingFieldsTitle,
+      message: messages.block.page.missingFields.title,
+    })
+  })
+
+  it('mentions only the relation when the title is present', () => {
+    expect(getPageMetadataNotification('Page title', '')).toEqual({
+      title: messages.block.page.missingFieldsTitle,
+      message: messages.block.page.missingFields.relation,
+    })
+  })
+
+  it('mentions both fields when both are missing', () => {
+    expect(getPageMetadataNotification('  ', '')).toEqual({
+      title: messages.block.page.missingFieldsTitle,
+      message: messages.block.page.missingFields.both,
     })
   })
 })

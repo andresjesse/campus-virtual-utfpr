@@ -14,6 +14,14 @@
         "create": "É preciso adicionar pelo menos um arquivo para criar um bloco.",
         "update": "O bloco precisa ter pelo menos um arquivo."
       }
+    },
+    "page": {
+      "missingFieldsTitle": "Página incompleta",
+      "missingFields": {
+        "title": "Preencha o título da página antes de salvar o bloco.",
+        "relation": "Selecione o elemento relacionado antes de salvar o bloco.",
+        "both": "Preencha o título da página e selecione o elemento relacionado antes de salvar o bloco."
+      }
     }
   },
   "files": {

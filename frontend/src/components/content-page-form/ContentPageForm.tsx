@@ -80,7 +80,10 @@ export default function ContentPageForm({
         mih={0}
         style={{ overflowY: "auto" }}
       >
-        <BlocksList />
+        <BlocksList
+          pageTitle={values.title}
+          pageRelation={values.relation}
+        />
       </Box>
     </Stack>
   );
