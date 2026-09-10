@@ -14,7 +14,7 @@ import {
 import type { ContentPageListRecord } from "@/types/content-page";
 
 import classes from "./content-page-list.module.css";
-import {getContentPageErrorMessage} from "@/helpers/content-pages-service-helper.ts";
+import {getRequestErrorMessage} from "@/helpers/request-error-helper.ts";
 import {DialogContext} from "@/contexts/dialog-context.ts";
 
 
@@ -35,7 +35,7 @@ export default function ContentPageList() {
     try {
       setPages(await listContentPages());
     } catch (requestError) {
-      setError(getContentPageErrorMessage(requestError));
+      setError(getRequestErrorMessage(requestError));
     } finally {
       setIsLoading(false);
     }
@@ -77,7 +77,7 @@ export default function ContentPageList() {
       notifications.show({
         color: "red",
         title: "Não foi possível excluir",
-        message: getContentPageErrorMessage(deleteError),
+        message: getRequestErrorMessage(deleteError),
       });
     } finally {
       setDeletingPageId(null);

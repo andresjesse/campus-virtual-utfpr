@@ -18,7 +18,7 @@ import type {
 } from "@/types/content-page";
 
 import classes from "./content-page-editor.module.css";
-import {getContentPageErrorMessage} from "@/helpers/content-pages-service-helper.ts";
+import {getRequestErrorMessage} from "@/helpers/request-error-helper.ts";
 
 const AUTOSAVE_ERROR_NOTIFICATION_ID = "content-page-autosave-error";
 
@@ -74,7 +74,7 @@ export default function ContentPageEditorPage() {
           : { relation: "", title: "" },
       );
     } catch (requestError) {
-      setError(getContentPageErrorMessage(requestError));
+      setError(getRequestErrorMessage(requestError));
     } finally {
       setIsLoading(false);
     }

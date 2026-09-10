@@ -5,7 +5,7 @@ import {
   updateContentPage,
 } from "@/services/content-page-service.ts";
 import type { ContentPageFormValues } from "@/types/content-page";
-import {getContentPageErrorMessage} from "@/helpers/content-pages-service-helper.ts";
+import {getRequestErrorMessage} from "@/helpers/request-error-helper.ts";
 import {AUTOSAVE_DELAY} from "@/constants/operation-constants.ts";
 
 export type AutosaveStatus = "error" | "saved" | "saving";
@@ -80,7 +80,7 @@ export function useContentPageAutosave({
               }
             } catch (error) {
               setStatus("error");
-              onError(getContentPageErrorMessage(error));
+              onError(getRequestErrorMessage(error));
             }
           });
       }, AUTOSAVE_DELAY);
