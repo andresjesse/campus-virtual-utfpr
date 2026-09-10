@@ -29,5 +29,23 @@
       "showMore": "Ver mais",
       "showLess": "Ver menos"
     }
+  },
+  "errors": {
+    "generic": "Não foi possível concluir a operação. Tente novamente.",
+    "duplicate": "Já existe um registro com esse identificador.",
+    "badRequest": "Verifique os dados informados e tente novamente.",
+    "unauthenticated": "Sua sessão expirou. Entre novamente para continuar.",
+    "forbidden": "Você não tem permissão para realizar esta ação.",
+    "notFound": "O registro ou o elemento relacionado não foi encontrado.",
+    "server": "O servidor não conseguiu concluir a operação. Tente novamente mais tarde.",
+    "network": "Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente."
+  },
+  "mesh": {
+    "identifier": {
+      "empty": "Informe o identificador do mesh.",
+      "invalid": "Use apenas letras minúsculas, números e underscores, sem espaços.",
+      "duplicate": "Já existe um arquivo mesh com esse identificador.",
+      "help": "Copie o nome exato do objeto na hierarquia do Blender (painel Outliner). Erros de digitação impedem a detecção de raios no WebGL."
+    }
   }
 }
