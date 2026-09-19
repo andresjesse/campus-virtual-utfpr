@@ -17,14 +17,6 @@
   width: min(30rem, 58%);
 }
 
-.newButton {
-  flex: 0 0 auto;
-  margin-inline-start: auto;
-  min-width: 9.25rem;
-  color: var(--app-brand-primary);
-  border-width: 2px;
-}
-
 .results {
   display: flex;
   flex: 1;
@@ -52,11 +44,6 @@
 
   .search {
     flex: none;
-    width: 100%;
-    margin-inline-start: 0;
-  }
-
-  .newButton {
     width: 100%;
     margin-inline-start: 0;
   }

@@ -16,7 +16,7 @@ import type { ContentPageListRecord } from "@/types/content-page";
 import classes from "./content-page-list.module.css";
 import {getRequestErrorMessage} from "@/helpers/request-error-helper.ts";
 import {DialogContext} from "@/contexts/dialog-context.ts";
-
+import messages from "@/constants/messages.json";
 
 export default function ContentPageList() {
   const navigate = useNavigate();
@@ -100,9 +100,8 @@ export default function ContentPageList() {
           size="sm"
           leftSection={<PlusIcon aria-hidden size={16} />}
           onClick={() => navigate("/admin/pages/new")}
-          className={classes.newButton}
         >
-          Nova Página
+          {messages.content_pages.list.new}
         </Button>
       </Group>
 
