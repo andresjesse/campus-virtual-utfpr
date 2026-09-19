@@ -4,7 +4,7 @@ import { CaretDoubleLeftIcon } from "@phosphor-icons/react/dist/csr/CaretDoubleL
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 
-import ContentPageForm from "@/components/content-page-form/ContentPageForm.tsx";
+import ContentPageForm from "@/components/content-page/content-page-form/ContentPageForm.tsx";
 import ElementPalette from "@/components/element-palette/ElementPalette.tsx";
 import FeedbackState from "@/components/feedback-state";
 import { useContentPageAutosave } from "@/hooks/use-content-page-autosave";

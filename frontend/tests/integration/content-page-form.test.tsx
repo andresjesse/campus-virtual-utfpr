@@ -2,9 +2,9 @@ import { MantineProvider } from '@mantine/core'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
-import ContentPageForm from '@/components/content-page-form/ContentPageForm.tsx'
+import ContentPageForm from '@/components/content-page/content-page-form/ContentPageForm.tsx'
 
-jest.mock('@/components/content-page-form/BlocksList.tsx', () => ({
+jest.mock('@/components/content-page/content-page-form/BlocksList.tsx', () => ({
   __esModule: true,
   default: () => null,
 }))

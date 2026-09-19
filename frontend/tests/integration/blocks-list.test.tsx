@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { notifications } from '@mantine/notifications'
 
-import BlocksList from '@/components/content-page-form/BlocksList.tsx'
+import BlocksList from '@/components/content-page/content-page-form/BlocksList.tsx'
 import { DialogContext } from '@/contexts/dialog-context.ts'
 import { getAllContentBlocksMetadata } from '@/helpers/content-pages-service-helper.ts'
 import { deleteBlockContent } from '@/services/content-page-service.ts'
