@@ -1,22 +1,22 @@
-import { Button, Group } from "@mantine/core";
+import {Button, Flex, Group} from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { PlusIcon } from "@phosphor-icons/react/dist/csr/Plus";
 import {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import { useNavigate } from "react-router";
 
 import FeedbackState from "@/components/feedback-state";
-import PageSearch from "@/components/page-search";
-import PageTable from "@/components/page-table/PageTable.tsx";
+import PageSearch from "@/components/content-page/page-search";
+import PageTable from "@/components/content-page/page-table/PageTable.tsx";
 import {
   deleteContentPage,
   listContentPages,
 } from "@/services/content-page-service.ts";
 import type { ContentPageListRecord } from "@/types/content-page";
 
-import classes from "./content-page-list.module.css";
 import {getRequestErrorMessage} from "@/helpers/request-error-helper.ts";
 import {DialogContext} from "@/contexts/dialog-context.ts";
 import messages from "@/constants/messages.json";
+import {branding} from "@/config/branding.ts";
 
 export default function ContentPageList() {
   const navigate = useNavigate();
@@ -89,11 +89,11 @@ export default function ContentPageList() {
   }, [loadPages]);
 
   return (
-    <main className={classes.page}>
-      <Group className={classes.toolbar} justify="space-between" gap="xl">
-        <div className={classes.search}>
+    <Flex direction="column" px="lg" pt="lg" pb={0} mih="calc(100dvh - 60px)" >
+      <Group justify="space-between" gap="xl" w="100%" mx={0} mt="auto" mb="lg" px="lg">
+        <Flex flex={1}>
           <PageSearch value={query} onChange={setQuery} />
-        </div>
+        </Flex>
         <Button
           variant="outline"
           color="brand"
@@ -105,7 +105,15 @@ export default function ContentPageList() {
         </Button>
       </Group>
 
-      <section className={classes.results} aria-label="Páginas cadastradas">
+      <Flex
+        flex={1}
+        direction="column"
+        mih={0}
+        w="100%"
+        pt="md"
+        style={{ "border-top": `1px solid ${branding.colors.border.default}` }}
+        aria-label={messages.content_pages.list.title}
+      >
         {isLoading && <FeedbackState loading title="Carregando páginas" />}
         {!isLoading && error && (
           <FeedbackState
@@ -134,7 +142,7 @@ export default function ContentPageList() {
             onDelete={(page) => handleDelete(page)}
           />
         )}
-      </section>
-    </main>
+      </Flex>
+    </Flex>
   );
 }

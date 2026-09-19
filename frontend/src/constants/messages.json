@@ -46,6 +46,51 @@
       "invalid": "Use apenas letras minúsculas, números e underscores, sem espaços.",
       "duplicate": "Já existe um arquivo mesh com esse identificador.",
       "help": "Copie o nome exato do objeto na hierarquia do Blender (painel Outliner). Erros de digitação impedem a detecção de raios no WebGL."
+    },
+    "list": {
+      "title": "Arquivos Mesh",
+      "searchLabel": "Pesquisar arquivos mesh pelo identificador",
+      "searchPlaceholder": "Pesquise pelo identificador",
+      "new": "Novo Mesh",
+      "loading": "Carregando arquivos mesh",
+      "loadErrorTitle": "Não foi possível carregar os arquivos mesh",
+      "retry": "Tentar novamente",
+      "emptyTitle": "Nenhum arquivo mesh cadastrado",
+      "emptyDescription": "Cadastre o primeiro mesh para começar.",
+      "emptyResultsTitle": "Nenhum arquivo mesh encontrado",
+      "emptyResultsDescription": "Tente pesquisar usando outro identificador.",
+      "deleteConfirmTitle": "Excluir arquivo mesh",
+      "deleteConfirmFirst": "Deseja realmente excluir permanentemente o mesh {name}?",
+      "deleteConfirmSecond": "Entidades 3D vinculadas a este mesh serão afetadas.",
+      "deletedTitle": "Arquivo mesh excluído",
+      "deletedMessage": "O arquivo mesh foi removido.",
+      "deleteErrorTitle": "Não foi possível excluir",
+      "tableName": "Identificador",
+      "tableDescription": "Descrição",
+      "tableCreated": "Criado em",
+      "tableUpdated": "Modificado em"
+    },
+    "editor": {
+      "newTitle": "Novo Arquivo Mesh",
+      "editTitle": "Editar Arquivo Mesh",
+      "back": "Voltar",
+      "save": "Salvar",
+      "saveSuccessTitle": "Arquivo mesh salvo",
+      "saveSuccessMessage": "O arquivo mesh foi salvo com sucesso.",
+      "saveErrorTitle": "Não foi possível salvar",
+      "nameLabel": "Identificador do Mesh",
+      "namePlaceholder": "ex: predio_principal_bloco_a",
+      "descriptionLabel": "Descrição",
+      "descriptionPlaceholder": "Descrição opcional do mesh",
+      "fileLabel": "Arquivo GLB",
+      "fileRequiredError": "Selecione o arquivo .glb do mesh.",
+      "loading": "Carregando arquivo mesh"
+    }
+  },
+  "content_pages": {
+    "list": {
+      "new": "Nova página",
+      "title": "Páginas cadastradas"
     }
   }
 }
