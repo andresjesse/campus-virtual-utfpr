@@ -2,7 +2,7 @@ import { ActionIcon, ScrollArea, Table } from "@mantine/core";
 import { TrashIcon } from "@phosphor-icons/react/dist/csr/Trash";
 import { useNavigate } from "react-router";
 
-import type { ContentPageListRecord } from "@/types/content-page";
+import type { ContentPageListRecord } from "@/types/content-page.ts";
 
 import classes from "./page-table.module.css";
 

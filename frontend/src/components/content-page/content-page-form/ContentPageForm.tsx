@@ -4,10 +4,10 @@ import { useState } from "react";
 import type {
   ContentPageFormValues,
   RelatedOption,
-} from "@/types/content-page";
+} from "@/types/content-page.ts";
 
 import classes from "./content-page-form.module.css";
-import BlocksList from "@/components/content-page-form/BlocksList.tsx";
+import BlocksList from "@/components/content-page/content-page-form/BlocksList.tsx";
 import TitleInput from "@/components/text-input/TitleInput.tsx";
 
 type ContentPageFormProps = {
