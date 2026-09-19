@@ -8,6 +8,12 @@ export async function listMeshes(): Promise<MeshRecord[]> {
     .getFullList({ requestKey: null, sort: "name" });
 }
 
+export async function getMesh(id: string) {
+  return pocketbase
+    .collection<MeshRecord>(MESH_COLLECTION)
+    .getOne(id, { requestKey: null });
+}
+
 export async function createMesh(values: MeshFormValues) {
   return pocketbase
     .collection<MeshRecord>(MESH_COLLECTION)
