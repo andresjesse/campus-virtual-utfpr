@@ -11,15 +11,13 @@ import BlocksList from "@/components/content-page/content-page-form/BlocksList.t
 import TitleInput from "@/components/text-input/TitleInput.tsx";
 
 type ContentPageFormProps = {
-  initialValues?: ContentPageFormValues;
+  initialValues: ContentPageFormValues;
   onChange: (values: ContentPageFormValues) => void;
   relatedOptions: RelatedOption[];
 };
 
-const EMPTY_VALUES: ContentPageFormValues = { relation: "", title: "" };
-
 export default function ContentPageForm({
-  initialValues = EMPTY_VALUES,
+  initialValues,
   onChange,
   relatedOptions,
 }: ContentPageFormProps) {
