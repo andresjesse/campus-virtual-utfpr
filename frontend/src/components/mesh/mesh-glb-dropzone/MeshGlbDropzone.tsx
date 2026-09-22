@@ -66,7 +66,7 @@ export default function MeshGlbDropzone({
       icon={CloudArrowUpIcon}
       title={messages.mesh.editor.dropzoneTitle}
       description={messages.mesh.editor.dropzoneDescription}
-      actionLabel={messages.mesh.editor.dropzoneAction}
+      actionLabel={messages.common.selectFiles}
     />
   );
 }

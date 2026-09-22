@@ -51,7 +51,7 @@ describe('MeshGlbDropzone', () => {
     renderDropzone(null)
 
     expect(screen.getByText(messages.mesh.editor.dropzoneTitle)).toBeInTheDocument()
-    expect(screen.getByText(messages.mesh.editor.dropzoneAction)).toBeInTheDocument()
+    expect(screen.getByText(messages.common.selectFiles)).toBeInTheDocument()
     expect(screen.getByText('Drop').parentElement).toHaveAttribute('data-multiple', 'false')
     expect(screen.getByText('Drop').parentElement).toHaveAttribute('data-layout', 'stacked')
   })

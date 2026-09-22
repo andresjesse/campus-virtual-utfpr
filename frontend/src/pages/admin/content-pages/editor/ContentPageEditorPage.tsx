@@ -45,7 +45,7 @@ export default function ContentPageEditorPage() {
       id: AUTOSAVE_ERROR_NOTIFICATION_ID,
       autoClose: 8000,
       color: "red",
-      title: messages.contentPages.editor.autosaveErrorTitle,
+      title: messages.common.saveError,
       message,
     };
 
@@ -113,10 +113,10 @@ export default function ContentPageEditorPage() {
             aria-live="polite"
           >
             {status === "saving"
-              ? messages.contentPages.editor.saving
+              ? messages.common.saving
               : status === "error"
-                ? messages.contentPages.editor.saveError
-                : messages.contentPages.editor.saved}
+                ? messages.common.saveError
+                : messages.common.saved}
           </Badge>
         </Group>
 

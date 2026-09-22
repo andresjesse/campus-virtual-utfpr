@@ -155,7 +155,7 @@ export default function ContentBlockEditOverlay({
               leftSection={<CheckIcon aria-hidden size={16} />}
               onClick={() => void handleUpdate()}
             >
-              {messages.block.editor.save}
+              {messages.common.save}
             </Button>
           </Group>
         </Modal.Body>

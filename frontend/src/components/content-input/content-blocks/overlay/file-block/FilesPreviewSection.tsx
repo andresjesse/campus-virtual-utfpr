@@ -71,7 +71,7 @@ export default function FilesPreviewSection({
             />
           }
         >
-          {expanded ? messages.files.preview.showLess : messages.files.preview.showMore}
+          {expanded ? messages.common.showLess : messages.common.showMore}
         </Button>
       )}
     </section>
