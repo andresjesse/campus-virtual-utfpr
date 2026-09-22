@@ -1,9 +1,31 @@
 import type { FileRejection } from "react-dropzone";
 
-export type FileUploadLimits = {
-  maxSizeInBytes: number;
-  allowedMimeTypes: string[];
-};
+import { bytesToMegabytes } from "@/helpers/conversion-helper.ts";
+import type {
+  DragStatus,
+  DropzoneAccept,
+  FileUploadLimits,
+} from "@/types/file.ts";
+
+export function getAcceptedMimeTypes(accept: DropzoneAccept): string[] {
+  return Array.isArray(accept) ? accept : Object.keys(accept);
+}
+
+export function getDragStatus(
+  items: DataTransferItemList | undefined,
+  acceptedMimeTypes: string[],
+): DragStatus {
+  if (!items || items.length === 0) return "accept";
+
+  for (let i = 0; i < items.length; i += 1) {
+    const type = items[i].type;
+    if (type && !acceptedMimeTypes.includes(type)) {
+      return "reject";
+    }
+  }
+
+  return "accept";
+}
 
 export const FILE_UPLOAD_REJECTION_NOTIFICATION = {
   color: "red",
@@ -28,7 +50,7 @@ export function getFileRejectionMessage(
   limits: FileUploadLimits,
 ): string {
   const fileName = rejection.file.name;
-  const maxSizeMb = limits.maxSizeInBytes / (1000 * 1000);
+  const maxSizeMb = bytesToMegabytes(limits.maxSizeInBytes);
 
   return rejection.errors
     .map((error) => {

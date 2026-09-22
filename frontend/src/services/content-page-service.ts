@@ -12,7 +12,7 @@ import {PAGE_BLOCK_COLLECTIONS} from "@/constants/content-constants.ts";
 import {encodeRelation, generateFilesUrl, parseRelation} from "@/helpers/content-pages-service-helper.ts";
 import {ContentPageBlocksEnum, type ContentPageBlockType} from "@/enums/content-pages-enum.ts";
 import sanitizeRichText from "@/helpers/sanitize-rich-text.ts";
-import {getFilenameFromUrl} from "@/helpers/file-upload-helper.ts";
+import {getFilenameFromUrl} from "@/helpers/file-helper.ts";
 
 // #####################################################################
 // #### == #### == #### COLLECTION NAMES #### == #### == #### == #### ==
