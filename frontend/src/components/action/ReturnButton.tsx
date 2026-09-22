@@ -20,7 +20,7 @@ export default function ReturnButton({ navRoute }: ReturnButtonProps) {
       mb="lg"
       style={{ alignSelf: "flex-start" }}
     >
-      {messages.mesh.editor.back}
+      {messages.common.back}
     </Button>
   );
 }

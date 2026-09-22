@@ -1,4 +1,8 @@
 {
+  "common": {
+    "back": "Voltar",
+    "retry": "Tentar novamente"
+  },
   "block": {
     "editor": {
       "save": "Salvar"
@@ -25,6 +29,12 @@
     }
   },
   "files": {
+    "dropzone": {
+      "images": {
+        "title": "Arraste imagens aqui ou clique para selecionar arquivos",
+        "description": "Anexe quantas imagens quiser, cada uma não pode exceder 15MB"
+      }
+    },
     "preview": {
       "showMore": "Ver mais",
       "showLess": "Ver menos"
@@ -54,7 +64,6 @@
       "new": "Novo Mesh",
       "loading": "Carregando arquivos mesh",
       "loadErrorTitle": "Não foi possível carregar os arquivos mesh",
-      "retry": "Tentar novamente",
       "emptyTitle": "Nenhum arquivo mesh cadastrado",
       "emptyDescription": "Cadastre o primeiro mesh para começar.",
       "emptyResultsTitle": "Nenhum arquivo mesh encontrado",
@@ -73,7 +82,6 @@
     "editor": {
       "newTitle": "Novo Arquivo Mesh",
       "editTitle": "Editar Arquivo Mesh",
-      "back": "Voltar",
       "save": "Salvar",
       "saveSuccessTitle": "Arquivo mesh salvo",
       "saveSuccessMessage": "O arquivo mesh foi salvo com sucesso.",
@@ -84,10 +92,23 @@
       "descriptionPlaceholder": "Descrição opcional do mesh",
       "fileLabel": "Arquivo GLB",
       "fileRequiredError": "Selecione o arquivo .glb do mesh.",
+      "dropzoneTitle": "Carregar Arquivo",
+      "dropzoneDescription": "Arraste e solte arquivo glTF ou clique no botão abaixo para selecioná-lo.",
+      "dropzoneAction": "Selecionar Arquivos",
+      "removeFileLabel": "Remover arquivo GLB",
       "loading": "Carregando arquivo mesh"
     }
   },
   "contentPages": {
+    "editor": {
+      "canvasLabel": "Conteúdo da página",
+      "loading": "Carregando página",
+      "loadErrorTitle": "Não foi possível carregar a página",
+      "saving": "Salvando...",
+      "saved": "Salvo",
+      "saveError": "Erro ao salvar",
+      "autosaveErrorTitle": "Não foi possível salvar"
+    },
     "list": {
       "new": "Nova página",
       "title": "Páginas cadastradas"
