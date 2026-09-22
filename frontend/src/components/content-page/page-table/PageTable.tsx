@@ -2,6 +2,7 @@ import { ActionIcon, ScrollArea, Table } from "@mantine/core";
 import { TrashIcon } from "@phosphor-icons/react/dist/csr/Trash";
 import { useNavigate } from "react-router";
 
+import { appLocale } from "@/config/locale.ts";
 import type { ContentPageListRecord } from "@/types/content-page.ts";
 
 import classes from "./page-table.module.css";
@@ -24,7 +25,7 @@ function formatDate(date: string) {
 
   return Number.isNaN(parsedDate.getTime())
     ? "—"
-    : new Intl.DateTimeFormat("pt-BR").format(parsedDate);
+    : new Intl.DateTimeFormat(appLocale).format(parsedDate);
 }
 
 function PageTableRow({ deleting, onDelete, onOpen, page }: PageTableRowProps) {

@@ -1,7 +1,7 @@
 import {Button, Flex, Group} from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { PlusIcon } from "@phosphor-icons/react/dist/csr/Plus";
-import {useCallback, useContext, useEffect, useMemo, useState} from "react";
+import {useCallback, useContext, useEffect, useState} from "react";
 import { useNavigate } from "react-router";
 
 import FeedbackState from "@/components/feedback-state";
@@ -17,6 +17,7 @@ import {getRequestErrorMessage} from "@/helpers/request-error-helper.ts";
 import {DialogContext} from "@/contexts/dialog-context.ts";
 import messages from "@/constants/messages.json";
 import {branding} from "@/config/branding.ts";
+import {useLocaleSearch} from "@/hooks/use-locale-search.ts";
 
 export default function ContentPageList() {
   const navigate = useNavigate();
@@ -41,15 +42,7 @@ export default function ContentPageList() {
     }
   }, []);
 
-  const filteredPages = useMemo(() => {
-    const normalizedQuery = query.trim().toLocaleLowerCase("pt-BR");
-
-    return normalizedQuery
-      ? pages.filter((page) =>
-          page.title.toLocaleLowerCase("pt-BR").includes(normalizedQuery),
-        )
-      : pages;
-  }, [pages, query]);
+  const filteredPages = useLocaleSearch(pages, query, (page) => page.title);
 
   const handleDelete
     = useCallback(async (page: ContentPageListRecord) => {
