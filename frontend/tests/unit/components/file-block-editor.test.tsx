@@ -9,7 +9,7 @@ const mockExistingUrl = 'http://localhost/api/files/c/r/existing.png'
 const mockFile = new File(['x'], 'a.png', { type: 'image/png' })
 
 jest.mock(
-  '@/components/content-input/content-blocks/overlay/file-block/DropzoneSection.tsx',
+  '@/components/content-input/DropzoneSection.tsx',
   () => ({
     __esModule: true,
     default: ({ onDrop }: { onDrop: (files: File[]) => void }) => (
