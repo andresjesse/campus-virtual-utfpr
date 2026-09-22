@@ -87,7 +87,7 @@
       "loading": "Carregando arquivo mesh"
     }
   },
-  "content_pages": {
+  "contentPages": {
     "list": {
       "new": "Nova página",
       "title": "Páginas cadastradas"

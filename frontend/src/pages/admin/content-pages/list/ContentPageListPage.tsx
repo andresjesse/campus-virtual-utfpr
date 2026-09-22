@@ -101,7 +101,7 @@ export default function ContentPageList() {
           leftSection={<PlusIcon aria-hidden size={16} />}
           onClick={() => navigate("/admin/pages/new")}
         >
-          {messages.content_pages.list.new}
+          {messages.contentPages.list.new}
         </Button>
       </Group>
 
@@ -112,7 +112,7 @@ export default function ContentPageList() {
         w="100%"
         pt="md"
         style={{ "border-top": `1px solid ${branding.colors.border.default}` }}
-        aria-label={messages.content_pages.list.title}
+        aria-label={messages.contentPages.list.title}
       >
         {isLoading && <FeedbackState loading title="Carregando páginas" />}
         {!isLoading && error && (
