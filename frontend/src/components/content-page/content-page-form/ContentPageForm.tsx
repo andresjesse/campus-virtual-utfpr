@@ -9,6 +9,7 @@ import type {
 import classes from "./content-page-form.module.css";
 import BlocksList from "@/components/content-page/content-page-form/BlocksList.tsx";
 import TitleInput from "@/components/text-input/TitleInput.tsx";
+import FormBodySection from "@/containers/FormBodySection.tsx";
 import FormMetadataSection from "@/containers/FormMetadataSection.tsx";
 
 type ContentPageFormProps = {
@@ -80,7 +81,7 @@ export default function ContentPageForm({
           </Box>
         </Flex>
       </FormMetadataSection>
-      <Box
+      <FormBodySection
         flex="1 1 0"
         mih={0}
         style={{ overflowY: "auto" }}
@@ -89,7 +90,7 @@ export default function ContentPageForm({
           pageTitle={values.title}
           pageRelation={values.relation}
         />
-      </Box>
+      </FormBodySection>
     </Stack>
   );
 }
