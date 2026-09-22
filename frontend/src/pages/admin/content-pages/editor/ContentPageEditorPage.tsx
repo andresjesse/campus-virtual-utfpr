@@ -1,6 +1,5 @@
-import { Badge, Button, Group } from "@mantine/core";
+import { Badge, Group } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { CaretDoubleLeftIcon } from "@phosphor-icons/react/dist/csr/CaretDoubleLeft";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 
@@ -19,6 +18,7 @@ import type {
 
 import classes from "./content-page-editor.module.css";
 import {getRequestErrorMessage} from "@/helpers/request-error-helper.ts";
+import ReturnButton from "@/components/action/ReturnButton.tsx";
 
 const AUTOSAVE_ERROR_NOTIFICATION_ID = "content-page-autosave-error";
 
@@ -88,15 +88,7 @@ export default function ContentPageEditorPage() {
     <main className={classes.page}>
       <section className={classes.workspace}>
         <Group className={classes.backRow} justify="space-between">
-          <Button
-            size="xs"
-            variant="subtle"
-            color="gray"
-            leftSection={<CaretDoubleLeftIcon aria-hidden size={17} />}
-            onClick={() => navigate("/admin/pages")}
-          >
-            Voltar
-          </Button>
+          <ReturnButton navRoute={"/admin/pages"} />
           <Badge
             size="xs"
             color={status === "error" ? "red" : status === "saved" ? "green" : "gray"}
@@ -112,6 +104,7 @@ export default function ContentPageEditorPage() {
           </Badge>
         </Group>
 
+        {/* TODO: Change to RoundedPaperContainer? */}
         <section className={classes.canvas} aria-label="Conteúdo da página">
           {isLoading && <FeedbackState loading title="Carregando página" />}
           {!isLoading && error && (
