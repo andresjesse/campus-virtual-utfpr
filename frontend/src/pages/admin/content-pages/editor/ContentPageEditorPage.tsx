@@ -8,7 +8,7 @@ import ElementPalette from "@/components/element-palette/ElementPalette.tsx";
 import FeedbackState from "@/components/feedback-state";
 import { branding } from "@/config/branding.ts";
 import messages from "@/constants/messages.json";
-import RoundedPaperContainer from "@/containers/RoundedPaperContainer.tsx";
+import EditorPageContainer from "@/containers/EditorPageContainer.tsx";
 import { useContentPageAutosave } from "@/hooks/use-content-page-autosave";
 import {
   getContentPageEditorData,
@@ -20,7 +20,6 @@ import type {
 } from "@/types/content-page";
 
 import {getRequestErrorMessage} from "@/helpers/request-error-helper.ts";
-import ReturnButton from "@/components/action/ReturnButton.tsx";
 
 const AUTOSAVE_ERROR_NOTIFICATION_ID = "content-page-autosave-error";
 
@@ -92,22 +91,15 @@ export default function ContentPageEditorPage() {
       direction={{ base: "column", md: "row" }}
       mih="calc(100dvh - 60px)"
     >
-      <Flex
-        component="section"
-        direction="column"
-        flex="1 1 auto"
-        miw={0}
-        px={{ base: "0.75rem", md: "md" }}
-        pt={{ base: "0.75rem", md: "0.55rem" }}
-        pb={{ base: "0.75rem", md: 0 }}
+      <EditorPageContainer
+        navRoute="/admin/pages"
+        ariaLabel={messages.contentPages.editor.canvasLabel}
       >
-        <Group justify="space-between" flex="0 0 auto" mih="2rem" mb="0.4rem">
-          <ReturnButton navRoute={"/admin/pages"} />
+        <Group justify="flex-end" px="xl" pt="sm">
           <Badge
             size="xs"
             color={status === "error" ? "red" : status === "saved" ? "green" : "gray"}
             variant="light"
-            me="1rem"
             lts="0.02em"
             opacity={0.75}
             aria-live="polite"
@@ -119,33 +111,26 @@ export default function ContentPageEditorPage() {
                 : messages.common.saved}
           </Badge>
         </Group>
-
-        <RoundedPaperContainer
-          ariaLabel={messages.contentPages.editor.canvasLabel}
-          mih={{ base: "calc(100dvh - 6.5rem)", md: 0 }}
-          style={{ overflow: "hidden" }}
-        >
-          {isLoading && (
-            <FeedbackState loading title={messages.contentPages.editor.loading} />
-          )}
-          {!isLoading && error && (
-            <FeedbackState
-              title={messages.contentPages.editor.loadErrorTitle}
-              description={error}
-              actionLabel={messages.common.retry}
-              onAction={() => void loadEditor()}
-            />
-          )}
-          {!isLoading && !error && initialValues && (
-            <ContentPageForm
-              key={`${initialValues.title}:${initialValues.relation}`}
-              initialValues={initialValues}
-              relatedOptions={relatedOptions}
-              onChange={queueSave}
-            />
-          )}
-        </RoundedPaperContainer>
-      </Flex>
+        {isLoading && (
+          <FeedbackState loading title={messages.contentPages.editor.loading} />
+        )}
+        {!isLoading && error && (
+          <FeedbackState
+            title={messages.contentPages.editor.loadErrorTitle}
+            description={error}
+            actionLabel={messages.common.retry}
+            onAction={() => void loadEditor()}
+          />
+        )}
+        {!isLoading && !error && initialValues && (
+          <ContentPageForm
+            key={`${initialValues.title}:${initialValues.relation}`}
+            initialValues={initialValues}
+            relatedOptions={relatedOptions}
+            onChange={queueSave}
+          />
+        )}
+      </EditorPageContainer>
 
       <Box
         flex="0 0 auto"
