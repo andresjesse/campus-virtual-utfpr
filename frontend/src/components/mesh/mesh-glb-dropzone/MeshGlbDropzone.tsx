@@ -15,12 +15,14 @@ import { XIcon } from "@phosphor-icons/react/dist/csr/X";
 type MeshGlbDropzoneProps = {
   onChange: (file: File | null) => void;
   value: File | null;
+  error?: string;
 };
 
 export default function MeshGlbDropzone({
   onChange,
   value,
-}: MeshGlbDropzoneProps) {
+  error,
+}:MeshGlbDropzoneProps) {
   if (value) {
     return (
       <Group
@@ -67,6 +69,7 @@ export default function MeshGlbDropzone({
       title={messages.mesh.editor.dropzoneTitle}
       description={messages.mesh.editor.dropzoneDescription}
       actionLabel={messages.common.selectFiles}
+      error={error}
     />
   );
 }

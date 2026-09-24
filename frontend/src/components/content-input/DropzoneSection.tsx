@@ -25,6 +25,7 @@ type DropzoneSectionProps = {
   multiple?: boolean;
   layout?: "inline" | "stacked";
   actionLabel?: string;
+  error?: string;
 }
 
 type DragState = 'none' | DragStatus;
@@ -83,6 +84,7 @@ export default function DropzoneSection({
   multiple = true,
   layout = "inline",
   actionLabel,
+  error,
 }: DropzoneSectionProps) {
   const {hovered, ref} = useHover<HTMLDivElement>();
   const [dragActive, setDragActive] = useState(false);
@@ -151,6 +153,7 @@ export default function DropzoneSection({
   );
 
   return (
+    <>
     <Dropzone
       ref={ref}
       onDrop={handleAcceptedDrop}
@@ -216,5 +219,15 @@ export default function DropzoneSection({
         </Group>
       )}
     </Dropzone>
+    <Text
+      c={branding.colors.feedback.error}
+      size="sm"
+      mt="xs"
+      aria-hidden={!error}
+      style={{ visibility: error ? 'visible' : 'hidden' }}
+    >
+      {error ?? ' '}
+    </Text>
+    </>
   );
 }

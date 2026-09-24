@@ -13,7 +13,7 @@ type PendingImage = {
   url: string;
 }
 
-export default function FileBlockEditor({ content, onChange }: BlockEditorProps) {
+export default function FileBlockEditor({ content, onChange, error }: BlockEditorProps) {
   const [existingUrls] = useState<string[]>(
     () => (typeof content === "object" ? content.urls : []),
   );
@@ -70,6 +70,7 @@ export default function FileBlockEditor({ content, onChange }: BlockEditorProps)
         icon={ImageIcon}
         title={messages.files.dropzone.images.title}
         description={messages.files.dropzone.images.description}
+        error={error}
       />
       <Space h="lg" />
       <FilesPreviewSection

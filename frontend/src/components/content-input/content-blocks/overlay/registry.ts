@@ -8,6 +8,7 @@ import type {ContentPageBlockValue} from "@/types/content-page.ts";
 export type BlockEditorProps = {
   content?: ContentPageBlockValue,
   onChange: (value: ContentPageBlockValue) => void,
+  error?: string,
 }
 
 export const CONTENT_BLOCK_EDITOR_OVERLAY_BODY: Record<
