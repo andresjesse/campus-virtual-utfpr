@@ -9,6 +9,7 @@ import {
   getRtfBlocksMetadata
 } from "@/services/content-page-service.ts";
 import type PocketBase from "pocketbase";
+import {getFileUrl} from "@/helpers/file-helper.ts";
 
 export function encodeRelation(type: RelatedType, id: string) {
   return `${type}:${id}`;
@@ -54,6 +55,6 @@ export function generateFilesUrl(
   const filePaths = fileRecord.content as unknown as string[];
 
   return filePaths.map((filePath) =>
-    pocketBaseInstance.files.getURL(fileRecord, filePath)
+    getFileUrl(fileRecord, filePath, pocketBaseInstance)
   )
 }

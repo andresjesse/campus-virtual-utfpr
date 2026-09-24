@@ -93,6 +93,9 @@
       "dropzoneTitle": "Carregar Arquivo",
       "dropzoneDescription": "Arraste e solte arquivo glTF ou clique no botão abaixo para selecioná-lo.",
       "removeFileLabel": "Remover arquivo GLB",
+      "currentFileLabel": "Arquivo atual",
+      "replaceFileLabel": "Substituir arquivo",
+      "cancelReplaceLabel": "Manter arquivo atual",
       "loading": "Carregando arquivo mesh"
     }
   },

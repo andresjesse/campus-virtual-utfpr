@@ -1,3 +1,4 @@
+import type PocketBase from "pocketbase";
 import type { FileRejection } from "react-dropzone";
 
 import { bytesToMegabytes } from "@/helpers/conversion-helper.ts";
@@ -35,6 +36,14 @@ export const FILE_UPLOAD_REJECTION_NOTIFICATION = {
 
 const FILE_TOO_LARGE = "file-too-large";
 const FILE_INVALID_TYPE = "file-invalid-type";
+
+export function getFileUrl(
+  record: Record<string, unknown>,
+  fileName: string,
+  pocketBaseInstance: PocketBase,
+): string {
+  return pocketBaseInstance.files.getURL(record, fileName);
+}
 
 export function getFilenameFromUrl(url: string): string {
   try {

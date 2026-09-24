@@ -5,6 +5,7 @@ import {
   getDragStatus,
   getFileRejectionMessage,
   getFilenameFromUrl,
+  getFileUrl,
 } from '@/helpers/file-helper.ts'
 import type { FileRejection } from 'react-dropzone'
 
@@ -124,5 +125,17 @@ describe('file-helper', () => {
     it('accepts items whose type is empty (e.g. .glb)', () => {
       expect(getDragStatus(items(''), ['model/gltf-binary'])).toBe('accept')
     })
+  })
+})
+
+describe('getFileUrl', () => {
+  it('delegates to the PocketBase files API', () => {
+    const getURL = jest.fn().mockReturnValue('http://localhost/api/files/c/r/a.glb')
+    const record = { id: 'r' }
+
+    const url = getFileUrl(record, 'a.glb', { files: { getURL } } as never)
+
+    expect(getURL).toHaveBeenCalledWith(record, 'a.glb')
+    expect(url).toBe('http://localhost/api/files/c/r/a.glb')
   })
 })

@@ -11,3 +11,7 @@ export type MeshFormValues = {
   description: string;
   file: File | null;
 };
+
+export type MeshCurrentFile = {
+  name: string;
+};

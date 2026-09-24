@@ -37,10 +37,16 @@ jest.mock('@/components/content-input/DropzoneSection.tsx', () => ({
   ),
 }))
 
-function renderDropzone(value: File | null, onChange = jest.fn()) {
+const currentFile = { name: 'predio_a_x7f3k2.glb' }
+
+function renderDropzone(
+  value: File | null,
+  onChange = jest.fn(),
+  current?: typeof currentFile,
+) {
   render(
     <MantineProvider>
-      <MeshGlbDropzone value={value} onChange={onChange} />
+      <MeshGlbDropzone value={value} onChange={onChange} currentFile={current} />
     </MantineProvider>,
   )
   return onChange
@@ -84,5 +90,25 @@ describe('MeshGlbDropzone', () => {
     )
 
     expect(onChange).toHaveBeenCalledWith(null)
+  })
+
+  describe('with a stored file', () => {
+    it('shows the current file name instead of the dropzone', () => {
+      renderDropzone(null, jest.fn(), currentFile)
+
+      expect(screen.getByText(currentFile.name)).toBeInTheDocument()
+      expect(screen.getByText(messages.mesh.editor.currentFileLabel)).toBeInTheDocument()
+      expect(screen.queryByText(messages.mesh.editor.dropzoneTitle)).toBeNull()
+    })
+
+    it('reveals the dropzone on replace and returns to the card on cancel', () => {
+      renderDropzone(null, jest.fn(), currentFile)
+
+      fireEvent.click(screen.getByRole('button', { name: messages.mesh.editor.replaceFileLabel }))
+      expect(screen.getByText(messages.mesh.editor.dropzoneTitle)).toBeInTheDocument()
+
+      fireEvent.click(screen.getByRole('button', { name: messages.mesh.editor.cancelReplaceLabel }))
+      expect(screen.getByText(currentFile.name)).toBeInTheDocument()
+    })
   })
 })
