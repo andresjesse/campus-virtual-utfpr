@@ -8,7 +8,11 @@
     "selectFiles": "Selecionar Arquivos",
     "saving": "Salvando...",
     "saved": "Salvo",
-    "saveError": "Não foi possível salvar"
+    "saveError": "Não foi possível salvar",
+    "emptyValue": "—",
+    "createdAt": "Criado em",
+    "updatedAt": "Modificado em",
+    "actions": "Ações"
   },
   "block": {
     "empty": {
@@ -76,8 +80,8 @@
       "deleteErrorTitle": "Não foi possível excluir",
       "tableName": "Identificador",
       "tableDescription": "Descrição",
-      "tableCreated": "Criado em",
-      "tableUpdated": "Modificado em"
+      "noIdentifier": "Sem identificador",
+      "editAriaLabel": "Editar mesh {name}"
     },
     "editor": {
       "newTitle": "Novo Arquivo Mesh",
@@ -107,7 +111,14 @@
     },
     "list": {
       "new": "Nova página",
-      "title": "Páginas cadastradas"
+      "title": "Páginas cadastradas",
+      "tableTitle": "Nome",
+      "tableRelatedType": "Tipo relacionado",
+      "relatedEntity": "Modelo 3D",
+      "relatedMenuItem": "Item de Menu",
+      "untitled": "Sem título",
+      "editAriaLabel": "Editar página {name}",
+      "deleteAriaLabel": "Excluir página {name}"
     }
   }
 }

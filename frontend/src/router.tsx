@@ -40,10 +40,9 @@ export const Router = () => {
               />
             </Route>
             <Route element={<AuthorizationRoute capability="meshes.manage" />}>
-              <Route
-                path="meshes"
-                element={<Pages.Admin.Placeholder title="Arquivos Mesh" />}
-              />
+              <Route path="meshes" element={<Pages.Admin.MeshList />} />
+              <Route path="meshes/new" element={<Pages.Admin.MeshEditor />} />
+              <Route path="meshes/:meshId" element={<Pages.Admin.MeshEditor />} />
             </Route>
           </Route>
         </Route>
