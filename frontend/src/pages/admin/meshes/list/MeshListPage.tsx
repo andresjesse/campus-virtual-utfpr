@@ -1,87 +1,36 @@
 import {Button, Flex, Group} from "@mantine/core";
-import { notifications } from "@mantine/notifications";
 import { PlusIcon } from "@phosphor-icons/react/dist/csr/Plus";
-import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
 import FeedbackState from "@/components/feedback-state";
 import PageSearch from "@/components/content-page/page-search";
 import MeshTable from "@/components/mesh/mesh-table/MeshTable";
 import messages from "@/constants/messages.json";
-import { getRequestErrorMessage } from "@/helpers/request-error-helper";
 import { deleteMesh, listMeshes } from "@/services/mesh-service";
-import type { MeshRecord } from "@/types/mesh";
 
 import {branding} from "@/config/branding.ts";
-import {useLocaleSearch} from "@/hooks/use-locale-search.ts";
-import {DialogContext} from "@/contexts/dialog-context.ts";
-import {formatMessage} from "@/helpers/message-helper.ts";
+import {useRecordList} from "@/hooks/use-record-list.ts";
 
 export default function MeshListPage() {
   const navigate = useNavigate();
-  const [meshes, setMeshes] = useState<MeshRecord[]>([]);
-  const [query, setQuery] = useState("");
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-  const [deletingMeshId, setDeletingMeshId] = useState<string | null>(null);
 
-  const dialogBox = useContext(DialogContext);
-
-  const loadMeshes = useCallback(async () => {
-    setError("");
-    setIsLoading(true);
-
-    try {
-      setMeshes(await listMeshes());
-    } catch (requestError) {
-      setError(getRequestErrorMessage(requestError));
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const handleDelete = useCallback(
-    async (mesh: MeshRecord) => {
-      const name = mesh.name || messages.mesh.list.noIdentifier;
-
-      const confirmDelete = await dialogBox!.confirm({
-        title: messages.mesh.list.deleteConfirmTitle,
-        firstMessage: formatMessage(messages.mesh.list.deleteConfirmFirst, name),
-        secondMessage: messages.mesh.list.deleteConfirmSecond,
-      });
-
-      if (!confirmDelete) return;
-
-      setDeletingMeshId(mesh.id);
-
-      try {
-        await deleteMesh(mesh.id);
-        setMeshes((currentMeshes) =>
-          currentMeshes.filter((currentMesh) => currentMesh.id !== mesh.id),
-        );
-        notifications.show({
-          color: "green",
-          title: messages.mesh.list.deletedTitle,
-          message: messages.mesh.list.deletedMessage,
-        });
-      } catch (deleteError) {
-        notifications.show({
-          color: "red",
-          title: messages.mesh.list.deleteErrorTitle,
-          message: getRequestErrorMessage(deleteError),
-        });
-      } finally {
-        setDeletingMeshId(null);
-      }
-    },
-    [dialogBox],
-  );
-
-  const filteredMeshes = useLocaleSearch(meshes, query, (mesh) => mesh.name);
-
-  useEffect(() => {
-    void loadMeshes();
-  }, [loadMeshes]);
+  const {
+    records,
+    filtered,
+    query,
+    setQuery,
+    isLoading,
+    error,
+    reload,
+    deletingId,
+    requestDelete,
+  } = useRecordList({
+    texts: messages.mesh.list,
+    listRecords: listMeshes,
+    deleteRecord: deleteMesh,
+    getSearchableText: (mesh) => mesh.name,
+    getName: (mesh) => mesh.name || messages.mesh.list.noIdentifier,
+  });
 
   return (
     <Flex direction="column" px="lg" pt="lg" pb={0} mih="calc(100dvh - 60px)" >
@@ -111,7 +60,7 @@ export default function MeshListPage() {
         mih={0}
         w="100%"
         pt="md"
-        style={{ "border-top": `1px solid ${branding.colors.border.default}` }}
+        style={{ borderTop: `1px solid ${branding.colors.border.default}` }}
         aria-label={messages.mesh.list.title}
       >
         {isLoading && <FeedbackState loading title={messages.mesh.list.loading} />}
@@ -120,26 +69,26 @@ export default function MeshListPage() {
             title={messages.mesh.list.loadErrorTitle}
             description={error}
             actionLabel={messages.common.retry}
-            onAction={() => void loadMeshes()}
+            onAction={() => void reload()}
           />
         )}
-        {!isLoading && !error && meshes.length === 0 && (
+        {!isLoading && !error && records.length === 0 && (
           <FeedbackState
             title={messages.mesh.list.emptyTitle}
             description={messages.mesh.list.emptyDescription}
           />
         )}
-        {!isLoading && !error && meshes.length > 0 && filteredMeshes.length === 0 && (
+        {!isLoading && !error && records.length > 0 && filtered.length === 0 && (
           <FeedbackState
             title={messages.mesh.list.emptyResultsTitle}
             description={messages.mesh.list.emptyResultsDescription}
           />
         )}
-        {!isLoading && !error && filteredMeshes.length > 0 && (
+        {!isLoading && !error && filtered.length > 0 && (
           <MeshTable
-            meshes={filteredMeshes}
-            deletingMeshId={deletingMeshId}
-            onDelete={(mesh) => void handleDelete(mesh)}
+            meshes={filtered}
+            deletingMeshId={deletingId}
+            onDelete={(mesh) => void requestDelete(mesh)}
           />
         )}
       </Flex>
