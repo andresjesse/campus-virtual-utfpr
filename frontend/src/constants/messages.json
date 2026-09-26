@@ -81,7 +81,8 @@
       "tableName": "Identificador",
       "tableDescription": "Descrição",
       "noIdentifier": "Sem identificador",
-      "editAriaLabel": "Editar mesh {name}"
+      "editAriaLabel": "Editar mesh {name}",
+      "deleteAriaLabel": "Excluir mesh {name}"
     },
     "editor": {
       "newTitle": "Novo Arquivo Mesh",

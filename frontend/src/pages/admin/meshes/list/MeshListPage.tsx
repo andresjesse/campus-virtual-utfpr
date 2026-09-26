@@ -1,6 +1,7 @@
 import {Button, Flex, Group} from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import { PlusIcon } from "@phosphor-icons/react/dist/csr/Plus";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
 import FeedbackState from "@/components/feedback-state";
@@ -8,11 +9,13 @@ import PageSearch from "@/components/content-page/page-search";
 import MeshTable from "@/components/mesh/mesh-table/MeshTable";
 import messages from "@/constants/messages.json";
 import { getRequestErrorMessage } from "@/helpers/request-error-helper";
-import { listMeshes } from "@/services/mesh-service";
+import { deleteMesh, listMeshes } from "@/services/mesh-service";
 import type { MeshRecord } from "@/types/mesh";
 
 import {branding} from "@/config/branding.ts";
 import {useLocaleSearch} from "@/hooks/use-locale-search.ts";
+import {DialogContext} from "@/contexts/dialog-context.ts";
+import {formatMessage} from "@/helpers/message-helper.ts";
 
 export default function MeshListPage() {
   const navigate = useNavigate();
@@ -20,6 +23,9 @@ export default function MeshListPage() {
   const [query, setQuery] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [deletingMeshId, setDeletingMeshId] = useState<string | null>(null);
+
+  const dialogBox = useContext(DialogContext);
 
   const loadMeshes = useCallback(async () => {
     setError("");
@@ -33,6 +39,43 @@ export default function MeshListPage() {
       setIsLoading(false);
     }
   }, []);
+
+  const handleDelete = useCallback(
+    async (mesh: MeshRecord) => {
+      const name = mesh.name || messages.mesh.list.noIdentifier;
+
+      const confirmDelete = await dialogBox!.confirm({
+        title: messages.mesh.list.deleteConfirmTitle,
+        firstMessage: formatMessage(messages.mesh.list.deleteConfirmFirst, name),
+        secondMessage: messages.mesh.list.deleteConfirmSecond,
+      });
+
+      if (!confirmDelete) return;
+
+      setDeletingMeshId(mesh.id);
+
+      try {
+        await deleteMesh(mesh.id);
+        setMeshes((currentMeshes) =>
+          currentMeshes.filter((currentMesh) => currentMesh.id !== mesh.id),
+        );
+        notifications.show({
+          color: "green",
+          title: messages.mesh.list.deletedTitle,
+          message: messages.mesh.list.deletedMessage,
+        });
+      } catch (deleteError) {
+        notifications.show({
+          color: "red",
+          title: messages.mesh.list.deleteErrorTitle,
+          message: getRequestErrorMessage(deleteError),
+        });
+      } finally {
+        setDeletingMeshId(null);
+      }
+    },
+    [dialogBox],
+  );
 
   const filteredMeshes = useLocaleSearch(meshes, query, (mesh) => mesh.name);
 
@@ -93,7 +136,11 @@ export default function MeshListPage() {
           />
         )}
         {!isLoading && !error && filteredMeshes.length > 0 && (
-          <MeshTable meshes={filteredMeshes} />
+          <MeshTable
+            meshes={filteredMeshes}
+            deletingMeshId={deletingMeshId}
+            onDelete={(mesh) => void handleDelete(mesh)}
+          />
         )}
       </Flex>
     </Flex>

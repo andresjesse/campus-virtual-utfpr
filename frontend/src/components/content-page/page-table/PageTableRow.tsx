@@ -1,6 +1,6 @@
-import { ActionIcon, Table } from "@mantine/core";
-import { TrashIcon } from "@phosphor-icons/react/dist/csr/Trash";
+import { Table } from "@mantine/core";
 
+import TableDeleteActionCell from "@/components/table/TableDeleteActionCell.tsx";
 import messages from "@/constants/messages.json";
 import { formatDate } from "@/helpers/conversion-helper.ts";
 import { formatMessage } from "@/helpers/message-helper.ts";
@@ -46,22 +46,11 @@ export default function PageTableRow({
             ? messages.contentPages.list.relatedMenuItem
             : messages.common.emptyValue}
       </Table.Td>
-      <Table.Td ta="right">
-        <ActionIcon
-          aria-label={formatMessage(messages.contentPages.list.deleteAriaLabel, title)}
-          color="red"
-          variant="subtle"
-          size="sm"
-          loading={deleting}
-          onClick={(event) => {
-            event.stopPropagation();
-            onDelete();
-          }}
-          onKeyDown={(event) => event.stopPropagation()}
-        >
-          <TrashIcon aria-hidden size={15} />
-        </ActionIcon>
-      </Table.Td>
+      <TableDeleteActionCell
+        ariaLabel={formatMessage(messages.contentPages.list.deleteAriaLabel, title)}
+        deleting={deleting}
+        onDelete={onDelete}
+      />
     </Table.Tr>
   );
 }
