@@ -53,15 +53,38 @@ describe('MeshForm', () => {
     expect(screen.getByText(messages.mesh.identifier.empty)).toBeInTheDocument()
   })
 
-  it('blocks submission when the identifier has invalid characters', () => {
+  it('blocks submission and flags the field when the identifier is only whitespace', () => {
     const onSubmit = renderForm()
 
     fireEvent.change(screen.getByLabelText(messages.mesh.editor.nameLabel), {
-      target: { value: 'Prédio Principal' },
+      target: { value: '   ' },
     })
     submit()
 
     expect(onSubmit).not.toHaveBeenCalled()
+    expect(screen.getByText(messages.mesh.identifier.empty)).toBeInTheDocument()
+  })
+
+  it.each([
+    ['a space between words', 'predio a'],
+    ['a leading space', ' predio_a a'],
+    ['an uppercase letter', 'Predio_a'],
+    ['an accent', 'prédio_a'],
+    ['a hyphen', 'predio-a'],
+    ['a dot', 'predio_a.glb'],
+  ])('blocks submission when the identifier has %s', (_description, identifier) => {
+    const onSubmit = renderForm()
+
+    fireEvent.change(screen.getByLabelText(messages.mesh.editor.nameLabel), {
+      target: { value: identifier },
+    })
+    submit()
+
+    expect(onSubmit).not.toHaveBeenCalled()
+    expect(screen.getByLabelText(messages.mesh.editor.nameLabel)).toHaveAttribute(
+      'aria-invalid',
+      'true',
+    )
     expect(screen.getByText(messages.mesh.identifier.invalid)).toBeInTheDocument()
   })
 
