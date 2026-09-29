@@ -21,12 +21,11 @@ export default function RouteTabs({ active, ariaLabel, options }: RouteTabsProps
   return (
     <Box
       bg={branding.colors.surface.panel}
-      px="lg"
-      pt="lg"
+      px="xs"
+      pt="xs"
       style={{ borderStartStartRadius: "1.5rem", borderStartEndRadius: "1.5rem" }}
     >
       <Tabs
-        radius="md"
         variant="pills"
         value={active}
         onChange={(value) => {
@@ -36,7 +35,7 @@ export default function RouteTabs({ active, ariaLabel, options }: RouteTabsProps
         }}
       >
         <Tabs.List grow aria-label={ariaLabel} style={{ gap: "0.75rem" }}>
-          {options.map((option) => {
+          {options.map((option, index) => {
             const isActive = option.value === active;
 
             return (
@@ -44,11 +43,17 @@ export default function RouteTabs({ active, ariaLabel, options }: RouteTabsProps
                 key={option.value}
                 value={option.value}
                 bg="transparent"
-                bd={`1px solid ${isActive ? branding.colors.brand.primary : branding.colors.border.strong}`}
+                bd={`2px solid ${isActive ? branding.colors.brand.primary : branding.colors.border.strong}`}
                 c={isActive ? branding.colors.brand.primary : branding.colors.text.primary}
                 fz="0.85rem"
                 fw={500}
                 p="0.7rem"
+                style={{
+                  borderStartStartRadius: index === 0 ? "1.25rem" : 0,
+                  borderStartEndRadius: index === options.length - 1 ? "1.25rem" : 0,
+                  borderEndStartRadius: 0,
+                  borderEndEndRadius: 0,
+                }}
               >
                 {option.label}
               </Tabs.Tab>
