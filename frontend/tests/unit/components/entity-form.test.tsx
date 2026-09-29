@@ -10,7 +10,7 @@ import type { EntityFormValues, EntityMeshOption } from '@/types/entity.ts'
 
 jest.mock('@mantine/notifications', () => ({ notifications: { show: jest.fn() } }))
 
-const meshOptions: EntityMeshOption[] = [{ label: 'predio_a', value: 'mesh-a' }]
+const meshOptions: EntityMeshOption[] = [{ label: 'building_a', value: 'mesh-a' }]
 
 const validValues: EntityFormValues = {
   ...ENTITY_DEFAULT_TRANSFORM,
@@ -82,7 +82,7 @@ describe('EntityForm', () => {
     expect(screen.getByText(messages.entities.slug.empty)).toBeInTheDocument()
   })
 
-  it.each([['Block_A'], ['ru block'], ['_ru'], ['ru_'], ['ru__block'], ['prédio_a']])(
+  it.each([['Block_A'], ['ru block'], ['_ru'], ['ru_'], ['ru__block'], ['café_a']])(
     'rejects the slug %s',
     async (slug) => {
       const onSubmit = renderForm({ ...validValues, slug })

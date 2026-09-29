@@ -4,7 +4,7 @@ import { useLocaleSearch } from '@/hooks/use-locale-search.ts'
 
 type Item = { name: string }
 
-const items: Item[] = [{ name: 'Prédio Principal' }, { name: 'Biblioteca' }]
+const items: Item[] = [{ name: 'Main Building' }, { name: 'Library' }]
 
 describe('useLocaleSearch', () => {
   it('returns every item when the query is empty', () => {
@@ -20,9 +20,9 @@ describe('useLocaleSearch', () => {
   })
 
   it('filters case-insensitively by the given field', () => {
-    const { result } = renderHook(() => useLocaleSearch(items, 'BIBLIO', (item) => item.name))
+    const { result } = renderHook(() => useLocaleSearch(items, 'LIBRA', (item) => item.name))
 
-    expect(result.current).toEqual([{ name: 'Biblioteca' }])
+    expect(result.current).toEqual([{ name: 'Library' }])
   })
 
   it('returns an empty array when nothing matches', () => {
