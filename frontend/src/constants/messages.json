@@ -106,6 +106,67 @@
       "loading": "Carregando arquivo mesh"
     }
   },
+  "entities": {
+    "errors": {
+      "duplicate": "Já existe uma entidade 3D com esse slug."
+    },
+    "slug": {
+      "empty": "Informe o slug da entidade.",
+      "invalid": "Use apenas letras minúsculas, números, hífen e underscore, começando e terminando com letra ou número.",
+      "help": "O slug identifica a entidade no câmpus virtual. Use um nome curto e estável, porque alterá-lo quebra as referências existentes."
+    },
+    "transform": {
+      "required": "Informe um valor.",
+      "invalid": "Informe um número válido."
+    },
+    "list": {
+      "title": "Entidades 3D",
+      "searchLabel": "Pesquisar entidades 3D pelo slug",
+      "searchPlaceholder": "Pesquise pelo slug",
+      "new": "Nova Entidade",
+      "loading": "Carregando entidades 3D",
+      "loadErrorTitle": "Não foi possível carregar as entidades 3D",
+      "emptyTitle": "Nenhuma entidade 3D cadastrada",
+      "emptyDescription": "Cadastre a primeira entidade para começar.",
+      "emptyResultsTitle": "Nenhuma entidade 3D encontrada",
+      "emptyResultsDescription": "Tente pesquisar usando outro slug.",
+      "deleteConfirmTitle": "Excluir entidade 3D",
+      "deleteConfirmFirst": "Deseja realmente excluir permanentemente a entidade {name}?",
+      "deleteConfirmSecond": "Páginas de conteúdo vinculadas a esta entidade serão afetadas.",
+      "deletedTitle": "Entidade 3D excluída",
+      "deletedMessage": "A entidade 3D foi removida.",
+      "tableSlug": "Slug",
+      "tableMesh": "Mesh",
+      "tableActive": "Ativo",
+      "activeYes": "Sim",
+      "activeNo": "Não",
+      "noIdentifier": "Sem slug",
+      "noMesh": "Sem mesh",
+      "editAriaLabel": "Editar entidade {name}",
+      "deleteAriaLabel": "Excluir entidade {name}"
+    },
+    "editor": {
+      "newTitle": "Nova Entidade 3D",
+      "editTitle": "Editar Entidade 3D",
+      "loading": "Carregando entidade 3D",
+      "saveSuccessTitle": "Entidade 3D salva",
+      "saveSuccessMessage": "A entidade 3D foi salva com sucesso.",
+      "slugLabel": "Slug",
+      "slugPlaceholder": "example_slug",
+      "meshLabel": "Mesh",
+      "meshPlaceholder": "Selecione",
+      "meshNothingFound": "Nenhum mesh encontrado",
+      "meshRequiredError": "Selecione o mesh da entidade.",
+      "isActiveLabel": "Ativo",
+      "transformLabel": "{group} Eixo {axis}",
+      "groupPosition": "Posição",
+      "groupRotation": "Rotação",
+      "groupScale": "Escala",
+      "axisX": "X",
+      "axisY": "Y",
+      "axisZ": "Z"
+    }
+  },
   "contentPages": {
     "editor": {
       "canvasLabel": "Conteúdo da página",
