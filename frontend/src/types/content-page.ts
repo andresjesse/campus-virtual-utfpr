@@ -1,5 +1,7 @@
 import type { RecordModel } from "pocketbase";
 
+import type { EntityRecord } from "@/types/entity.ts";
+
 export type ContentPageFormValues = {
   relation: string;
   title: string;
@@ -28,10 +30,6 @@ export type GroupedContentPageBlockMetadata = {
   diagram_block?: ContentPageBlockMetadata[];
   file_block?: ContentPageBlockMetadata[];
 }
-
-export type EntityRecord = RecordModel & {
-  slug: string;
-};
 
 export type ContentPageBlockRecord = RecordModel & {
   id?: string;

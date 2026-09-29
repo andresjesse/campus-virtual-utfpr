@@ -1,4 +1,4 @@
-import { ActionIcon, Button, createTheme, Input, Loader } from "@mantine/core";
+import { ActionIcon, Button, createTheme, Input, InputWrapper, Loader } from "@mantine/core";
 
 import { branding } from "@/config/branding";
 
@@ -16,6 +16,11 @@ export const theme = createTheme({
     Input: Input.extend({
       styles: {
         input: { "--input-bd-focus": branding.colors.brand.primary },
+      },
+    }),
+    InputWrapper: InputWrapper.extend({
+      styles: {
+        required: { color: branding.colors.feedback.error },
       },
     }),
     Button: Button.extend({

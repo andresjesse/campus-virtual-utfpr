@@ -34,10 +34,9 @@ export const Router = () => {
               />
             </Route>
             <Route element={<AuthorizationRoute capability="entities.manage" />}>
-              <Route
-                path="entities"
-                element={<Pages.Admin.Placeholder title="Entidades 3D" />}
-              />
+              <Route path="entities" element={<Pages.Admin.EntityList />} />
+              <Route path="entities/new" element={<Pages.Admin.EntityEditor />} />
+              <Route path="entities/:entityId" element={<Pages.Admin.EntityEditor />} />
             </Route>
             <Route element={<AuthorizationRoute capability="meshes.manage" />}>
               <Route path="meshes" element={<Pages.Admin.MeshList />} />
