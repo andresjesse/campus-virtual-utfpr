@@ -1,9 +1,12 @@
 import {
   buildFileRejectionNotification,
   FILE_UPLOAD_REJECTION_NOTIFICATION,
+  getAcceptedMimeTypes,
+  getDragStatus,
   getFileRejectionMessage,
   getFilenameFromUrl,
-} from '@/helpers/file-upload-helper.ts'
+  getFileUrl,
+} from '@/helpers/file-helper.ts'
 import type { FileRejection } from 'react-dropzone'
 
 const limits = {
@@ -22,7 +25,7 @@ function rejection(
   }
 }
 
-describe('file-upload-helper', () => {
+describe('file-helper', () => {
   describe('getFileRejectionMessage', () => {
     it('maps a file-too-large error to the size message', () => {
       expect(
@@ -81,5 +84,58 @@ describe('file-upload-helper', () => {
           '"b.pdf" tem um formato não suportado.',
       })
     })
+  })
+
+  describe('getAcceptedMimeTypes', () => {
+    it('returns an array accept as-is', () => {
+      expect(getAcceptedMimeTypes(['image/png', 'video/mp4'])).toEqual([
+        'image/png',
+        'video/mp4',
+      ])
+    })
+
+    it('returns the MIME types (keys) of a record accept', () => {
+      expect(
+        getAcceptedMimeTypes({ 'model/gltf-binary': ['.glb'] }),
+      ).toEqual(['model/gltf-binary'])
+    })
+  })
+
+  describe('getDragStatus', () => {
+    const items = (...types: string[]) =>
+      types.map((type) => ({ type })) as unknown as DataTransferItemList
+
+    it('accepts when there are no items', () => {
+      expect(getDragStatus(undefined, ['image/png'])).toBe('accept')
+      expect(getDragStatus(items(), ['image/png'])).toBe('accept')
+    })
+
+    it('accepts when every item type is allowed', () => {
+      expect(
+        getDragStatus(items('image/png', 'video/mp4'), ['image/png', 'video/mp4']),
+      ).toBe('accept')
+    })
+
+    it('rejects when any item type is not allowed', () => {
+      expect(
+        getDragStatus(items('image/png', 'application/pdf'), ['image/png']),
+      ).toBe('reject')
+    })
+
+    it('accepts items whose type is empty (e.g. .glb)', () => {
+      expect(getDragStatus(items(''), ['model/gltf-binary'])).toBe('accept')
+    })
+  })
+})
+
+describe('getFileUrl', () => {
+  it('delegates to the PocketBase files API', () => {
+    const getURL = jest.fn().mockReturnValue('http://localhost/api/files/c/r/a.glb')
+    const record = { id: 'r' }
+
+    const url = getFileUrl(record, 'a.glb', { files: { getURL } } as never)
+
+    expect(getURL).toHaveBeenCalledWith(record, 'a.glb')
+    expect(url).toBe('http://localhost/api/files/c/r/a.glb')
   })
 })

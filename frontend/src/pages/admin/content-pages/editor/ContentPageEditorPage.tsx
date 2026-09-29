@@ -1,12 +1,14 @@
-import { Badge, Button, Group } from "@mantine/core";
+import { Badge, Box, Flex, Group } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { CaretDoubleLeftIcon } from "@phosphor-icons/react/dist/csr/CaretDoubleLeft";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 
-import ContentPageForm from "@/components/content-page-form/ContentPageForm.tsx";
+import ContentPageForm from "@/components/content-page/content-page-form/ContentPageForm.tsx";
 import ElementPalette from "@/components/element-palette/ElementPalette.tsx";
 import FeedbackState from "@/components/feedback-state";
+import { branding } from "@/config/branding.ts";
+import messages from "@/constants/messages.json";
+import EditorPageContainer from "@/containers/EditorPageContainer.tsx";
 import { useContentPageAutosave } from "@/hooks/use-content-page-autosave";
 import {
   getContentPageEditorData,
@@ -17,8 +19,7 @@ import type {
   RelatedOption,
 } from "@/types/content-page";
 
-import classes from "./content-page-editor.module.css";
-import {getContentPageErrorMessage} from "@/helpers/content-pages-service-helper.ts";
+import {getRequestErrorMessage} from "@/helpers/request-error-helper.ts";
 
 const AUTOSAVE_ERROR_NOTIFICATION_ID = "content-page-autosave-error";
 
@@ -43,7 +44,7 @@ export default function ContentPageEditorPage() {
       id: AUTOSAVE_ERROR_NOTIFICATION_ID,
       autoClose: 8000,
       color: "red",
-      title: "Não foi possível salvar",
+      title: messages.common.saveError,
       message,
     };
 
@@ -74,7 +75,7 @@ export default function ContentPageEditorPage() {
           : { relation: "", title: "" },
       );
     } catch (requestError) {
-      setError(getContentPageErrorMessage(requestError));
+      setError(getRequestErrorMessage(requestError));
     } finally {
       setIsLoading(false);
     }
@@ -85,55 +86,59 @@ export default function ContentPageEditorPage() {
   }, [loadEditor]);
 
   return (
-    <main className={classes.page}>
-      <section className={classes.workspace}>
-        <Group className={classes.backRow} justify="space-between">
-          <Button
-            size="xs"
-            variant="subtle"
-            color="gray"
-            leftSection={<CaretDoubleLeftIcon aria-hidden size={17} />}
-            onClick={() => navigate("/admin/pages")}
-          >
-            Voltar
-          </Button>
+    <Flex
+      component="main"
+      direction={{ base: "column", md: "row" }}
+      mih="calc(100dvh - 60px)"
+    >
+      <EditorPageContainer
+        navRoute="/admin/pages"
+        ariaLabel={messages.contentPages.editor.canvasLabel}
+      >
+        <Group justify="flex-end" px="xl" pt="sm">
           <Badge
             size="xs"
             color={status === "error" ? "red" : status === "saved" ? "green" : "gray"}
             variant="light"
-            className={classes.saveStatus}
+            lts="0.02em"
+            opacity={0.75}
             aria-live="polite"
           >
             {status === "saving"
-              ? "Salvando..."
+              ? messages.common.saving
               : status === "error"
-                ? "Erro ao salvar"
-                : "Salvo"}
+                ? messages.common.saveError
+                : messages.common.saved}
           </Badge>
         </Group>
+        {isLoading && (
+          <FeedbackState loading title={messages.contentPages.editor.loading} />
+        )}
+        {!isLoading && error && (
+          <FeedbackState
+            title={messages.contentPages.editor.loadErrorTitle}
+            description={error}
+            actionLabel={messages.common.retry}
+            onAction={() => void loadEditor()}
+          />
+        )}
+        {!isLoading && !error && initialValues && (
+          <ContentPageForm
+            key={`${initialValues.title}:${initialValues.relation}`}
+            initialValues={initialValues}
+            relatedOptions={relatedOptions}
+            onChange={queueSave}
+          />
+        )}
+      </EditorPageContainer>
 
-        <section className={classes.canvas} aria-label="Conteúdo da página">
-          {isLoading && <FeedbackState loading title="Carregando página" />}
-          {!isLoading && error && (
-            <FeedbackState
-              title="Não foi possível carregar a página"
-              description={error}
-              actionLabel="Tentar novamente"
-              onAction={() => void loadEditor()}
-            />
-          )}
-          {!isLoading && !error && initialValues && (
-            <ContentPageForm
-              key={`${initialValues.title}:${initialValues.relation}`}
-              initialValues={initialValues}
-              relatedOptions={relatedOptions}
-              onChange={queueSave}
-            />
-          )}
-        </section>
-      </section>
-
-      <ElementPalette />
-    </main>
+      <Box
+        flex="0 0 auto"
+        w={{ base: "100%", md: "16rem", lg: "19rem" }}
+        bg={branding.colors.surface.sidebar}
+      >
+        <ElementPalette />
+      </Box>
+    </Flex>
   );
 }

@@ -42,6 +42,7 @@ export default function ContentBlockEditOverlay({
 }: ContentBlockEditModalProps) {
   const [draftMetadata, setDraftMetadata] = useState(blockMetadata);
   const [isSaving, setIsSaving] = useState(false);
+  const [contentError, setContentError] = useState<string>();
   const { blockData, isLoading, upsertBlockContent } = useContentBlockData(draftMetadata);
   const content = useRef<ContentPageBlockValue>(blockData);
 
@@ -69,6 +70,7 @@ export default function ContentBlockEditOverlay({
         blockMetadata.collectionName,
         isNewBlock,
       );
+      setContentError(message);
       notifications.show({ color: "yellow", title, message });
       return;
     }
@@ -130,7 +132,11 @@ export default function ContentBlockEditOverlay({
 
               <EditorBody
                 content={blockData}
-                onChange={(value) => content.current = value}
+                onChange={(value) => {
+                  content.current = value;
+                  setContentError(undefined);
+                }}
+                error={contentError}
               />
             </Stack>
           )}
@@ -155,7 +161,7 @@ export default function ContentBlockEditOverlay({
               leftSection={<CheckIcon aria-hidden size={16} />}
               onClick={() => void handleUpdate()}
             >
-              {messages.block.editor.save}
+              {messages.common.save}
             </Button>
           </Group>
         </Modal.Body>

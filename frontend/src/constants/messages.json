@@ -1,8 +1,21 @@
 {
+  "common": {
+    "back": "Voltar",
+    "retry": "Tentar novamente",
+    "save": "Salvar",
+    "showMore": "Ver mais",
+    "showLess": "Ver menos",
+    "selectFiles": "Selecionar Arquivos",
+    "saving": "Salvando...",
+    "saved": "Salvo",
+    "saveError": "Não foi possível salvar",
+    "emptyValue": "—",
+    "createdAt": "Criado em",
+    "updatedAt": "Modificado em",
+    "actions": "Ações",
+    "deleteErrorTitle": "Não foi possível excluir"
+  },
   "block": {
-    "editor": {
-      "save": "Salvar"
-    },
     "empty": {
       "title": "Bloco sem conteúdo",
       "create": "É preciso adicionar conteúdo para criar um bloco.",
@@ -25,9 +38,101 @@
     }
   },
   "files": {
-    "preview": {
-      "showMore": "Ver mais",
-      "showLess": "Ver menos"
+    "dropzone": {
+      "images": {
+        "title": "Arraste imagens aqui ou clique para selecionar arquivos",
+        "description": "Anexe quantas imagens quiser, cada uma não pode exceder 15MB"
+      }
+    }
+  },
+  "errors": {
+    "generic": "Não foi possível concluir a operação. Tente novamente.",
+    "duplicate": "Já existe um registro com esse identificador.",
+    "badRequest": "Verifique os dados informados e tente novamente.",
+    "unauthenticated": "Sua sessão expirou. Entre novamente para continuar.",
+    "forbidden": "Você não tem permissão para realizar esta ação.",
+    "notFound": "O registro ou o elemento relacionado não foi encontrado.",
+    "server": "O servidor não conseguiu concluir a operação. Tente novamente mais tarde.",
+    "network": "Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente."
+  },
+  "mesh": {
+    "errors": {
+      "duplicate": "Já existe um arquivo mesh com esse identificador."
+    },
+    "identifier": {
+      "empty": "Informe o identificador do mesh.",
+      "invalid": "Use apenas letras minúsculas, números e underscores, sem espaços.",
+      "help": "Copie o nome exato do objeto na hierarquia do Blender (painel Outliner). Erros de digitação impedem a detecção de raios no WebGL."
+    },
+    "list": {
+      "title": "Arquivos Mesh",
+      "searchLabel": "Pesquisar arquivos mesh pelo identificador",
+      "searchPlaceholder": "Pesquise pelo identificador",
+      "new": "Novo Mesh",
+      "loading": "Carregando arquivos mesh",
+      "loadErrorTitle": "Não foi possível carregar os arquivos mesh",
+      "emptyTitle": "Nenhum arquivo mesh cadastrado",
+      "emptyDescription": "Cadastre o primeiro mesh para começar.",
+      "emptyResultsTitle": "Nenhum arquivo mesh encontrado",
+      "emptyResultsDescription": "Tente pesquisar usando outro identificador.",
+      "deleteConfirmTitle": "Excluir arquivo mesh",
+      "deleteConfirmFirst": "Deseja realmente excluir permanentemente o mesh {name}?",
+      "deleteConfirmSecond": "Entidades 3D vinculadas a este mesh serão afetadas.",
+      "deletedTitle": "Arquivo mesh excluído",
+      "deletedMessage": "O arquivo mesh foi removido.",
+      "tableName": "Identificador",
+      "tableDescription": "Descrição",
+      "noIdentifier": "Sem identificador",
+      "editAriaLabel": "Editar mesh {name}",
+      "deleteAriaLabel": "Excluir mesh {name}"
+    },
+    "editor": {
+      "newTitle": "Novo Arquivo Mesh",
+      "editTitle": "Editar Arquivo Mesh",
+      "saveSuccessTitle": "Arquivo mesh salvo",
+      "saveSuccessMessage": "O arquivo mesh foi salvo com sucesso.",
+      "nameLabel": "Identificador do Mesh",
+      "namePlaceholder": "ex: predio_principal_bloco_a",
+      "descriptionLabel": "Descrição",
+      "descriptionPlaceholder": "Descrição opcional do mesh",
+      "fileLabel": "Arquivo GLB",
+      "fileRequiredError": "Selecione o arquivo .glb do mesh.",
+      "dropzoneTitle": "Carregar Arquivo",
+      "dropzoneDescription": "Arraste e solte arquivo glTF ou clique no botão abaixo para selecioná-lo.",
+      "removeFileLabel": "Remover arquivo GLB",
+      "currentFileLabel": "Arquivo atual",
+      "replaceFileLabel": "Substituir arquivo",
+      "cancelReplaceLabel": "Manter arquivo atual",
+      "loading": "Carregando arquivo mesh"
+    }
+  },
+  "contentPages": {
+    "editor": {
+      "canvasLabel": "Conteúdo da página",
+      "loading": "Carregando página",
+      "loadErrorTitle": "Não foi possível carregar a página"
+    },
+    "list": {
+      "new": "Nova página",
+      "title": "Páginas cadastradas",
+      "tableTitle": "Nome",
+      "tableRelatedType": "Tipo relacionado",
+      "relatedEntity": "Modelo 3D",
+      "relatedMenuItem": "Item de Menu",
+      "untitled": "Sem título",
+      "editAriaLabel": "Editar página {name}",
+      "deleteAriaLabel": "Excluir página {name}",
+      "loading": "Carregando páginas",
+      "loadErrorTitle": "Não foi possível carregar as páginas",
+      "emptyTitle": "Nenhuma página cadastrada",
+      "emptyDescription": "Crie a primeira página para começar.",
+      "emptyResultsTitle": "Nenhuma página encontrada",
+      "emptyResultsDescription": "Tente pesquisar usando outro nome.",
+      "deleteConfirmTitle": "Excluir página",
+      "deleteConfirmFirst": "Deseja realmente excluir permanentemente a página {name}?",
+      "deleteConfirmSecond": "Todos os blocos relacionados serão automaticamente excluídos.",
+      "deletedTitle": "Página excluída",
+      "deletedMessage": "A página e seus blocos foram removidos."
     }
   }
 }

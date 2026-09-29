@@ -1,141 +1,95 @@
-import { Button, Group } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
+import {Button, Flex, Group} from "@mantine/core";
 import { PlusIcon } from "@phosphor-icons/react/dist/csr/Plus";
-import {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import { useNavigate } from "react-router";
 
 import FeedbackState from "@/components/feedback-state";
-import PageSearch from "@/components/page-search";
-import PageTable from "@/components/page-table/PageTable.tsx";
+import PageSearch from "@/components/content-page/page-search";
+import PageTable from "@/components/content-page/page-table/PageTable.tsx";
 import {
   deleteContentPage,
   listContentPages,
 } from "@/services/content-page-service.ts";
-import type { ContentPageListRecord } from "@/types/content-page";
 
-import classes from "./content-page-list.module.css";
-import {getContentPageErrorMessage} from "@/helpers/content-pages-service-helper.ts";
-import {DialogContext} from "@/contexts/dialog-context.ts";
-
+import {branding} from "@/config/branding.ts";
+import messages from "@/constants/messages.json";
+import {useRecordList} from "@/hooks/use-record-list.ts";
 
 export default function ContentPageList() {
   const navigate = useNavigate();
-  const [pages, setPages] = useState<ContentPageListRecord[]>([]);
-  const [query, setQuery] = useState("");
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-  const [deletingPageId, setDeletingPageId] = useState<string | null>(null);
 
-  const dialogBox = useContext(DialogContext)
-
-  const loadPages = useCallback(async () => {
-    setError("");
-    setIsLoading(true);
-
-    try {
-      setPages(await listContentPages());
-    } catch (requestError) {
-      setError(getContentPageErrorMessage(requestError));
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const filteredPages = useMemo(() => {
-    const normalizedQuery = query.trim().toLocaleLowerCase("pt-BR");
-
-    return normalizedQuery
-      ? pages.filter((page) =>
-          page.title.toLocaleLowerCase("pt-BR").includes(normalizedQuery),
-        )
-      : pages;
-  }, [pages, query]);
-
-  const handleDelete
-    = useCallback(async (page: ContentPageListRecord) => {
-    const confirmDelete = await dialogBox!.confirm({
-      title: "Excluir página",
-      firstMessage: `Deseja realmente excluir permanentemente a página ${page?.title ?? 'Sem Título'}?`,
-      secondMessage: "Todos os blocos relacionados serão automaticamente excluídos.",
-    })
-
-    if (!confirmDelete) return;
-
-    setDeletingPageId(page.id);
-
-    try {
-      await deleteContentPage(page.id);
-      setPages((currentPages) =>
-        currentPages.filter((currentPage) => currentPage.id !== page.id),
-      );
-      notifications.show({
-        color: "green",
-        title: "Página excluída",
-        message: "A página e seus blocos foram removidos.",
-      });
-    } catch (deleteError) {
-      notifications.show({
-        color: "red",
-        title: "Não foi possível excluir",
-        message: getContentPageErrorMessage(deleteError),
-      });
-    } finally {
-      setDeletingPageId(null);
-    }
-  }, [dialogBox]);
-
-  useEffect(() => {
-    void loadPages();
-  }, [loadPages]);
+  const {
+    records,
+    filtered,
+    query,
+    setQuery,
+    isLoading,
+    error,
+    reload,
+    deletingId,
+    requestDelete,
+  } = useRecordList({
+    texts: messages.contentPages.list,
+    listRecords: listContentPages,
+    deleteRecord: deleteContentPage,
+    getSearchableText: (page) => page.title,
+    getName: (page) => page.title || messages.contentPages.list.untitled,
+  });
 
   return (
-    <main className={classes.page}>
-      <Group className={classes.toolbar} justify="space-between" gap="xl">
-        <div className={classes.search}>
+    <Flex direction="column" px="lg" pt="lg" pb={0} mih="calc(100dvh - 60px)" >
+      <Group justify="space-between" gap="xl" w="100%" mx={0} mt="auto" mb="lg" px="lg">
+        <Flex flex={1}>
           <PageSearch value={query} onChange={setQuery} />
-        </div>
+        </Flex>
         <Button
           variant="outline"
           color="brand"
           size="sm"
           leftSection={<PlusIcon aria-hidden size={16} />}
           onClick={() => navigate("/admin/pages/new")}
-          className={classes.newButton}
         >
-          Nova Página
+          {messages.contentPages.list.new}
         </Button>
       </Group>
 
-      <section className={classes.results} aria-label="Páginas cadastradas">
-        {isLoading && <FeedbackState loading title="Carregando páginas" />}
+      <Flex
+        flex={1}
+        direction="column"
+        mih={0}
+        w="100%"
+        pt="md"
+        style={{ borderTop: `1px solid ${branding.colors.border.default}` }}
+        aria-label={messages.contentPages.list.title}
+      >
+        {isLoading && <FeedbackState loading title={messages.contentPages.list.loading} />}
         {!isLoading && error && (
           <FeedbackState
-            title="Não foi possível carregar as páginas"
+            title={messages.contentPages.list.loadErrorTitle}
             description={error}
-            actionLabel="Tentar novamente"
-            onAction={() => void loadPages()}
+            actionLabel={messages.common.retry}
+            onAction={() => void reload()}
           />
         )}
-        {!isLoading && !error && pages.length === 0 && (
+        {!isLoading && !error && records.length === 0 && (
           <FeedbackState
-            title="Nenhuma página cadastrada"
-            description="Crie a primeira página para começar."
+            title={messages.contentPages.list.emptyTitle}
+            description={messages.contentPages.list.emptyDescription}
           />
         )}
-        {!isLoading && !error && pages.length > 0 && filteredPages.length === 0 && (
+        {!isLoading && !error && records.length > 0 && filtered.length === 0 && (
           <FeedbackState
-            title="Nenhuma página encontrada"
-            description="Tente pesquisar usando outro nome."
+            title={messages.contentPages.list.emptyResultsTitle}
+            description={messages.contentPages.list.emptyResultsDescription}
           />
         )}
-        {!isLoading && !error && filteredPages.length > 0 && (
+        {!isLoading && !error && filtered.length > 0 && (
           <PageTable
-            pages={filteredPages}
-            deletingPageId={deletingPageId}
-            onDelete={(page) => handleDelete(page)}
+            pages={filtered}
+            deletingPageId={deletingId}
+            onDelete={(page) => void requestDelete(page)}
           />
         )}
-      </section>
-    </main>
+      </Flex>
+    </Flex>
   );
 }

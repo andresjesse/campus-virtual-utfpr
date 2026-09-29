@@ -1,8 +1,11 @@
 import type {BlockEditorProps} from "@/components/content-input/content-blocks/overlay/registry.ts";
-import DropzoneSection from "@/components/content-input/content-blocks/overlay/file-block/DropzoneSection.tsx";
+import DropzoneSection from "@/components/content-input/DropzoneSection.tsx";
 import FilesPreviewSection from "@/components/content-input/content-blocks/overlay/file-block/FilesPreviewSection.tsx";
 import { Space } from "@mantine/core";
+import {ImageIcon} from "@phosphor-icons/react";
 import {useEffect, useRef, useState} from "react";
+import {FILE_BLOCK_MAX_SIZE_IN_BYTES, FILE_BLOCK_MIME_TYPES} from "@/constants/content-constants.ts";
+import messages from "@/constants/messages.json";
 import type {FileBlockContentValue} from "@/types/content-page.ts";
 
 type PendingImage = {
@@ -10,7 +13,7 @@ type PendingImage = {
   url: string;
 }
 
-export default function FileBlockEditor({ content, onChange }: BlockEditorProps) {
+export default function FileBlockEditor({ content, onChange, error }: BlockEditorProps) {
   const [existingUrls] = useState<string[]>(
     () => (typeof content === "object" ? content.urls : []),
   );
@@ -60,7 +63,15 @@ export default function FileBlockEditor({ content, onChange }: BlockEditorProps)
 
   return (
     <section>
-      <DropzoneSection onDrop={handleDrop} />
+      <DropzoneSection
+        onDrop={handleDrop}
+        accept={FILE_BLOCK_MIME_TYPES}
+        maxSizeInBytes={FILE_BLOCK_MAX_SIZE_IN_BYTES}
+        icon={ImageIcon}
+        title={messages.files.dropzone.images.title}
+        description={messages.files.dropzone.images.description}
+        error={error}
+      />
       <Space h="lg" />
       <FilesPreviewSection
         content={previewUrls}
