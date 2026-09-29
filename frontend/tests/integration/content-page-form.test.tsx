@@ -13,6 +13,7 @@ function renderForm(onChange = jest.fn()) {
   render(
     <MantineProvider>
       <ContentPageForm
+        initialValues={{ relation: '', title: '' }}
         relatedOptions={[{ label: 'Modelo 3D — bloco-a', value: 'entity:entity-a' }]}
         onChange={onChange}
       />
