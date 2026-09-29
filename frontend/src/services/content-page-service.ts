@@ -4,11 +4,12 @@ import type {
   ContentPageFormValues,
   ContentPageListRecord,
   ContentPageRecord,
-  EntityRecord,
   MenuItemRecord,
   RelatedOption,
 } from "@/types/content-page.ts";
 import {PAGE_BLOCK_COLLECTIONS} from "@/constants/content-constants.ts";
+import type {EntityRecord} from "@/types/entity.ts";
+import {ENTITY_COLLECTION} from "@/constants/entity-constants.ts";
 import {encodeRelation, generateFilesUrl, parseRelation} from "@/helpers/content-pages-service-helper.ts";
 import {ContentPageBlocksEnum, type ContentPageBlockType} from "@/enums/content-pages-enum.ts";
 import sanitizeRichText from "@/helpers/sanitize-rich-text.ts";
@@ -19,7 +20,6 @@ import {getFilenameFromUrl} from "@/helpers/file-helper.ts";
 // #####################################################################
 
 const CONTENT_PAGES_COLLECTION = "content_page";
-const ENTITIES_COLLECTION = "entities";
 const MENU_ITEMS_COLLECTION = "menu_items";
 
 // #####################################################################
@@ -78,7 +78,7 @@ export async function getContentPageEditorData(id: string) {
 export async function listRelatedOptions(): Promise<RelatedOption[]> {
   const [entities, menuItems] = await Promise.all([
     pocketbase
-      .collection<EntityRecord>(ENTITIES_COLLECTION)
+      .collection<EntityRecord>(ENTITY_COLLECTION)
       .getFullList({ requestKey: null, sort: "slug" }),
     pocketbase
       .collection<MenuItemRecord>(MENU_ITEMS_COLLECTION)
