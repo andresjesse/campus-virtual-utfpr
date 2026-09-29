@@ -36,7 +36,7 @@ const NAVIGATION_ITEMS: NavigationItem[] = [
     capability: "menu.manage",
     icon: ListBulletsIcon,
     label: "Itens e Categorias do Menu",
-    to: "/admin/menu-items",
+    to: "/admin/menu",
   },
   {
     capability: "entities.manage",

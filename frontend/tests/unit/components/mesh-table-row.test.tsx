@@ -8,9 +8,9 @@ import type { MeshRecord } from '@/types/mesh.ts'
 
 const mesh = {
   id: 'm1',
-  name: 'predio_a',
-  description: 'Bloco A',
-  file: 'predio_a_x7.glb',
+  name: 'building_a',
+  description: 'Block A',
+  file: 'building_a_x7.glb',
   created: '2026-09-24T04:09:13.379Z',
   updated: '2026-09-24T04:09:13.379Z',
 } as MeshRecord
@@ -43,12 +43,12 @@ describe('MeshTableRow', () => {
 
     expect(
       screen.getByRole('row', {
-        name: formatMessage(messages.mesh.list.editAriaLabel, 'predio_a'),
+        name: formatMessage(messages.mesh.list.editAriaLabel, 'building_a'),
       }),
     ).toBeInTheDocument()
     expect(
       screen.getByRole('button', {
-        name: formatMessage(messages.mesh.list.deleteAriaLabel, 'predio_a'),
+        name: formatMessage(messages.mesh.list.deleteAriaLabel, 'building_a'),
       }),
     ).toBeInTheDocument()
   })
@@ -80,7 +80,7 @@ describe('MeshTableRow', () => {
 
     fireEvent.click(
       screen.getByRole('button', {
-        name: formatMessage(messages.mesh.list.deleteAriaLabel, 'predio_a'),
+        name: formatMessage(messages.mesh.list.deleteAriaLabel, 'building_a'),
       }),
     )
 

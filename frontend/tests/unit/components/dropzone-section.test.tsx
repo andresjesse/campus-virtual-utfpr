@@ -60,8 +60,8 @@ const baseProps = {
   onDrop: jest.fn(),
   accept: ['image/png'],
   maxSizeInBytes: 1000 * 1000 * 15,
-  title: 'Título',
-  description: 'Descrição',
+  title: 'Title',
+  description: 'Description',
   icon: ImageIcon,
 }
 
@@ -136,16 +136,16 @@ describe('DropzoneSection', () => {
     expect(mockDropzoneProps).toHaveBeenLastCalledWith(
       expect.objectContaining({ multiple: true, activateOnClick: true }),
     )
-    expect(screen.getByText('Título')).toBeInTheDocument()
-    expect(screen.getByText('Descrição')).toBeInTheDocument()
+    expect(screen.getByText('Title')).toBeInTheDocument()
+    expect(screen.getByText('Description')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Selecionar' })).toBeNull()
   })
 
   it('renders the action button in the stacked layout and opens the file dialog', () => {
     renderDropzone({ layout: 'stacked', actionLabel: 'Selecionar' })
 
-    expect(screen.getByText('Título')).toBeInTheDocument()
-    expect(screen.getByText('Descrição')).toBeInTheDocument()
+    expect(screen.getByText('Title')).toBeInTheDocument()
+    expect(screen.getByText('Description')).toBeInTheDocument()
     expect(mockDropzoneProps).toHaveBeenLastCalledWith(
       expect.objectContaining({ activateOnClick: false }),
     )

@@ -5,6 +5,7 @@ import { MemoryRouter, Route, Routes } from 'react-router'
 import { notifications } from '@mantine/notifications'
 
 import BlocksList from '@/components/content-page/content-page-form/BlocksList.tsx'
+import messages from '@/constants/messages.json'
 import { DialogContext } from '@/contexts/dialog-context.ts'
 import { getAllContentBlocksMetadata } from '@/helpers/content-pages-service-helper.ts'
 import { deleteBlockContent } from '@/services/content-page-service.ts'
@@ -264,7 +265,7 @@ describe('BlocksList', () => {
       await screen.findByText('Não foi possível carregar os blocos de conteúdo.'),
     ).toBeInTheDocument()
     expect(screen.getByText('Houve um erro inesperado.')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Tentar novamente' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: messages.common.retry })).toBeInTheDocument()
 
     consoleLog.mockRestore()
   })

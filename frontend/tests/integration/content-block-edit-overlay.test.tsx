@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import ContentBlockEditOverlay from '@/components/content-input/content-blocks/overlay/ContentBlockEditOverlay.tsx'
+import messages from '@/constants/messages.json'
 import { notifications } from '@mantine/notifications'
 import {
   getBlockContent,
@@ -103,7 +104,7 @@ describe('ContentBlockEditOverlay', () => {
     expect(screen.getByLabelText('Carregando conteúdo...')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: '' })).not.toBeInTheDocument()
 
-    const saveButton = screen.getByRole('button', { name: 'Salvar' })
+    const saveButton = screen.getByRole('button', { name: messages.common.save })
     expect(saveButton).toBeInTheDocument()
     expect(saveButton).toBeEnabled()
 
@@ -141,7 +142,7 @@ describe('ContentBlockEditOverlay', () => {
 
     const content = screen.getByLabelText('Conteúdo')
     fireEvent.change(content, { target: { value: '<p>New content</p>' } })
-    await user.click(screen.getByRole('button', { name: 'Salvar' }))
+    await user.click(screen.getByRole('button', { name: messages.common.save }))
 
     await waitFor(() => {
       expect(upsertBlockContentApiMock).toHaveBeenCalledWith({
@@ -160,7 +161,7 @@ describe('ContentBlockEditOverlay', () => {
     upsertBlockContentApiMock.mockReturnValue(save.promise)
     const { onUpdate } = renderOverlay()
 
-    const saveButton = await screen.findByRole('button', { name: 'Salvar' })
+    const saveButton = await screen.findByRole('button', { name: messages.common.save })
     await user.click(saveButton)
 
     expect(saveButton).toBeDisabled()
@@ -182,7 +183,7 @@ describe('ContentBlockEditOverlay', () => {
     upsertBlockContentApiMock.mockRejectedValue(new Error('Save failed'))
     const { onUpdate } = renderOverlay()
 
-    const saveButton = await screen.findByRole('button', { name: 'Salvar' })
+    const saveButton = await screen.findByRole('button', { name: messages.common.save })
     await user.click(saveButton)
 
     await waitFor(() => expect(saveButton).toBeEnabled())
@@ -207,13 +208,13 @@ describe('ContentBlockEditOverlay', () => {
       .mockImplementation()
     const { onUpdate } = renderOverlay({ blockMetadata: newBlockMetadata })
 
-    await user.click(screen.getByRole('button', { name: 'Salvar' }))
+    await user.click(screen.getByRole('button', { name: messages.common.save }))
 
     await waitFor(() => {
       expect(notificationsShowMock).toHaveBeenCalledWith({
         color: 'yellow',
-        title: 'Bloco sem conteúdo',
-        message: 'É preciso adicionar conteúdo para criar um bloco.',
+        title: messages.block.empty.title,
+        message: messages.block.empty.create,
       })
     })
     expect(upsertBlockContentApiMock).not.toHaveBeenCalled()
@@ -231,13 +232,13 @@ describe('ContentBlockEditOverlay', () => {
     getBlockContentMock.mockResolvedValue('')
     const { onUpdate } = renderOverlay()
 
-    await user.click(await screen.findByRole('button', { name: 'Salvar' }))
+    await user.click(await screen.findByRole('button', { name: messages.common.save }))
 
     await waitFor(() => {
       expect(notificationsShowMock).toHaveBeenCalledWith({
         color: 'yellow',
-        title: 'Bloco sem conteúdo',
-        message: 'O bloco de texto não pode ficar vazio.',
+        title: messages.block.empty.title,
+        message: messages.block.empty.update,
       })
     })
     expect(upsertBlockContentApiMock).not.toHaveBeenCalled()
@@ -254,13 +255,13 @@ describe('ContentBlockEditOverlay', () => {
     getBlockContentMock.mockResolvedValue('<p>Content</p>')
     const { onUpdate } = renderOverlay({ pageTitle: '  ' })
 
-    await user.click(await screen.findByRole('button', { name: 'Salvar' }))
+    await user.click(await screen.findByRole('button', { name: messages.common.save }))
 
     await waitFor(() => {
       expect(notificationsShowMock).toHaveBeenCalledWith({
         color: 'yellow',
-        title: 'Página incompleta',
-        message: 'Preencha o título da página antes de salvar o bloco.',
+        title: messages.block.page.missingFieldsTitle,
+        message: messages.block.page.missingFields.title,
       })
     })
     expect(upsertBlockContentApiMock).not.toHaveBeenCalled()
@@ -277,14 +278,14 @@ describe('ContentBlockEditOverlay', () => {
     getBlockContentMock.mockResolvedValue('<p>Content</p>')
     const { onUpdate } = renderOverlay({ pageRelation: '' })
 
-    await user.click(await screen.findByRole('button', { name: 'Salvar' }))
+    await user.click(await screen.findByRole('button', { name: messages.common.save }))
 
     await waitFor(() => {
       expect(notificationsShowMock).toHaveBeenCalledWith({
         color: 'yellow',
-        title: 'Página incompleta',
+        title: messages.block.page.missingFieldsTitle,
         message:
-          'Selecione o elemento relacionado antes de salvar o bloco.',
+          messages.block.page.missingFields.relation,
       })
     })
     expect(upsertBlockContentApiMock).not.toHaveBeenCalled()
@@ -301,14 +302,14 @@ describe('ContentBlockEditOverlay', () => {
     getBlockContentMock.mockResolvedValue('<p>Content</p>')
     const { onUpdate } = renderOverlay({ pageTitle: '', pageRelation: '' })
 
-    await user.click(await screen.findByRole('button', { name: 'Salvar' }))
+    await user.click(await screen.findByRole('button', { name: messages.common.save }))
 
     await waitFor(() => {
       expect(notificationsShowMock).toHaveBeenCalledWith({
         color: 'yellow',
-        title: 'Página incompleta',
+        title: messages.block.page.missingFieldsTitle,
         message:
-          'Preencha o título da página e selecione o elemento relacionado antes de salvar o bloco.',
+          messages.block.page.missingFields.both,
       })
     })
     expect(upsertBlockContentApiMock).not.toHaveBeenCalled()

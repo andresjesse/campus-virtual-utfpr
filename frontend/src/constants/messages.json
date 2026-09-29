@@ -167,6 +167,55 @@
       "axisZ": "Z"
     }
   },
+  "menu": {
+    "tabs": {
+      "ariaLabel": "Seções do menu",
+      "items": "Itens do Menu",
+      "categories": "Categorias"
+    },
+    "itemsPlaceholder": {
+      "title": "Itens do Menu",
+      "description": "Esta área será implementada em uma próxima tarefa."
+    }
+  },
+  "menuCategories": {
+    "errors": {
+      "duplicate": "Já existe uma categoria com essa etiqueta."
+    },
+    "label": {
+      "empty": "Informe a etiqueta da categoria."
+    },
+    "list": {
+      "title": "Categorias do Menu",
+      "searchLabel": "Pesquisar categorias do menu pelo nome",
+      "searchPlaceholder": "Pesquise pelo nome",
+      "new": "Nova Categoria",
+      "loading": "Carregando categorias do menu",
+      "loadErrorTitle": "Não foi possível carregar as categorias do menu",
+      "emptyTitle": "Nenhuma categoria cadastrada",
+      "emptyDescription": "Cadastre a primeira categoria para começar.",
+      "emptyResultsTitle": "Nenhuma categoria encontrada",
+      "emptyResultsDescription": "Tente pesquisar usando outro nome.",
+      "deleteConfirmTitle": "Excluir categoria",
+      "deleteConfirmFirst": "Deseja realmente excluir permanentemente a categoria {name}?",
+      "deleteConfirmSecond": "Todos os itens de menu vinculados a esta categoria também serão excluídos.",
+      "deletedTitle": "Categoria excluída",
+      "deletedMessage": "A categoria foi removida.",
+      "tableLabel": "Etiqueta",
+      "noIdentifier": "Sem etiqueta",
+      "editAriaLabel": "Editar categoria {name}",
+      "deleteAriaLabel": "Excluir categoria {name}"
+    },
+    "editor": {
+      "newTitle": "Nova Categoria do Menu",
+      "editTitle": "Editar Categoria do Menu",
+      "loading": "Carregando categoria do menu",
+      "saveSuccessTitle": "Categoria salva",
+      "saveSuccessMessage": "A categoria foi salva com sucesso.",
+      "labelLabel": "Etiqueta",
+      "labelPlaceholder": "example_label"
+    }
+  },
   "contentPages": {
     "editor": {
       "canvasLabel": "Conteúdo da página",

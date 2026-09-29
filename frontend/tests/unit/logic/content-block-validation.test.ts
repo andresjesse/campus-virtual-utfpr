@@ -101,8 +101,8 @@ describe('getEmptyContentNotification', () => {
     expect(
       getEmptyContentNotification(ContentPageBlocksEnum.RTF_BLOCK, true),
     ).toEqual({
-      title: 'Bloco sem conteúdo',
-      message: 'É preciso adicionar conteúdo para criar um bloco.',
+      title: messages.block.empty.title,
+      message: messages.block.empty.create,
     })
   })
 
@@ -110,8 +110,8 @@ describe('getEmptyContentNotification', () => {
     expect(
       getEmptyContentNotification(ContentPageBlocksEnum.RTF_BLOCK, false),
     ).toEqual({
-      title: 'Bloco sem conteúdo',
-      message: 'O bloco de texto não pode ficar vazio.',
+      title: messages.block.empty.title,
+      message: messages.block.empty.update,
     })
   })
 
@@ -119,8 +119,8 @@ describe('getEmptyContentNotification', () => {
     expect(
       getEmptyContentNotification(ContentPageBlocksEnum.FILE_BLOCK, true),
     ).toEqual({
-      title: 'Bloco sem arquivos',
-      message: 'É preciso adicionar pelo menos um arquivo para criar um bloco.',
+      title: messages.block.file.empty.title,
+      message: messages.block.file.empty.create,
     })
   })
 
@@ -128,8 +128,8 @@ describe('getEmptyContentNotification', () => {
     expect(
       getEmptyContentNotification(ContentPageBlocksEnum.FILE_BLOCK, false),
     ).toEqual({
-      title: 'Bloco sem arquivos',
-      message: 'O bloco precisa ter pelo menos um arquivo.',
+      title: messages.block.file.empty.title,
+      message: messages.block.file.empty.update,
     })
   })
 })

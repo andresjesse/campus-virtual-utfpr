@@ -25,6 +25,14 @@ jest.mock('@/services/mesh-service.ts', () => ({
   listMeshes: jest.fn(async () => []),
 }))
 
+jest.mock('@/services/menu-category-service.ts', () => ({
+  listMenuCategories: jest.fn(async () => []),
+  deleteMenuCategory: jest.fn(),
+  getMenuCategory: jest.fn(),
+  createMenuCategory: jest.fn(),
+  updateMenuCategory: jest.fn(),
+}))
+
 jest.mock('@/services/pocketbase', () => ({
   pocketbase: { files: { getURL: jest.fn(() => '') } },
 }))
@@ -71,7 +79,7 @@ describe('Router', () => {
     renderRouter(authenticatedUser(isAdmin))
 
     expect(
-      await screen.findByText('Nenhuma página cadastrada'),
+      await screen.findByText(messages.contentPages.list.emptyTitle),
     ).toBeInTheDocument()
     expect(window.location.pathname).toBe('/admin/pages')
   })
@@ -82,7 +90,7 @@ describe('Router', () => {
     renderRouter(authenticatedUser(false))
 
     expect(
-      await screen.findByText('Nenhuma página cadastrada'),
+      await screen.findByText(messages.contentPages.list.emptyTitle),
     ).toBeInTheDocument()
     expect(screen.queryByText(messages.entities.list.title)).not.toBeInTheDocument()
     expect(screen.queryByText(messages.mesh.list.title)).not.toBeInTheDocument()
@@ -116,13 +124,49 @@ describe('Router', () => {
     expect(window.location.pathname).toBe('/admin/entities/new')
   })
 
+  it('sends an editor from the menu section to the categories tab', async () => {
+    window.history.pushState({}, '', '/admin/menu')
+
+    renderRouter(authenticatedUser(false))
+
+    expect(
+      await screen.findByRole('tab', { name: messages.menu.tabs.categories }),
+    ).toHaveAttribute('aria-selected', 'true')
+    expect(window.location.pathname).toBe('/admin/menu/categories')
+  })
+
+  it('lets an editor open the menu items tab and the category editor', async () => {
+    window.history.pushState({}, '', '/admin/menu/items')
+
+    renderRouter(authenticatedUser(false))
+
+    expect(
+      await screen.findByRole('tab', { name: messages.menu.tabs.items }),
+    ).toHaveAttribute('aria-selected', 'true')
+    expect(
+      screen.getByText(messages.menu.itemsPlaceholder.description),
+    ).toBeInTheDocument()
+    expect(window.location.pathname).toBe('/admin/menu/items')
+  })
+
+  it('lets an editor open the category editor', async () => {
+    window.history.pushState({}, '', '/admin/menu/categories/new')
+
+    renderRouter(authenticatedUser(false))
+
+    expect(
+      await screen.findByLabelText(messages.menuCategories.editor.newTitle),
+    ).toBeInTheDocument()
+    expect(window.location.pathname).toBe('/admin/menu/categories/new')
+  })
+
   it('redirects an authenticated user away from login', async () => {
     window.history.pushState({}, '', '/login')
 
     renderRouter(authenticatedUser())
 
     expect(
-      await screen.findByText('Nenhuma página cadastrada'),
+      await screen.findByText(messages.contentPages.list.emptyTitle),
     ).toBeInTheDocument()
     expect(window.location.pathname).toBe('/admin/pages')
   })
@@ -137,7 +181,7 @@ describe('Router', () => {
     renderRouter(authenticatedUser())
 
     expect(
-      await screen.findByText('Nenhuma página cadastrada'),
+      await screen.findByText(messages.contentPages.list.emptyTitle),
     ).toBeInTheDocument()
     expect(window.location.pathname).toBe('/admin/pages')
   })

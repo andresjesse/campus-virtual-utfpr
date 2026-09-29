@@ -14,7 +14,7 @@ function renderForm(onChange = jest.fn()) {
     <MantineProvider>
       <ContentPageForm
         initialValues={{ relation: '', title: '' }}
-        relatedOptions={[{ label: 'Modelo 3D — bloco-a', value: 'entity:entity-a' }]}
+        relatedOptions={[{ label: '3D Model — block-a', value: 'entity:entity-a' }]}
         onChange={onChange}
       />
     </MantineProvider>,
@@ -49,7 +49,7 @@ describe('ContentPageForm', () => {
     const user = userEvent.setup()
     const { onChange } = renderForm()
 
-    await user.type(screen.getByLabelText('Título da Página'), '  Bloco A  ')
+    await user.type(screen.getByLabelText('Título da Página'), '  Block A  ')
     await user.click(
       screen.getByRole('combobox', { name: 'Elemento Relacionado' }),
     )
@@ -57,7 +57,7 @@ describe('ContentPageForm', () => {
 
     expect(onChange).toHaveBeenLastCalledWith({
       relation: 'entity:entity-a',
-      title: '  Bloco A  ',
+      title: '  Block A  ',
     })
   })
 })

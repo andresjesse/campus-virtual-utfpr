@@ -8,7 +8,7 @@ import type { MeshFormValues } from '@/types/mesh.ts'
 
 jest.mock('@mantine/notifications', () => ({ notifications: { show: jest.fn() } }))
 
-const mockFile = new File(['x'], 'predio_a.glb', { type: 'model/gltf-binary' })
+const mockFile = new File(['x'], 'building_a.glb', { type: 'model/gltf-binary' })
 
 jest.mock('@/components/mesh/mesh-glb-dropzone/MeshGlbDropzone.tsx', () => ({
   __esModule: true,
@@ -80,12 +80,12 @@ describe('MeshForm', () => {
   })
 
   it.each([
-    ['a space between words', 'predio a'],
-    ['a leading space', ' predio_a a'],
-    ['an uppercase letter', 'Predio_a'],
-    ['an accent', 'prédio_a'],
-    ['a hyphen', 'predio-a'],
-    ['a dot', 'predio_a.glb'],
+    ['a space between words', 'building a'],
+    ['a leading space', ' building_a a'],
+    ['an uppercase letter', 'Building_a'],
+    ['an accent', 'café_a'],
+    ['a hyphen', 'building-a'],
+    ['a dot', 'building_a.glb'],
   ])('blocks submission when the identifier has %s', async (_description, identifier) => {
     const onSubmit = renderForm()
 
@@ -102,7 +102,7 @@ describe('MeshForm', () => {
 
   it('explains why an existing mesh with an invalid identifier cannot be saved', async () => {
     const onSubmit = renderForm(true, {
-      name: 'Predio A',
+      name: 'Building A',
       description: '',
       file: null,
     })
@@ -116,7 +116,7 @@ describe('MeshForm', () => {
   it('blocks submission when creating without a file', async () => {
     const onSubmit = renderForm()
 
-    typeIdentifier('predio_a')
+    typeIdentifier('building_a')
     await submit()
 
     expect(onSubmit).not.toHaveBeenCalled()
@@ -124,7 +124,7 @@ describe('MeshForm', () => {
   })
 
   it('does not require a new file when editing', async () => {
-    const onSubmit = renderForm(true, { name: 'predio_a', description: '', file: null })
+    const onSubmit = renderForm(true, { name: 'building_a', description: '', file: null })
 
     await submit()
 
@@ -135,24 +135,24 @@ describe('MeshForm', () => {
   it('submits once the identifier is valid and a file was selected', async () => {
     const onSubmit = renderForm()
 
-    typeIdentifier('predio_a')
+    typeIdentifier('building_a')
     fireEvent.click(screen.getByText('Drop'))
     await submit()
 
     expect(onSubmit).toHaveBeenCalledWith({
-      name: 'predio_a',
+      name: 'building_a',
       description: '',
       file: mockFile,
     })
   })
 
   it('does not require a file when editing an existing mesh', async () => {
-    const onSubmit = renderForm(true, { name: 'predio_a', description: '', file: null })
+    const onSubmit = renderForm(true, { name: 'building_a', description: '', file: null })
 
     await submit()
 
     expect(onSubmit).toHaveBeenCalledWith({
-      name: 'predio_a',
+      name: 'building_a',
       description: '',
       file: null,
     })
@@ -160,7 +160,7 @@ describe('MeshForm', () => {
 
   describe('an identifier the server rejects as duplicate', () => {
     const takenValues: MeshFormValues = {
-      name: 'predio_a',
+      name: 'building_a',
       description: '',
       file: null,
     }
@@ -198,7 +198,7 @@ describe('MeshForm', () => {
       await submit()
       expect(screen.getByText(messages.mesh.errors.duplicate)).toBeInTheDocument()
 
-      typeIdentifier('predio_b')
+      typeIdentifier('building_b')
 
       expect(screen.queryByText(messages.mesh.errors.duplicate)).toBeNull()
 
