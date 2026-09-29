@@ -2,6 +2,7 @@ import { MantineProvider } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
 import { render, screen } from '@testing-library/react'
 
+import messages from '@/constants/messages.json'
 import { AuthenticationContext } from '@/contexts/authentication-context'
 import { Router } from '@/router'
 import { createAuthenticationContextValue } from '../mocks/authentication'
@@ -10,6 +11,18 @@ import { createUserRecord } from '../mocks/pocketbase'
 jest.mock('@/services/content-page-service.ts', () => ({
   getContentPageErrorMessage: () => 'Request failed',
   listContentPages: jest.fn(async () => []),
+}))
+
+jest.mock('@/services/entity-service.ts', () => ({
+  listEntities: jest.fn(async () => []),
+  deleteEntity: jest.fn(),
+  getEntity: jest.fn(),
+  createEntity: jest.fn(),
+  updateEntity: jest.fn(),
+}))
+
+jest.mock('@/services/mesh-service.ts', () => ({
+  listMeshes: jest.fn(async () => []),
 }))
 
 jest.mock('@/services/pocketbase', () => ({
@@ -71,18 +84,36 @@ describe('Router', () => {
     expect(
       await screen.findByText('Nenhuma página cadastrada'),
     ).toBeInTheDocument()
-    expect(screen.queryByText('Entidades 3D')).not.toBeInTheDocument()
-    expect(screen.queryByText('Arquivos Mesh')).not.toBeInTheDocument()
+    expect(screen.queryByText(messages.entities.list.title)).not.toBeInTheDocument()
+    expect(screen.queryByText(messages.mesh.list.title)).not.toBeInTheDocument()
     expect(window.location.pathname).toBe('/admin/pages')
   })
 
-  it('allows an administrator to access entity routes', async () => {
+  it('allows an administrator to access the entity list', async () => {
     window.history.pushState({}, '', '/admin/entities')
 
     renderRouter(authenticatedUser(true))
 
-    expect(await screen.findByRole('heading', { name: 'Entidades 3D' })).toBeInTheDocument()
+    expect(
+      await screen.findByRole('heading', {
+        name: messages.entities.list.emptyTitle,
+      }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByLabelText(messages.entities.list.searchLabel),
+    ).toBeInTheDocument()
     expect(window.location.pathname).toBe('/admin/entities')
+  })
+
+  it('allows an administrator to open the entity editor', async () => {
+    window.history.pushState({}, '', '/admin/entities/new')
+
+    renderRouter(authenticatedUser(true))
+
+    expect(
+      await screen.findByLabelText(messages.entities.editor.newTitle),
+    ).toBeInTheDocument()
+    expect(window.location.pathname).toBe('/admin/entities/new')
   })
 
   it('redirects an authenticated user away from login', async () => {
