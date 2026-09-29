@@ -10,6 +10,7 @@ import type {
 import {PAGE_BLOCK_COLLECTIONS} from "@/constants/content-constants.ts";
 import type {EntityRecord} from "@/types/entity.ts";
 import {ENTITY_COLLECTION} from "@/constants/entity-constants.ts";
+import {MENU_ITEM_COLLECTION} from "@/constants/menu-constants.ts";
 import {encodeRelation, generateFilesUrl, parseRelation} from "@/helpers/content-pages-service-helper.ts";
 import {ContentPageBlocksEnum, type ContentPageBlockType} from "@/enums/content-pages-enum.ts";
 import sanitizeRichText from "@/helpers/sanitize-rich-text.ts";
@@ -20,7 +21,6 @@ import {getFilenameFromUrl} from "@/helpers/file-helper.ts";
 // #####################################################################
 
 const CONTENT_PAGES_COLLECTION = "content_page";
-const MENU_ITEMS_COLLECTION = "menu_items";
 
 // #####################################################################
 // #### == #### == #### CONTENT PAGES #### == #### == #### == #### == ##
@@ -28,7 +28,7 @@ const MENU_ITEMS_COLLECTION = "menu_items";
 
 async function listPageMenuItems(pageId?: string) {
   return pocketbase
-    .collection<MenuItemRecord>(MENU_ITEMS_COLLECTION)
+    .collection<MenuItemRecord>(MENU_ITEM_COLLECTION)
     .getFullList({
       filter: pageId
         ? pocketbase.filter("page = {:page}", { page: pageId })
@@ -81,7 +81,7 @@ export async function listRelatedOptions(): Promise<RelatedOption[]> {
       .collection<EntityRecord>(ENTITY_COLLECTION)
       .getFullList({ requestKey: null, sort: "slug" }),
     pocketbase
-      .collection<MenuItemRecord>(MENU_ITEMS_COLLECTION)
+      .collection<MenuItemRecord>(MENU_ITEM_COLLECTION)
       .getFullList({ requestKey: null, sort: "label" }),
   ]);
 
@@ -105,7 +105,7 @@ async function unlinkMenuItems(pageId: string, exceptId?: string) {
       .filter((item) => item.id !== exceptId)
       .map((item) =>
         pocketbase
-          .collection<MenuItemRecord>(MENU_ITEMS_COLLECTION)
+          .collection<MenuItemRecord>(MENU_ITEM_COLLECTION)
           .update(item.id, { page: "" }, { requestKey: null }),
       ),
   );
@@ -125,7 +125,7 @@ export async function createContentPage(values: ContentPageFormValues) {
 
   if (relation.type === "menu_item") {
     await pocketbase
-      .collection<MenuItemRecord>(MENU_ITEMS_COLLECTION)
+      .collection<MenuItemRecord>(MENU_ITEM_COLLECTION)
       .update(relation.id, { page: page.id }, { requestKey: null });
   }
 
@@ -150,7 +150,7 @@ export async function updateContentPage(
     .update(id, { entity: "", title: values.title }, { requestKey: null });
   await unlinkMenuItems(id, relation.id);
   await pocketbase
-    .collection<MenuItemRecord>(MENU_ITEMS_COLLECTION)
+    .collection<MenuItemRecord>(MENU_ITEM_COLLECTION)
     .update(relation.id, { page: id }, { requestKey: null });
 
   return page;
