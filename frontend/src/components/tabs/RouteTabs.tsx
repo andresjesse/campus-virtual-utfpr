@@ -3,6 +3,8 @@ import { useNavigate } from "react-router";
 
 import { branding } from "@/config/branding.ts";
 
+import classes from "./route-tabs.module.css";
+
 export type RouteTabOption = {
   value: string;
   label: string;
@@ -42,7 +44,7 @@ export default function RouteTabs({ active, ariaLabel, options }: RouteTabsProps
               <Tabs.Tab
                 key={option.value}
                 value={option.value}
-                bg="transparent"
+                className={classes.tab}
                 bd={`2px solid ${isActive ? branding.colors.brand.primary : branding.colors.border.strong}`}
                 c={isActive ? branding.colors.brand.primary : branding.colors.text.primary}
                 fz="0.85rem"
