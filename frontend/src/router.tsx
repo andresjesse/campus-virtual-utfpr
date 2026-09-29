@@ -28,9 +28,13 @@ export const Router = () => {
               <Route path="pages/:pageId" element={<Pages.Admin.ContentPageEditor />} />
             </Route>
             <Route element={<AuthorizationRoute capability="menu.manage" />}>
+              <Route path="menu" element={<Navigate to="categories" replace />} />
+              <Route path="menu/items" element={<Pages.Admin.MenuItemList />} />
+              <Route path="menu/categories" element={<Pages.Admin.MenuCategoryList />} />
+              <Route path="menu/categories/new" element={<Pages.Admin.MenuCategoryEditor />} />
               <Route
-                path="menu-items"
-                element={<Pages.Admin.Placeholder title="Itens e Categorias do Menu" />}
+                path="menu/categories/:categoryId"
+                element={<Pages.Admin.MenuCategoryEditor />}
               />
             </Route>
             <Route element={<AuthorizationRoute capability="entities.manage" />}>
