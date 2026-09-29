@@ -23,7 +23,6 @@ export default function MeshEditorPage() {
   const [currentFile, setCurrentFile] = useState<MeshCurrentFile>();
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
 
   const loadEditor = useCallback(async () => {
     setError("");
@@ -45,30 +44,18 @@ export default function MeshEditorPage() {
 
   const handleSubmit = useCallback(
     async (values: MeshFormValues) => {
-      setIsSaving(true);
-
-      try {
-        if (meshId) {
-          await updateMesh(meshId, values);
-        } else {
-          await createMesh(values);
-        }
-
-        notifications.show({
-          color: "green",
-          title: messages.mesh.editor.saveSuccessTitle,
-          message: messages.mesh.editor.saveSuccessMessage,
-        });
-        navigate("/admin/meshes");
-      } catch (submitError) {
-        notifications.show({
-          color: "red",
-          title: messages.common.saveError,
-          message: getRequestErrorMessage(submitError),
-        });
-      } finally {
-        setIsSaving(false);
+      if (meshId) {
+        await updateMesh(meshId, values);
+      } else {
+        await createMesh(values);
       }
+
+      notifications.show({
+        color: "green",
+        title: messages.mesh.editor.saveSuccessTitle,
+        message: messages.mesh.editor.saveSuccessMessage,
+      });
+      navigate("/admin/meshes");
     },
     [meshId, navigate],
   );
@@ -102,8 +89,7 @@ export default function MeshEditorPage() {
         initialValues={mesh}
         isEditing={Boolean(meshId)}
         currentFile={currentFile}
-        onSubmit={(values) => void handleSubmit(values)}
-        isSaving={isSaving}
+        onSubmit={handleSubmit}
       />
     </EditorPageContainer>
   );

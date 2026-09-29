@@ -1,87 +1,122 @@
 import messages from "@/constants/messages.json";
 
-function extractResponsePayload(error: unknown) {
-  const response =
-    typeof error === "object" &&
+export type RequestErrorKind =
+  | "duplicate"
+  | "serverMessage"
+  | "badRequest"
+  | "unauthenticated"
+  | "forbidden"
+  | "notFound"
+  | "server"
+  | "network"
+  | "generic";
+
+// A domain supplies only the states it wants to reword; the rest fall back to
+// messages.errors. `serverMessage` is excluded: that text comes from pb_hooks.
+export type RequestErrorMessages = Partial<
+  Record<Exclude<RequestErrorKind, "serverMessage">, string>
+>;
+
+export type RequestFieldError = {
+  code: string;
+  message: string;
+};
+
+const UNIQUE_VIOLATION_CODE = "validation_not_unique";
+
+const DUPLICATE_MESSAGE_PATTERN =
+  /duplicat|unique constraint|must be unique|already exists|já existe|existente/i;
+
+// pb_hooks answers in pt-BR, so an accented message is ours and worth showing verbatim.
+const SERVER_MESSAGE_PATTERN = /[áàâãéêíóôõúç]/i;
+
+function getResponse(error: unknown) {
+  return typeof error === "object" &&
     error !== null &&
     "response" in error &&
     typeof error.response === "object" &&
     error.response !== null
-      ? error.response
-      : null;
+    ? (error.response as Record<string, unknown>)
+    : null;
+}
 
-  const responseMessage =
-    response &&
-    "message" in response &&
-    typeof response.message === "string"
-      ? response.message.trim()
-      : "";
+export function getRequestFieldErrors(
+  error: unknown,
+): Record<string, RequestFieldError> {
+  const data = getResponse(error)?.data;
 
-  const fieldMessage =
-    response &&
-    "data" in response &&
-    typeof response.data === "object" &&
-    response.data !== null &&
-    "name" in response.data &&
-    typeof response.data.name === "object" &&
-    response.data.name !== null &&
-    "message" in response.data.name &&
-    typeof response.data.name.message === "string"
-      ? response.data.name.message.trim()
-      : "";
+  if (typeof data !== "object" || data === null) return {};
 
-  const status =
-    typeof error === "object" &&
+  return Object.entries(data).reduce<Record<string, RequestFieldError>>(
+    (fieldErrors, [field, value]) => {
+      if (typeof value !== "object" || value === null) return fieldErrors;
+
+      const { code, message } = value as Record<string, unknown>;
+
+      fieldErrors[field] = {
+        code: typeof code === "string" ? code : "",
+        message: typeof message === "string" ? message.trim() : "",
+      };
+
+      return fieldErrors;
+    },
+    {},
+  );
+}
+
+function getServerMessage(error: unknown) {
+  const responseMessage = getResponse(error)?.message;
+  const fieldMessages = Object.values(getRequestFieldErrors(error))
+    .map((fieldError) => fieldError.message)
+    .join(" ");
+
+  return `${typeof responseMessage === "string" ? responseMessage : ""} ${fieldMessages}`.trim();
+}
+
+function getStatus(error: unknown) {
+  return typeof error === "object" &&
     error !== null &&
     "status" in error &&
     typeof error.status === "number"
-      ? error.status
-      : 0;
-
-  return { fieldMessage, responseMessage, status };
+    ? error.status
+    : 0;
 }
 
-export function getRequestErrorMessage(error: unknown) {
-  if (typeof error !== "object" || error === null) {
-    return messages.errors.generic;
-  }
+export function getRequestErrorKind(error: unknown): RequestErrorKind {
+  if (typeof error !== "object" || error === null) return "generic";
 
-  const { fieldMessage, responseMessage, status } =
-    extractResponsePayload(error);
-  const combinedMessage = `${responseMessage} ${fieldMessage}`.trim();
+  const fieldErrors = Object.values(getRequestFieldErrors(error));
+  const serverMessage = getServerMessage(error);
 
   if (
-    combinedMessage &&
-    /duplicat|unique constraint|already exists|já existe|existente/i.test(
-      combinedMessage,
-    )
+    fieldErrors.some((fieldError) => fieldError.code === UNIQUE_VIOLATION_CODE) ||
+    DUPLICATE_MESSAGE_PATTERN.test(serverMessage)
   ) {
-    return messages.errors.duplicate;
+    return "duplicate";
   }
 
-  if (combinedMessage && /[áàâãéêíóôõúç]/i.test(combinedMessage)) {
-    return combinedMessage;
+  if (serverMessage && SERVER_MESSAGE_PATTERN.test(serverMessage)) {
+    return "serverMessage";
   }
 
-  if (status === 400) {
-    return messages.errors.badRequest;
-  }
+  const status = getStatus(error);
 
-  if (status === 401) {
-    return messages.errors.unauthenticated;
-  }
+  if (status === 400) return "badRequest";
+  if (status === 401) return "unauthenticated";
+  if (status === 403) return "forbidden";
+  if (status === 404) return "notFound";
+  if (status >= 500) return "server";
 
-  if (status === 403) {
-    return messages.errors.forbidden;
-  }
+  return "network";
+}
 
-  if (status === 404) {
-    return messages.errors.notFound;
-  }
+export function getRequestErrorMessage(
+  error: unknown,
+  domainMessages?: RequestErrorMessages,
+): string {
+  const kind = getRequestErrorKind(error);
 
-  if (status >= 500) {
-    return messages.errors.server;
-  }
+  if (kind === "serverMessage") return getServerMessage(error);
 
-  return messages.errors.network;
+  return domainMessages?.[kind] ?? messages.errors[kind];
 }

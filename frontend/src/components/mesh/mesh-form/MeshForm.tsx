@@ -1,4 +1,5 @@
 import {Button, Group, Space, Stack, Textarea} from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import { useState } from "react";
 import type { FormEvent } from "react";
 
@@ -6,6 +7,10 @@ import FormBodySection from "@/containers/FormBodySection.tsx";
 import FormMetadataSection from "@/containers/FormMetadataSection.tsx";
 import messages from "@/constants/messages.json";
 import { getMeshIdentifierError } from "@/helpers/mesh-service-helper.ts";
+import {
+  getRequestErrorMessage,
+  getRequestFieldErrors,
+} from "@/helpers/request-error-helper.ts";
 import MeshGlbDropzone from "@/components/mesh/mesh-glb-dropzone/MeshGlbDropzone.tsx";
 import TitleInput from "@/components/text-input/TitleInput.tsx";
 import type { MeshCurrentFile, MeshFormValues } from "@/types/mesh.ts";
@@ -14,8 +19,12 @@ type MeshFormProps = {
   initialValues: MeshFormValues;
   isEditing: boolean;
   currentFile?: MeshCurrentFile;
-  isSaving: boolean;
-  onSubmit: (values: MeshFormValues) => void;
+  onSubmit: (values: MeshFormValues) => Promise<void>;
+};
+
+type FailedSubmit = {
+  name: string;
+  error: unknown;
 };
 
 export default function MeshForm({
@@ -23,32 +32,56 @@ export default function MeshForm({
   isEditing,
   currentFile,
   onSubmit,
-  isSaving
 }: MeshFormProps) {
   const [values, setValues] = useState<MeshFormValues>(initialValues);
   const [nameTouched, setNameTouched] = useState(false);
   const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [failedSubmit, setFailedSubmit] = useState<FailedSubmit>();
 
-  const nameError =
+  const validationError =
     nameTouched || submitAttempted ? getMeshIdentifierError(values.name) : undefined;
+  const serverNameError =
+    failedSubmit &&
+    failedSubmit.name === values.name.trim() &&
+    "name" in getRequestFieldErrors(failedSubmit.error)
+      ? getRequestErrorMessage(failedSubmit.error, messages.mesh.errors)
+      : undefined;
+  const nameError = validationError ?? serverNameError;
   const fileError =
     submitAttempted && !isEditing && !values.file
       ? messages.mesh.editor.fileRequiredError
       : undefined;
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setNameTouched(true);
     setSubmitAttempted(true);
 
     if (getMeshIdentifierError(values.name)) return;
+    // The server already refused this identifier; don't spend a round trip on it again.
+    if (serverNameError) return;
     if (!isEditing && !values.file) return;
 
-    onSubmit(values);
+    setIsSaving(true);
+
+    try {
+      await onSubmit(values);
+      setFailedSubmit(undefined);
+    } catch (submitError) {
+      setFailedSubmit({ name: values.name.trim(), error: submitError });
+      notifications.show({
+        color: "red",
+        title: messages.common.saveError,
+        message: getRequestErrorMessage(submitError, messages.mesh.errors),
+      });
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   return (
-    <form id="mesh-form" onSubmit={handleSubmit}>
+    <form id="mesh-form" onSubmit={(event) => void handleSubmit(event)}>
       <Stack h="100%" gap={0}>
         <FormMetadataSection>
           <TitleInput
