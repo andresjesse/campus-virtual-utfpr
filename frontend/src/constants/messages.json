@@ -167,6 +167,11 @@
       "axisZ": "Z"
     }
   },
+  "menuCategories": {
+    "label": {
+      "empty": "Informe a etiqueta da categoria."
+    }
+  },
   "contentPages": {
     "editor": {
       "canvasLabel": "Conteúdo da página",
