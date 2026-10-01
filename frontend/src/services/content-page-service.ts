@@ -4,9 +4,9 @@ import type {
   ContentPageFormValues,
   ContentPageListRecord,
   ContentPageRecord,
-  MenuItemRecord,
   RelatedOption,
 } from "@/types/content-page.ts";
+import type {MenuItemRecord} from "@/types/menu.ts";
 import {PAGE_BLOCK_COLLECTIONS} from "@/constants/content-constants.ts";
 import type {EntityRecord} from "@/types/entity.ts";
 import {ENTITY_COLLECTION} from "@/constants/entity-constants.ts";
