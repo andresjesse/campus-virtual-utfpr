@@ -4,6 +4,8 @@ export type DialogOptions = {
   title: string;
   firstMessage: string,
   secondMessage?: string,
+  confirmLabel?: string,
+  confirmColor?: string,
 }
 
 export type DialogPropsValue = {

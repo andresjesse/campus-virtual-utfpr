@@ -4,44 +4,27 @@ import type {
   ContentPageFormValues,
   ContentPageListRecord,
   ContentPageRecord,
-  MenuItemRecord,
   RelatedOption,
 } from "@/types/content-page.ts";
-import {PAGE_BLOCK_COLLECTIONS} from "@/constants/content-constants.ts";
+import type {MenuItemRecord} from "@/types/menu.ts";
+import {CONTENT_PAGE_COLLECTION, PAGE_BLOCK_COLLECTIONS} from "@/constants/content-constants.ts";
 import type {EntityRecord} from "@/types/entity.ts";
 import {ENTITY_COLLECTION} from "@/constants/entity-constants.ts";
 import {MENU_ITEM_COLLECTION} from "@/constants/menu-constants.ts";
+import {listPageMenuItems, unlinkMenuItems} from "@/services/menu-item-service.ts";
 import {encodeRelation, generateFilesUrl, parseRelation} from "@/helpers/content-pages-service-helper.ts";
 import {ContentPageBlocksEnum, type ContentPageBlockType} from "@/enums/content-pages-enum.ts";
 import sanitizeRichText from "@/helpers/sanitize-rich-text.ts";
 import {getFilenameFromUrl} from "@/helpers/file-helper.ts";
 
 // #####################################################################
-// #### == #### == #### COLLECTION NAMES #### == #### == #### == #### ==
-// #####################################################################
-
-const CONTENT_PAGES_COLLECTION = "content_page";
-
-// #####################################################################
 // #### == #### == #### CONTENT PAGES #### == #### == #### == #### == ##
 // #####################################################################
-
-async function listPageMenuItems(pageId?: string) {
-  return pocketbase
-    .collection<MenuItemRecord>(MENU_ITEM_COLLECTION)
-    .getFullList({
-      filter: pageId
-        ? pocketbase.filter("page = {:page}", { page: pageId })
-        : 'page != ""',
-      requestKey: null,
-      sort: "label",
-    });
-}
 
 export async function listContentPages(): Promise<ContentPageListRecord[]> {
   const [pages, linkedMenuItems] = await Promise.all([
     pocketbase
-      .collection<ContentPageRecord>(CONTENT_PAGES_COLLECTION)
+      .collection<ContentPageRecord>(CONTENT_PAGE_COLLECTION)
       .getFullList({ expand: "entity", requestKey: null, sort: "-updated" }),
     listPageMenuItems(),
   ]);
@@ -60,7 +43,7 @@ export async function listContentPages(): Promise<ContentPageListRecord[]> {
 export async function getContentPageEditorData(id: string) {
   const [page, menuItems] = await Promise.all([
     pocketbase
-      .collection<ContentPageRecord>(CONTENT_PAGES_COLLECTION)
+      .collection<ContentPageRecord>(CONTENT_PAGE_COLLECTION)
       .getOne(id, { expand: "entity", requestKey: null }),
     listPageMenuItems(id),
   ]);
@@ -97,24 +80,10 @@ export async function listRelatedOptions(): Promise<RelatedOption[]> {
   ];
 }
 
-async function unlinkMenuItems(pageId: string, exceptId?: string) {
-  const linkedItems = await listPageMenuItems(pageId);
-
-  await Promise.all(
-    linkedItems
-      .filter((item) => item.id !== exceptId)
-      .map((item) =>
-        pocketbase
-          .collection<MenuItemRecord>(MENU_ITEM_COLLECTION)
-          .update(item.id, { page: "" }, { requestKey: null }),
-      ),
-  );
-}
-
 export async function createContentPage(values: ContentPageFormValues) {
   const relation = parseRelation(values.relation);
   const page = await pocketbase
-    .collection<ContentPageRecord>(CONTENT_PAGES_COLLECTION)
+    .collection<ContentPageRecord>(CONTENT_PAGE_COLLECTION)
     .create(
       {
         entity: relation.type === "entity" ? relation.id : "",
@@ -141,12 +110,12 @@ export async function updateContentPage(
   if (relation.type === "entity") {
     await unlinkMenuItems(id);
     return pocketbase
-      .collection<ContentPageRecord>(CONTENT_PAGES_COLLECTION)
+      .collection<ContentPageRecord>(CONTENT_PAGE_COLLECTION)
       .update(id, { entity: relation.id, title: values.title }, { requestKey: null });
   }
 
   const page = await pocketbase
-    .collection<ContentPageRecord>(CONTENT_PAGES_COLLECTION)
+    .collection<ContentPageRecord>(CONTENT_PAGE_COLLECTION)
     .update(id, { entity: "", title: values.title }, { requestKey: null });
   await unlinkMenuItems(id, relation.id);
   await pocketbase
@@ -175,7 +144,7 @@ export async function deleteContentPage(id: string) {
   }
 
   await pocketbase
-    .collection<ContentPageRecord>(CONTENT_PAGES_COLLECTION)
+    .collection<ContentPageRecord>(CONTENT_PAGE_COLLECTION)
     .delete(id, { requestKey: null });
 }
 

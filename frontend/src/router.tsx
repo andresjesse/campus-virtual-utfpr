@@ -30,6 +30,8 @@ export const Router = () => {
             <Route element={<AuthorizationRoute capability="menu.manage" />}>
               <Route path="menu" element={<Navigate to="categories" replace />} />
               <Route path="menu/items" element={<Pages.Admin.MenuItemList />} />
+              <Route path="menu/items/new" element={<Pages.Admin.MenuItemEditor />} />
+              <Route path="menu/items/:itemId" element={<Pages.Admin.MenuItemEditor />} />
               <Route path="menu/categories" element={<Pages.Admin.MenuCategoryList />} />
               <Route path="menu/categories/new" element={<Pages.Admin.MenuCategoryEditor />} />
               <Route

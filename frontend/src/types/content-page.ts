@@ -58,8 +58,3 @@ export type RelatedType = "entity" | "menu_item";
 export type ContentPageListRecord = ContentPageRecord & {
   relatedType: RelatedType | null;
 };
-
-export type MenuItemRecord = RecordModel & {
-  label: string;
-  page: string;
-};

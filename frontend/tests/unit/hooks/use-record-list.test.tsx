@@ -116,8 +116,12 @@ describe('useRecordList', () => {
     expect(result.current.records).toEqual(records)
   })
 
-  it('removes the record and notifies once the deletion succeeds', async () => {
-    const { result, deleteRecord } = setup()
+  it('refetches the list and notifies once the deletion succeeds', async () => {
+    const listRecords = jest
+      .fn()
+      .mockResolvedValueOnce(records)
+      .mockResolvedValue([records[1]])
+    const { result, deleteRecord } = setup({ listRecords })
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
     await act(async () => {
@@ -125,6 +129,7 @@ describe('useRecordList', () => {
     })
 
     expect(deleteRecord).toHaveBeenCalledWith('a')
+    expect(listRecords).toHaveBeenCalledTimes(2)
     expect(result.current.records).toEqual([records[1]])
     expect(showMock).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -133,6 +138,23 @@ describe('useRecordList', () => {
         message: messages.mesh.list.deletedMessage,
       }),
     )
+  })
+
+  it('drops records the server cascaded away with the deleted one', async () => {
+    const parent = { id: 'parent', name: 'parent_item' }
+    const child = { id: 'child', name: 'child_item' }
+    const listRecords = jest
+      .fn()
+      .mockResolvedValueOnce([parent, child])
+      .mockResolvedValue([])
+    const { result } = setup({ listRecords })
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+
+    await act(async () => {
+      await result.current.requestDelete(parent)
+    })
+
+    expect(result.current.records).toEqual([])
   })
 
   it('keeps the record and notifies the error when the deletion fails', async () => {

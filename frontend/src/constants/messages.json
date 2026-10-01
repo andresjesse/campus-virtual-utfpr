@@ -13,7 +13,9 @@
     "createdAt": "Criado em",
     "updatedAt": "Modificado em",
     "actions": "Ações",
-    "deleteErrorTitle": "Não foi possível excluir"
+    "deleteErrorTitle": "Não foi possível excluir",
+    "cancel": "Cancelar",
+    "delete": "Excluir"
   },
   "block": {
     "empty": {
@@ -172,10 +174,86 @@
       "ariaLabel": "Seções do menu",
       "items": "Itens do Menu",
       "categories": "Categorias"
+    }
+  },
+  "menuItems": {
+    "label": {
+      "empty": "Informe a etiqueta do item."
     },
-    "itemsPlaceholder": {
+    "link": {
+      "empty": "Informe o link do item.",
+      "invalid": "Informe um link válido, começando com 'https://'."
+    },
+    "list": {
       "title": "Itens do Menu",
-      "description": "Esta área será implementada em uma próxima tarefa."
+      "searchLabel": "Pesquisar itens do menu pelo nome",
+      "searchPlaceholder": "Pesquise pela etiqueta",
+      "new": "Novo Item",
+      "loading": "Carregando itens do menu",
+      "loadErrorTitle": "Não foi possível carregar os itens do menu",
+      "emptyTitle": "Nenhum item cadastrado",
+      "emptyDescription": "Cadastre o primeiro item para começar.",
+      "emptyResultsTitle": "Nenhum item encontrado",
+      "emptyResultsDescription": "Tente pesquisar usando outro nome.",
+      "deleteConfirmTitle": "Excluir item",
+      "deleteConfirmFirst": "Deseja realmente excluir permanentemente o item {name}?",
+      "deleteConfirmSecond": "Os itens aninhados nele também serão excluídos.",
+      "deletedTitle": "Item excluído",
+      "deletedMessage": "O item foi removido.",
+      "tableLabel": "Etiqueta",
+      "tableCategory": "Categoria",
+      "tableRelatedType": "Tipo de elemento relacionado",
+      "tableIcon": "Ícone",
+      "relatedLink": "Link",
+      "relatedPage": "Página",
+      "noTargetWarning": "Este item ficou sem destino e não aparecerá no menu. Edite-o para vincular um link ou uma página.",
+      "noIdentifier": "Sem etiqueta",
+      "iconAlt": "Ícone do item {name}",
+      "editAriaLabel": "Editar item {name}",
+      "deleteAriaLabel": "Excluir item {name}"
+    },
+    "editor": {
+      "newTitle": "Novo Item do Menu",
+      "editTitle": "Editar Item do Menu",
+      "loading": "Carregando item do menu",
+      "saveSuccessTitle": "Item salvo",
+      "saveSuccessMessage": "O item foi salvo com sucesso.",
+      "labelLabel": "Etiqueta",
+      "labelPlaceholder": "example_label",
+      "linkLabel": "Elemento Vinculado",
+      "linkOptionLink": "Link",
+      "linkOptionPage": "Página",
+      "hrefPlaceholder": "https://link.example.com",
+      "pagePlaceholder": "Selecione uma página",
+      "pageNothingFound": "Nenhuma página encontrada",
+      "pageRequiredError": "Selecione a página vinculada.",
+      "pageUntitled": "Sem título",
+      "pageAvailable": "Disponível",
+      "pageHeldByEntity": "Vinculada a um Modelo 3D",
+      "pageHeldByItem": "Vinculada ao item {name}",
+      "pageRelinkTitle": "Vincular página a este item",
+      "pageRelinkFirst": "A página {page} já está vinculada ao item {item}.",
+      "pageRelinkSecond": "Ao salvar este item, o vínculo com {item} será desfeito. Nada é alterado até você salvar.",
+      "pageRelinkConfirm": "Vincular assim mesmo",
+      "categoryLabel": "Categoria",
+      "categoryPlaceholder": "Selecione...",
+      "categoryNothingFound": "Nenhuma categoria encontrada",
+      "categoryRequiredError": "Selecione a categoria do item.",
+      "categoryCreateAriaLabel": "Criar nova categoria",
+      "nestedLabel": "É um elemento aninhado?",
+      "nestedOptionNo": "Não",
+      "nestedOptionYes": "Sim",
+      "parentPlaceholder": "Selecione um item",
+      "parentNothingFound": "Nenhum item encontrado",
+      "parentNeedsCategory": "Selecione uma categoria para escolher o item.",
+      "parentRequiredError": "Selecione o item no qual este será aninhado.",
+      "iconRequiredError": "Carregue o ícone do item.",
+      "dropzoneTitle": "Carregar ícone",
+      "dropzoneDescription": "Arraste e solte arquivo de imagem do ícone ou clique no botão abaixo para selecioná-lo.",
+      "removeIconLabel": "Remover ícone",
+      "currentIconLabel": "Ícone atual",
+      "replaceIconLabel": "Substituir ícone",
+      "cancelReplaceIconLabel": "Manter ícone atual"
     }
   },
   "menuCategories": {
@@ -188,7 +266,7 @@
     "list": {
       "title": "Categorias do Menu",
       "searchLabel": "Pesquisar categorias do menu pelo nome",
-      "searchPlaceholder": "Pesquise pelo nome",
+      "searchPlaceholder": "Pesquise pela etiqueta",
       "new": "Nova Categoria",
       "loading": "Carregando categorias do menu",
       "loadErrorTitle": "Não foi possível carregar as categorias do menu",

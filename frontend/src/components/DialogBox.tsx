@@ -1,5 +1,6 @@
 import {Button, Group, Modal, Text} from "@mantine/core";
 import type { DialogPropsValue } from "@/types/user-feedback.ts";
+import messages from "@/constants/messages.json";
 
 export default function DialogBox({
   loading,
@@ -8,6 +9,8 @@ export default function DialogBox({
   opened,
   firstMessage,
   secondMessage,
+  confirmLabel,
+  confirmColor,
   title
 }: DialogPropsValue) {
   return (
@@ -31,15 +34,15 @@ export default function DialogBox({
           disabled={loading}
           onClick={onCancel}
         >
-          Cancelar
+          {messages.common.cancel}
         </Button>
         <Button
           size="xs"
-          color="red"
+          color={confirmColor ?? "red"}
           loading={loading}
           onClick={onConfirm}
         >
-          Excluir
+          {confirmLabel ?? messages.common.delete}
         </Button>
       </Group>
     </Modal>
