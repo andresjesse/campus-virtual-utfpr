@@ -248,7 +248,6 @@
       "parentPlaceholder": "Selecione um item",
       "parentNothingFound": "Nenhum item encontrado",
       "parentRequiredError": "Selecione o item no qual este será aninhado.",
-      "iconLabel": "Ícone",
       "iconRequiredError": "Carregue o ícone do item.",
       "dropzoneTitle": "Carregar ícone",
       "dropzoneDescription": "Arraste e solte arquivo de imagem do ícone ou clique no botão abaixo para selecioná-lo.",
