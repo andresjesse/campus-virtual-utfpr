@@ -95,7 +95,7 @@ describe('ContentBlockEditOverlay', () => {
     getBlockContentMock.mockReturnValue(request.promise)
     const { onClose } = renderOverlay()
 
-    expect(screen.getByLabelText('Carregando conteúdo...')).toBeInTheDocument()
+    expect(screen.getByLabelText(messages.block.editor.loading)).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: '' })).not.toBeInTheDocument()
 
     const saveButton = screen.getByRole('button', { name: messages.common.save })
@@ -130,7 +130,7 @@ describe('ContentBlockEditOverlay', () => {
     upsertBlockContentApiMock.mockResolvedValue(true)
     const { onUpdate } = renderOverlay()
 
-    const title = await screen.findByLabelText('Título')
+    const title = await screen.findByLabelText(messages.block.editor.titleLabel)
     await user.clear(title)
     await user.type(title, '  Updated title  ')
 
@@ -183,9 +183,8 @@ describe('ContentBlockEditOverlay', () => {
     await waitFor(() => expect(saveButton).toBeEnabled())
     expect(notificationsShowMock).toHaveBeenCalledWith({
       color: 'red',
-      title: 'Falha ao atualizar o conteúdo',
-      message:
-        'Não foi possível atualizar o conteúdo. Os dados permanecem os mesmos.',
+      title: messages.block.editor.saveErrorTitle,
+      message: messages.errors.network,
     })
     expect(screen.getByLabelText('Conteúdo')).toHaveValue(
       '<p>Existing content</p>',

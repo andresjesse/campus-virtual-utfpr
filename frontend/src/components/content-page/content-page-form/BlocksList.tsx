@@ -16,6 +16,9 @@ import {deleteBlockContent} from "@/services/content-page-service.ts";
 import ContentBlockEditOverlay from "@/components/content-input/content-blocks/overlay/ContentBlockEditOverlay.tsx";
 import {notifications} from "@mantine/notifications";
 import {PAGE_BLOCK_COLLECTIONS} from "@/constants/content-constants.ts";
+import messages from "@/constants/messages.json";
+import {formatMessage} from "@/helpers/message-helper.ts";
+import {getRequestErrorMessage} from "@/helpers/request-error-helper.ts";
 
 export default function BlocksList({
   children,
@@ -42,9 +45,8 @@ export default function BlocksList({
       setBlocksMetadata(
         await getAllContentBlocksMetadata(pageId, false)
       );
-    } catch(error) {
-      console.log(error);
-      setError("Houve um erro inesperado.")
+    } catch(requestError) {
+      setError(getRequestErrorMessage(requestError))
     } finally {
       setIsLoading(false);
     }
@@ -56,7 +58,7 @@ export default function BlocksList({
 
   function onDropNewBlock(blockType: string) {
     selectedContentBlock.current = {
-      title: "Título provisório",
+      title: messages.block.list.newBlockTitle,
       collectionName: blockType as ContentPageBlockType,
     }
     setIsModalOpen(true);
@@ -74,10 +76,11 @@ export default function BlocksList({
   }
 
   async function handleDelete(id: string, title: string, collectionName: string) {
+    const blockName = title || messages.block.list.untitled;
     const hasConfirmed = await dialogBox!.confirm({
-      title: "Excluir Bloco",
-      firstMessage: `Deseja mesmo excluir o bloco ${title ?? "Sem título"}?`,
-      secondMessage: "Esta ação não pode ser desfeita."
+      title: messages.block.list.deleteConfirmTitle,
+      firstMessage: formatMessage(messages.block.list.deleteConfirmFirst, blockName),
+      secondMessage: messages.block.list.deleteConfirmSecond
     })
 
     if (!hasConfirmed) return;
@@ -93,14 +96,14 @@ export default function BlocksList({
       })
       notifications.show({
         color: "green",
-        title: "Bloco excluído.",
-        message: "O bloco foi excluído corretamente.",
+        title: messages.block.list.deletedTitle,
+        message: messages.block.list.deletedMessage,
       });
-    } catch {
+    } catch (deleteError) {
       notifications.show({
         color: "red",
-        title: "Não foi possível excluir o bloco.",
-        message: "Tente novamente.",
+        title: messages.common.deleteErrorTitle,
+        message: getRequestErrorMessage(deleteError),
       });
     }
   }
@@ -113,8 +116,8 @@ export default function BlocksList({
     if (!selectedContentBlock.current) {
       notifications.show({
         color: "red",
-        title: "Recurso indisponível.",
-        message: "A ação não pôde ser completada.",
+        title: messages.block.list.unavailableTitle,
+        message: messages.block.list.unavailableMessage,
       });
       return;
     }
@@ -125,7 +128,7 @@ export default function BlocksList({
   if (isLoading) {
     return (
       <>
-        <FeedbackState title={"Carregando os blocos de conteúdo..."} loading />
+        <FeedbackState title={messages.block.list.loading} loading />
         {children}
       </>
     )
@@ -135,9 +138,9 @@ export default function BlocksList({
     return (
       <>
         <FeedbackState
-          title={"Não foi possível carregar os blocos de conteúdo."}
+          title={messages.block.list.loadErrorTitle}
           description={error}
-          actionLabel={"Tentar novamente"}
+          actionLabel={messages.common.retry}
           onAction={fetchBlocksMetadata}
         />
         {children}

@@ -6,6 +6,7 @@ import { notifications } from '@mantine/notifications'
 
 import BlocksList from '@/components/content-page/content-page-form/BlocksList.tsx'
 import messages from '@/constants/messages.json'
+import { formatMessage } from '@/helpers/message-helper.ts'
 import { DialogContext } from '@/contexts/dialog-context.ts'
 import { getAllContentBlocksMetadata } from '@/helpers/content-pages-service-helper.ts'
 import { deleteBlockContent } from '@/services/content-page-service.ts'
@@ -160,7 +161,7 @@ describe('BlocksList', () => {
 
     expect(screen.getByTestId('editor-metadata')).toHaveTextContent(
       JSON.stringify({
-        title: 'Título provisório',
+        title: messages.block.list.newBlockTitle,
         collectionName: 'rtf_block',
         page: 'page-1',
       }),
@@ -203,9 +204,12 @@ describe('BlocksList', () => {
     )
 
     expect(confirm).toHaveBeenCalledWith({
-      title: 'Excluir Bloco',
-      firstMessage: 'Deseja mesmo excluir o bloco Introduction?',
-      secondMessage: 'Esta ação não pode ser desfeita.',
+      title: messages.block.list.deleteConfirmTitle,
+      firstMessage: formatMessage(
+        messages.block.list.deleteConfirmFirst,
+        'Introduction',
+      ),
+      secondMessage: messages.block.list.deleteConfirmSecond,
     })
     expect(deleteBlockContentMock).not.toHaveBeenCalled()
     expect(screen.getByText('Introduction')).toBeInTheDocument()
@@ -247,26 +251,23 @@ describe('BlocksList', () => {
     await waitFor(() => {
       expect(showNotificationMock).toHaveBeenCalledWith({
         color: 'red',
-        title: 'Não foi possível excluir o bloco.',
-        message: 'Tente novamente.',
+        title: messages.common.deleteErrorTitle,
+        message: messages.errors.network,
       })
     })
     expect(screen.getByText('Introduction')).toBeInTheDocument()
   })
 
   it('shows a retry state when loading block metadata fails', async () => {
-    const consoleLog = jest.spyOn(console, 'log').mockImplementation()
     getAllContentBlocksMetadataMock.mockRejectedValue(
       new Error('Loading failed'),
     )
     renderBlocksList()
 
     expect(
-      await screen.findByText('Não foi possível carregar os blocos de conteúdo.'),
+      await screen.findByText(messages.block.list.loadErrorTitle),
     ).toBeInTheDocument()
-    expect(screen.getByText('Houve um erro inesperado.')).toBeInTheDocument()
+    expect(screen.getByText(messages.errors.network)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: messages.common.retry })).toBeInTheDocument()
-
-    consoleLog.mockRestore()
   })
 })

@@ -3,6 +3,8 @@ import {TrashIcon} from "@phosphor-icons/react/dist/csr/Trash";
 import {NotePencilIcon} from "@phosphor-icons/react";
 import type {ContentPageBlockMetadata} from "@/types/content-page.ts";
 import type {ContentPageBlockType} from "@/enums/content-pages-enum.ts";
+import messages from "@/constants/messages.json";
+import {formatMessage} from "@/helpers/message-helper.ts";
 
 type RtfBlockDisplayHeaderProps = {
   metadata: ContentPageBlockMetadata
@@ -11,12 +13,14 @@ type RtfBlockDisplayHeaderProps = {
 }
 
 export default function BlockDisplayHeader({ metadata, onDelete, onEdit }: RtfBlockDisplayHeaderProps) {
+  const blockName = metadata.title || messages.block.list.untitled;
+
   return (
     <Flex mb="xs" pb="0" flex={1} justify="space-between">
       <Title order={4}>{metadata.title}</Title>
       <Flex align="center">
         <ActionIcon
-          aria-label={`Editar conteúdo"}`}
+          aria-label={formatMessage(messages.block.list.editAriaLabel, blockName)}
           color="blue"
           variant="subtle"
           size="md"
@@ -33,7 +37,7 @@ export default function BlockDisplayHeader({ metadata, onDelete, onEdit }: RtfBl
         <Space w="sm" />
 
         <ActionIcon
-          aria-label={`Excluir conteúdo"}`}
+          aria-label={formatMessage(messages.block.list.deleteAriaLabel, blockName)}
           color="red"
           variant="subtle"
           size="md"

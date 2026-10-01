@@ -19,6 +19,7 @@ import {
   isBlockContentEmpty,
 } from "@/helpers/content-block-validation.ts";
 import messages from "@/constants/messages.json";
+import {getRequestErrorMessage} from "@/helpers/request-error-helper.ts";
 
 type ContentBlockEditModalProps = {
   blockMetadata: ContentPageBlockMetadata;
@@ -75,15 +76,15 @@ export default function ContentBlockEditOverlay({
       onUpdate();
       notifications.show({
         color: "green",
-        title: "Conteúdo atualizado",
-        message: "O conteúdo foi atualizado com sucesso."
+        title: messages.block.editor.saveSuccessTitle,
+        message: messages.block.editor.saveSuccessMessage
       })
     }
-    catch {
+    catch (saveError) {
       notifications.show({
         color: "red",
-        title: "Falha ao atualizar o conteúdo",
-        message: "Não foi possível atualizar o conteúdo. Os dados permanecem os mesmos."
+        title: messages.block.editor.saveErrorTitle,
+        message: getRequestErrorMessage(saveError)
       })
     }
     finally {
@@ -110,12 +111,12 @@ export default function ContentBlockEditOverlay({
         )}
         <Modal.Body pt={0}>
           {isLoading && !blockData ? (
-            <FeedbackState title="Carregando conteúdo..." loading />
+            <FeedbackState title={messages.block.editor.loading} loading />
           ) : (
             <Stack gap="lg">
               <TitleInput
-                label="Título"
-                placeholder="Digite um título"
+                label={messages.block.editor.titleLabel}
+                placeholder={messages.block.editor.titlePlaceholder}
                 value={draftMetadata.title}
                 onChange={(event) => {
                   const title = event.currentTarget.value;

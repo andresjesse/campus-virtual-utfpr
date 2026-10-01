@@ -31,6 +31,33 @@
     "page": {
       "unsavedTitle": "Página não salva",
       "unsavedMessage": "Salve a página antes de adicionar blocos de conteúdo."
+    },
+    "list": {
+      "loading": "Carregando os blocos de conteúdo",
+      "loadErrorTitle": "Não foi possível carregar os blocos de conteúdo",
+      "untitled": "Sem título",
+      "newBlockTitle": "Título provisório",
+      "placeholderContent": "Conteúdo provisório",
+      "editAriaLabel": "Editar bloco {name}",
+      "deleteAriaLabel": "Excluir bloco {name}",
+      "deleteConfirmTitle": "Excluir bloco",
+      "deleteConfirmFirst": "Deseja realmente excluir permanentemente o bloco {name}?",
+      "deleteConfirmSecond": "Esta ação não pode ser desfeita.",
+      "deletedTitle": "Bloco excluído",
+      "deletedMessage": "O bloco foi removido da página.",
+      "unavailableTitle": "Recurso indisponível",
+      "unavailableMessage": "A ação não pôde ser completada."
+    },
+    "diagram": {
+      "notImplemented": "Bloco de diagrama ainda não implementado."
+    },
+    "editor": {
+      "loading": "Carregando conteúdo",
+      "titleLabel": "Título",
+      "titlePlaceholder": "Digite um título",
+      "saveSuccessTitle": "Conteúdo atualizado",
+      "saveSuccessMessage": "O conteúdo foi atualizado com sucesso.",
+      "saveErrorTitle": "Falha ao atualizar o conteúdo"
     }
   },
   "files": {

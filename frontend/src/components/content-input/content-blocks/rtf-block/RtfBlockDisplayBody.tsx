@@ -3,11 +3,12 @@ import {Box, Typography} from "@mantine/core";
 import sanitizeRichText from "@/helpers/sanitize-rich-text.ts";
 import {useMemo} from "react";
 import type {BlockDisplayBodyProps} from "@/components/content-input/content-blocks/registry.ts";
+import messages from "@/constants/messages.json";
 
 export default function RtfBlockDisplayBody({ isLoading, content }: BlockDisplayBodyProps) {
   const richTextContent = typeof content === "string"
     ? content
-    : "<p>Conteúdo provisório</p>";
+    : `<p>${messages.block.list.placeholderContent}</p>`;
 
   const sanitizedContent = useMemo(
     () => sanitizeRichText(richTextContent),
@@ -15,7 +16,7 @@ export default function RtfBlockDisplayBody({ isLoading, content }: BlockDisplay
   );
 
   if (isLoading) {
-    return <FeedbackState title="Carregando conteúdo..." />
+    return <FeedbackState title={messages.block.editor.loading} />
   }
 
   return (
