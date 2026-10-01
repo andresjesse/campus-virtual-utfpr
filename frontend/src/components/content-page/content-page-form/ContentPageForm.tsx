@@ -114,7 +114,7 @@ export default function ContentPageForm({
           </Flex>
         </FormMetadataSection>
         <FormBodySection flex="1 1 0" mih={0} style={{ overflowY: "auto" }}>
-          <BlocksList pageTitle={values.title} pageRelation={values.relation}>
+          <BlocksList>
             <Group justify="flex-end">
               <Button
                 variant="outline"

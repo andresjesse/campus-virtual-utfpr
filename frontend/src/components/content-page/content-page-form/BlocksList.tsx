@@ -19,12 +19,8 @@ import {notifications} from "@mantine/notifications";
 import {PAGE_BLOCK_COLLECTIONS} from "@/constants/content-constants.ts";
 
 export default function BlocksList({
-  pageTitle,
-  pageRelation,
   children,
 }: {
-  pageTitle: string;
-  pageRelation: string;
   children?: ReactNode;
 }) {
   const { pageId } = useParams();
@@ -174,8 +170,6 @@ export default function BlocksList({
       <ContentBlockEditOverlay
         key={`${selectedContentBlock.current?.collectionName}-${selectedContentBlock.current?.id ?? "new"}`}
         blockMetadata={{ ...selectedContentBlock.current!, page: pageId  }}
-        pageTitle={pageTitle}
-        pageRelation={pageRelation}
         onUpdate={updateContentBlocks}
         opened={isModalOpen}
         onClose={closeContentBlockModal}

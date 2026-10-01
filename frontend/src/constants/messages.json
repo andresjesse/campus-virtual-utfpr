@@ -29,12 +29,8 @@
       }
     },
     "page": {
-      "missingFieldsTitle": "Página incompleta",
-      "missingFields": {
-        "title": "Preencha o título da página antes de salvar o bloco.",
-        "relation": "Selecione o elemento relacionado antes de salvar o bloco.",
-        "both": "Preencha o título da página e selecione o elemento relacionado antes de salvar o bloco."
-      }
+      "unsavedTitle": "Página não salva",
+      "unsavedMessage": "Salve a página antes de adicionar blocos de conteúdo."
     }
   },
   "files": {

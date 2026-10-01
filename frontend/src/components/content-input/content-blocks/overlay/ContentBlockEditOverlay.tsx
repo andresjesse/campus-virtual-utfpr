@@ -16,23 +16,17 @@ import {type ContentPageBlockType} from "@/enums/content-pages-enum.ts";
 import {notifications} from "@mantine/notifications";
 import {
   getEmptyContentNotification,
-  getPageMetadataNotification,
   isBlockContentEmpty,
-  isPageMetadataReady,
 } from "@/helpers/content-block-validation.ts";
 import messages from "@/constants/messages.json";
 
 type ContentBlockEditModalProps = {
   blockMetadata: ContentPageBlockMetadata;
-  pageTitle?: string;
-  pageRelation?: string;
   onUpdate: () => void;
 } & ModalProps
 
 export default function ContentBlockEditOverlay({
   blockMetadata,
-  pageTitle = "",
-  pageRelation = "",
   onUpdate,
   opened,
   onClose,
@@ -56,12 +50,12 @@ export default function ContentBlockEditOverlay({
   const handleUpdate = async () => {
     const isNewBlock = !draftMetadata.id;
 
-    if (!isPageMetadataReady(pageTitle, pageRelation)) {
-      const { title, message } = getPageMetadataNotification(
-        pageTitle,
-        pageRelation,
-      );
-      notifications.show({ color: "yellow", title, message });
+    if (!draftMetadata.page) {
+      notifications.show({
+        color: "yellow",
+        title: messages.block.page.unsavedTitle,
+        message: messages.block.page.unsavedMessage,
+      });
       return;
     }
 
