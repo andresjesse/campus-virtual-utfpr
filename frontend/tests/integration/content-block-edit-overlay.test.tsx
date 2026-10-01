@@ -69,21 +69,15 @@ function renderOverlay({
   onClose = jest.fn(),
   onUpdate = jest.fn(),
   blockMetadata: metadataOverride = metadata,
-  pageTitle = 'Page title',
-  pageRelation = 'entity:entity-a',
 }: {
   onClose?: jest.Mock
   onUpdate?: jest.Mock
   blockMetadata?: ContentPageBlockMetadata
-  pageTitle?: string
-  pageRelation?: string
 } = {}) {
   render(
     <MantineProvider>
       <ContentBlockEditOverlay
         blockMetadata={metadataOverride}
-        pageTitle={pageTitle}
-        pageRelation={pageRelation}
         opened
         onClose={onClose}
         onUpdate={onUpdate}
@@ -247,69 +241,23 @@ describe('ContentBlockEditOverlay', () => {
     notificationsShowMock.mockRestore()
   })
 
-  it('blocks saving when the page title is missing', async () => {
+  it('blocks saving while the page has not been saved yet', async () => {
     const user = userEvent.setup()
     const notificationsShowMock = jest
       .spyOn(notifications, 'show')
       .mockImplementation()
     getBlockContentMock.mockResolvedValue('<p>Content</p>')
-    const { onUpdate } = renderOverlay({ pageTitle: '  ' })
-
-    await user.click(await screen.findByRole('button', { name: messages.common.save }))
-
-    await waitFor(() => {
-      expect(notificationsShowMock).toHaveBeenCalledWith({
-        color: 'yellow',
-        title: messages.block.page.missingFieldsTitle,
-        message: messages.block.page.missingFields.title,
-      })
+    const { onUpdate } = renderOverlay({
+      blockMetadata: { ...newBlockMetadata, page: undefined },
     })
-    expect(upsertBlockContentApiMock).not.toHaveBeenCalled()
-    expect(onUpdate).not.toHaveBeenCalled()
-
-    notificationsShowMock.mockRestore()
-  })
-
-  it('blocks saving when the page relation is missing', async () => {
-    const user = userEvent.setup()
-    const notificationsShowMock = jest
-      .spyOn(notifications, 'show')
-      .mockImplementation()
-    getBlockContentMock.mockResolvedValue('<p>Content</p>')
-    const { onUpdate } = renderOverlay({ pageRelation: '' })
 
     await user.click(await screen.findByRole('button', { name: messages.common.save }))
 
     await waitFor(() => {
       expect(notificationsShowMock).toHaveBeenCalledWith({
         color: 'yellow',
-        title: messages.block.page.missingFieldsTitle,
-        message:
-          messages.block.page.missingFields.relation,
-      })
-    })
-    expect(upsertBlockContentApiMock).not.toHaveBeenCalled()
-    expect(onUpdate).not.toHaveBeenCalled()
-
-    notificationsShowMock.mockRestore()
-  })
-
-  it('blocks saving when the page title and relation are missing', async () => {
-    const user = userEvent.setup()
-    const notificationsShowMock = jest
-      .spyOn(notifications, 'show')
-      .mockImplementation()
-    getBlockContentMock.mockResolvedValue('<p>Content</p>')
-    const { onUpdate } = renderOverlay({ pageTitle: '', pageRelation: '' })
-
-    await user.click(await screen.findByRole('button', { name: messages.common.save }))
-
-    await waitFor(() => {
-      expect(notificationsShowMock).toHaveBeenCalledWith({
-        color: 'yellow',
-        title: messages.block.page.missingFieldsTitle,
-        message:
-          messages.block.page.missingFields.both,
+        title: messages.block.page.unsavedTitle,
+        message: messages.block.page.unsavedMessage,
       })
     })
     expect(upsertBlockContentApiMock).not.toHaveBeenCalled()

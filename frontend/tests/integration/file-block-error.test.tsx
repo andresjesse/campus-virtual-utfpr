@@ -16,8 +16,6 @@ function renderOverlay(blockMetadata: ContentPageBlockMetadata) {
     <MantineProvider>
       <ContentBlockEditOverlay
         blockMetadata={blockMetadata}
-        pageTitle="Page"
-        pageRelation="entity:a"
         onUpdate={jest.fn()}
         opened
         onClose={jest.fn()}
