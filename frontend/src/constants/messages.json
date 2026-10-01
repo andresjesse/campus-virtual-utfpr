@@ -327,7 +327,8 @@
       "titleRequiredError": "Informe o título da página.",
       "relationLabel": "Elemento Relacionado",
       "relationPlaceholder": "Selecione",
-      "relationRequiredError": "Selecione o elemento relacionado."
+      "relationRequiredError": "Selecione o elemento relacionado.",
+      "relationInvalidError": "Selecione um elemento relacionado válido."
     },
     "list": {
       "new": "Nova página",

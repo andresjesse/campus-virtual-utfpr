@@ -10,6 +10,7 @@ import {
 } from "@/services/content-page-service.ts";
 import type PocketBase from "pocketbase";
 import {getFileUrl} from "@/helpers/file-helper.ts";
+import messages from "@/constants/messages.json";
 
 export function encodeRelation(type: RelatedType, id: string) {
   return `${type}:${id}`;
@@ -19,7 +20,7 @@ export function parseRelation(relation: string) {
   const separator = relation.indexOf(":");
 
   if (separator < 1) {
-    throw new Error("Selecione um elemento relacionado válido.");
+    throw new Error(messages.contentPages.editor.relationInvalidError);
   }
 
   return {

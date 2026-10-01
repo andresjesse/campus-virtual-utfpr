@@ -65,7 +65,11 @@ export function getRequestFieldErrors(
 }
 
 function getServerMessage(error: unknown) {
-  const responseMessage = getResponse(error)?.message;
+  const response = getResponse(error);
+
+  if (!response) return error instanceof Error ? error.message.trim() : "";
+
+  const responseMessage = response.message;
   const fieldMessages = Object.values(getRequestFieldErrors(error))
     .map((fieldError) => fieldError.message)
     .join(" ");

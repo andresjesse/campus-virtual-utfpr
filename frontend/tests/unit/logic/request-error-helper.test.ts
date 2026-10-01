@@ -41,6 +41,8 @@ describe('request-error-helper', () => {
       ['notFound', { status: 404, response: {} }],
       ['server', { status: 503, response: {} }],
       ['network', { status: 0, response: {} }],
+      ['network', new Error('Request failed')],
+      ['serverMessage', new Error(messages.contentPages.editor.relationInvalidError)],
       ['generic', 'not an object'],
     ])('classifies %s', (kind, error) => {
       expect(getRequestErrorKind(error)).toBe(kind)
@@ -87,6 +89,14 @@ describe('request-error-helper', () => {
       expect(getRequestErrorMessage(plainBadRequest, messages.mesh.errors)).toBe(
         messages.errors.badRequest,
       )
+    })
+
+    it('shows the text of an error one of our own helpers threw', () => {
+      expect(
+        getRequestErrorMessage(
+          new Error(messages.contentPages.editor.relationInvalidError),
+        ),
+      ).toBe(messages.contentPages.editor.relationInvalidError)
     })
 
     it('shows a pb_hooks message verbatim, domain subtree or not', () => {
