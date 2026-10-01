@@ -150,8 +150,6 @@ export default function MenuItemForm({
               </Stack>
             </Flex>
 
-            {/* The dropzone sets flex:1 on itself; a bare flex child would get a
-                zero basis and collapse past its own height. */}
             <Box>
               <MenuItemIconDropzone
                 value={values.icon}
