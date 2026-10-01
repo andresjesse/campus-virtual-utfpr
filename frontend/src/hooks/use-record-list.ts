@@ -68,9 +68,7 @@ export function useRecordList<T extends { id: string }>({
 
       try {
         await deleteRecord(record.id);
-        setRecords((currentRecords) =>
-          currentRecords.filter((currentRecord) => currentRecord.id !== record.id),
-        );
+        await reload();
         notifications.show({
           color: "green",
           title: texts.deletedTitle,
@@ -87,7 +85,7 @@ export function useRecordList<T extends { id: string }>({
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps -- texts and the callbacks are stable
-    [dialogBox],
+    [dialogBox, reload],
   );
 
   const filtered = useLocaleSearch(records, query, getSearchableText);
