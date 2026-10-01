@@ -3,7 +3,7 @@ import type {
   GroupedContentPageBlockMetadata
 } from "@/types/content-page.ts";
 import BlockDisplay from "@/components/content-input/content-blocks/BlockDisplay.tsx";
-import classes from "@/components/content-page/content-page-form/content-page-form.module.css";
+// import classes from "@/components/content-page/content-page-form/content-page-form.module.css";
 import { type ContentPageBlockType } from "@/enums/content-pages-enum.ts";
 import DroppableContainer from "@/containers/DroppableContainer.tsx";
 import {useCallback, useContext, useEffect, useRef, useState} from "react";
@@ -149,7 +149,7 @@ export default function BlocksList({
   return (
     <>
       <DroppableContainer handleDrop={onDropNewBlock} >
-        <Box className={classes.blocksList} pt="lg" ml="lg" mr="lg">
+        <Box px="lg" pt="lg">
           { PAGE_BLOCK_COLLECTIONS.flatMap((collectionName) => (
               blocksMetadata?.[collectionName] ?? []).map((metadata) => (
               <BlockDisplay
