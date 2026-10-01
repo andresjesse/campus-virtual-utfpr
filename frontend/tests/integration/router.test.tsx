@@ -25,6 +25,16 @@ jest.mock('@/services/mesh-service.ts', () => ({
   listMeshes: jest.fn(async () => []),
 }))
 
+jest.mock('@/services/menu-item-service.ts', () => ({
+  listMenuItems: jest.fn(async () => []),
+  deleteMenuItem: jest.fn(),
+  getMenuItem: jest.fn(),
+  createMenuItem: jest.fn(),
+  updateMenuItem: jest.fn(),
+  listMenuItemPages: jest.fn(async () => []),
+  getMenuItemIconUrl: jest.fn(() => ''),
+}))
+
 jest.mock('@/services/menu-category-service.ts', () => ({
   listMenuCategories: jest.fn(async () => []),
   deleteMenuCategory: jest.fn(),
@@ -135,7 +145,7 @@ describe('Router', () => {
     expect(window.location.pathname).toBe('/admin/menu/categories')
   })
 
-  it('lets an editor open the menu items tab and the category editor', async () => {
+  it('lets an editor open the menu items tab', async () => {
     window.history.pushState({}, '', '/admin/menu/items')
 
     renderRouter(authenticatedUser(false))
@@ -144,9 +154,20 @@ describe('Router', () => {
       await screen.findByRole('tab', { name: messages.menu.tabs.items }),
     ).toHaveAttribute('aria-selected', 'true')
     expect(
-      screen.getByText(messages.menu.itemsPlaceholder.description),
+      screen.getByText(messages.menuItems.list.emptyTitle),
     ).toBeInTheDocument()
     expect(window.location.pathname).toBe('/admin/menu/items')
+  })
+
+  it('lets an editor open the menu item editor', async () => {
+    window.history.pushState({}, '', '/admin/menu/items/new')
+
+    renderRouter(authenticatedUser(false))
+
+    expect(
+      await screen.findByLabelText(messages.menuItems.editor.newTitle),
+    ).toBeInTheDocument()
+    expect(window.location.pathname).toBe('/admin/menu/items/new')
   })
 
   it('lets an editor open the category editor', async () => {

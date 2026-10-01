@@ -8,6 +8,7 @@ type MenuItemNestingFieldProps = {
   isNested: boolean;
   parent: string;
   parentOptions: MenuItemOption[];
+  hasCategory: boolean;
   error?: string;
   onNestedChange: (isNested: boolean) => void;
   onParentBlur: () => void;
@@ -18,6 +19,7 @@ export default function MenuItemNestingField({
   isNested,
   parent,
   parentOptions,
+  hasCategory,
   error,
   onNestedChange,
   onParentBlur,
@@ -39,7 +41,12 @@ export default function MenuItemNestingField({
       {isNested && (
         <Select
           searchable
-          placeholder={messages.menuItems.editor.parentPlaceholder}
+          disabled={!hasCategory}
+          placeholder={
+            hasCategory
+              ? messages.menuItems.editor.parentPlaceholder
+              : messages.menuItems.editor.parentNeedsCategory
+          }
           nothingFoundMessage={messages.menuItems.editor.parentNothingFound}
           data={parentOptions}
           value={parent || null}

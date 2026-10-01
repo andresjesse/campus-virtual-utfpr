@@ -1,3 +1,4 @@
+import { appLocale } from "@/config/locale.ts";
 import messages from "@/constants/messages.json";
 import { formatMessage } from "@/helpers/message-helper.ts";
 import type { ContentPageRecord } from "@/types/content-page.ts";
@@ -85,6 +86,23 @@ function getMenuItemName(item: MenuItemRecord) {
   return item.label || messages.menuItems.list.noIdentifier;
 }
 
+export function getMenuItemCategoryName(item: MenuItemRecord) {
+  return item.expand?.category?.label ?? "";
+}
+
+export function sortMenuItemsByCategory(menuItems: MenuItemRecord[]): MenuItemRecord[] {
+  return [...menuItems].sort((first, second) => {
+    const byCategory = getMenuItemCategoryName(first).localeCompare(
+      getMenuItemCategoryName(second),
+      appLocale,
+    );
+
+    return byCategory !== 0
+      ? byCategory
+      : getMenuItemName(first).localeCompare(getMenuItemName(second), appLocale);
+  });
+}
+
 export function findMenuItemPageOwner(
   menuItems: MenuItemRecord[],
   pageId: string,
@@ -132,8 +150,12 @@ export function buildMenuItemPageOptions(
 
 export function getMenuItemParentOptions(
   menuItems: MenuItemRecord[],
+  categoryId: string,
   currentItemId?: string,
 ): MenuItemOption[] {
+
+  if (!categoryId) return [];
+
   const itemsById = new Map(menuItems.map((item) => [item.id, item]));
 
   function isNestedUnderCurrent(item: MenuItemRecord) {
@@ -151,7 +173,12 @@ export function getMenuItemParentOptions(
   }
 
   return menuItems
-    .filter((item) => item.id !== currentItemId && !isNestedUnderCurrent(item))
+    .filter(
+      (item) =>
+        item.category === categoryId &&
+        item.id !== currentItemId &&
+        !isNestedUnderCurrent(item),
+    )
     .map((item) => ({ value: item.id, label: getMenuItemName(item) }));
 }
 

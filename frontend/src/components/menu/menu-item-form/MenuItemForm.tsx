@@ -11,7 +11,10 @@ import TitleInput from "@/components/text-input/TitleInput.tsx";
 import messages from "@/constants/messages.json";
 import FormBodySection from "@/containers/FormBodySection.tsx";
 import FormMetadataSection from "@/containers/FormMetadataSection.tsx";
-import { validateMenuItemForm } from "@/helpers/menu-item-service-helper.ts";
+import {
+  getMenuItemParentOptions,
+  validateMenuItemForm,
+} from "@/helpers/menu-item-service-helper.ts";
 import { getRequestErrorMessage } from "@/helpers/request-error-helper.ts";
 import type {
   MenuCategoryRecord,
@@ -19,13 +22,15 @@ import type {
   MenuItemFormValues,
   MenuItemOption,
   MenuItemPageOption,
+  MenuItemRecord,
 } from "@/types/menu.ts";
 
 type MenuItemFormProps = {
   initialValues: MenuItemFormValues;
   categoryOptions: MenuItemOption[];
   pageOptions: MenuItemPageOption[];
-  parentOptions: MenuItemOption[];
+  menuItems: MenuItemRecord[];
+  itemId?: string;
   currentIcon?: MenuItemCurrentIcon;
   onCategoryCreated: (category: MenuCategoryRecord) => void;
   onSubmit: (values: MenuItemFormValues) => Promise<void>;
@@ -35,7 +40,8 @@ export default function MenuItemForm({
   initialValues,
   categoryOptions,
   pageOptions,
-  parentOptions,
+  menuItems,
+  itemId,
   currentIcon,
   onCategoryCreated,
   onSubmit,
@@ -46,6 +52,7 @@ export default function MenuItemForm({
   const [isSaving, setIsSaving] = useState(false);
 
   const validationErrors = validateMenuItemForm(values, Boolean(currentIcon));
+  const parentOptions = getMenuItemParentOptions(menuItems, values.category, itemId);
 
   function errorFor(field: keyof MenuItemFormValues) {
     return submitAttempted || touched[field] ? validationErrors[field] : undefined;
@@ -119,7 +126,9 @@ export default function MenuItemForm({
                   value={values.category}
                   error={errorFor("category")}
                   onBlur={() => touch("category")}
-                  onChange={(category) => setValues({ ...values, category })}
+                  // A parent from the old category would break the shared-category
+                  // rule, so the selection does not survive the change.
+                  onChange={(category) => setValues({ ...values, category, parent: "" })}
                   onCategoryCreated={(category) => {
                     onCategoryCreated(category);
                     setValues((current) => ({ ...current, category: category.id }));
@@ -132,6 +141,7 @@ export default function MenuItemForm({
                   isNested={values.isNested}
                   parent={values.parent}
                   parentOptions={parentOptions}
+                  hasCategory={Boolean(values.category)}
                   error={errorFor("parent")}
                   onNestedChange={(isNested) => setValues({ ...values, isNested })}
                   onParentBlur={() => touch("parent")}

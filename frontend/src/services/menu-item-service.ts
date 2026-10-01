@@ -1,6 +1,7 @@
 import { CONTENT_PAGE_COLLECTION } from "@/constants/content-constants.ts";
 import { MENU_ITEM_COLLECTION } from "@/constants/menu-constants.ts";
 import { getFileUrl } from "@/helpers/file-helper.ts";
+import { sortMenuItemsByCategory } from "@/helpers/menu-item-service-helper.ts";
 import { pocketbase } from "@/services/pocketbase.ts";
 import type { ContentPageRecord } from "@/types/content-page.ts";
 import type { MenuItemFormValues, MenuItemRecord } from "@/types/menu.ts";
@@ -45,13 +46,13 @@ export async function unlinkMenuItems(pageId: string, exceptId?: string) {
 }
 
 export async function listMenuItems(): Promise<MenuItemRecord[]> {
-  return pocketbase
-    .collection<MenuItemRecord>(MENU_ITEM_COLLECTION)
-    .getFullList({
+  return sortMenuItemsByCategory(
+    await pocketbase.collection<MenuItemRecord>(MENU_ITEM_COLLECTION).getFullList({
       expand: "category,page,parent",
       requestKey: null,
       sort: "label",
-    });
+    }),
+  );
 }
 
 export async function listMenuItemPages(): Promise<ContentPageRecord[]> {
@@ -69,8 +70,6 @@ export async function getMenuItem(id: string) {
 export async function createMenuItem(values: MenuItemFormValues) {
   const payload = toMenuItemPayload(values);
 
-  // A page answers to a single menu item, so its previous owner has to be
-  // released before the write or the menu_items hook refuses it.
   if (payload.page) {
     await unlinkMenuItems(payload.page);
   }

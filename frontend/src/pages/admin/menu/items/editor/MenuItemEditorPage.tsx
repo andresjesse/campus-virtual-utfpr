@@ -8,7 +8,6 @@ import messages from "@/constants/messages.json";
 import EditorPageContainer from "@/containers/EditorPageContainer.tsx";
 import {
   buildMenuItemPageOptions,
-  getMenuItemParentOptions,
   toMenuCategoryOptions,
   toMenuItemFormValues,
 } from "@/helpers/menu-item-service-helper.ts";
@@ -26,6 +25,7 @@ import type {
   MenuItemFormValues,
   MenuItemOption,
   MenuItemPageOption,
+  MenuItemRecord,
 } from "@/types/menu.ts";
 
 const EMPTY_MENU_ITEM: MenuItemFormValues = {
@@ -45,7 +45,7 @@ export default function MenuItemEditorPage() {
   const [item, setItem] = useState<MenuItemFormValues>(EMPTY_MENU_ITEM);
   const [categoryOptions, setCategoryOptions] = useState<MenuItemOption[]>([]);
   const [pageOptions, setPageOptions] = useState<MenuItemPageOption[]>([]);
-  const [parentOptions, setParentOptions] = useState<MenuItemOption[]>([]);
+  const [menuItems, setMenuItems] = useState<MenuItemRecord[]>([]);
   const [currentIcon, setCurrentIcon] = useState<MenuItemCurrentIcon>();
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -55,7 +55,7 @@ export default function MenuItemEditorPage() {
     setIsLoading(true);
 
     try {
-      const [categories, menuItems, pages, loadedItem] = await Promise.all([
+      const [categories, loadedMenuItems, pages, loadedItem] = await Promise.all([
         listMenuCategories(),
         listMenuItems(),
         listMenuItemPages(),
@@ -63,8 +63,8 @@ export default function MenuItemEditorPage() {
       ]);
 
       setCategoryOptions(toMenuCategoryOptions(categories));
-      setParentOptions(getMenuItemParentOptions(menuItems, itemId));
-      setPageOptions(buildMenuItemPageOptions(pages, menuItems, itemId));
+      setMenuItems(loadedMenuItems);
+      setPageOptions(buildMenuItemPageOptions(pages, loadedMenuItems, itemId));
 
       if (loadedItem) {
         setItem(toMenuItemFormValues(loadedItem));
@@ -126,7 +126,8 @@ export default function MenuItemEditorPage() {
         initialValues={item}
         categoryOptions={categoryOptions}
         pageOptions={pageOptions}
-        parentOptions={parentOptions}
+        menuItems={menuItems}
+        itemId={itemId}
         currentIcon={currentIcon}
         onCategoryCreated={(category) =>
           setCategoryOptions((current) => [

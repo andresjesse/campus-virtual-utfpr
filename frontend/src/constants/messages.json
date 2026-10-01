@@ -174,10 +174,6 @@
       "ariaLabel": "Seções do menu",
       "items": "Itens do Menu",
       "categories": "Categorias"
-    },
-    "itemsPlaceholder": {
-      "title": "Itens do Menu",
-      "description": "Esta área será implementada em uma próxima tarefa."
     }
   },
   "menuItems": {
@@ -205,6 +201,7 @@
       "deletedTitle": "Item excluído",
       "deletedMessage": "O item foi removido.",
       "tableLabel": "Etiqueta",
+      "tableCategory": "Categoria",
       "tableRelatedType": "Tipo de elemento relacionado",
       "tableIcon": "Ícone",
       "relatedLink": "Link",
@@ -247,6 +244,7 @@
       "nestedOptionYes": "Sim",
       "parentPlaceholder": "Selecione um item",
       "parentNothingFound": "Nenhum item encontrado",
+      "parentNeedsCategory": "Selecione uma categoria para escolher o item.",
       "parentRequiredError": "Selecione o item no qual este será aninhado.",
       "iconRequiredError": "Carregue o ícone do item.",
       "dropzoneTitle": "Carregar ícone",
