@@ -31,8 +31,8 @@ export default function SegmentedChoice({
         aria-label={label}
         data={options}
         value={value}
-        color={branding.colors.surface.interactive}
-        bg={branding.colors.surface.panel}
+        bg={branding.colors.surface.interactiveHover}
+        color={branding.colors.surface.page}
         onChange={onChange}
       />
     </Input.Wrapper>
