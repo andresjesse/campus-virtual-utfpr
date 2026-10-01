@@ -206,6 +206,7 @@
       "tableIcon": "Ícone",
       "relatedLink": "Link",
       "relatedPage": "Página",
+      "noTargetWarning": "Este item ficou sem destino e não aparecerá no menu. Edite-o para vincular um link ou uma página.",
       "noIdentifier": "Sem etiqueta",
       "iconAlt": "Ícone do item {name}",
       "editAriaLabel": "Editar item {name}",
