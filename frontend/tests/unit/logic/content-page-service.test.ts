@@ -1,3 +1,5 @@
+import messages from '@/constants/messages.json'
+import { parseRelation } from '@/helpers/content-pages-service-helper.ts'
 import { upsertBlockContent } from '@/services/content-page-service.ts'
 
 const mockCreate = jest.fn()
@@ -197,6 +199,21 @@ describe('upsertBlockContent', () => {
         content: '<p>Updated content</p>',
       },
       { requestKey: null },
+    )
+  })
+})
+
+describe('parseRelation', () => {
+  it('splits an encoded relation into its type and id', () => {
+    expect(parseRelation('entity:entity-a')).toEqual({
+      id: 'entity-a',
+      type: 'entity',
+    })
+  })
+
+  it.each(['', 'entity', ':entity-a'])('rejects %j', (relation) => {
+    expect(() => parseRelation(relation)).toThrow(
+      messages.contentPages.editor.relationInvalidError,
     )
   })
 })

@@ -16,23 +16,18 @@ import {type ContentPageBlockType} from "@/enums/content-pages-enum.ts";
 import {notifications} from "@mantine/notifications";
 import {
   getEmptyContentNotification,
-  getPageMetadataNotification,
   isBlockContentEmpty,
-  isPageMetadataReady,
 } from "@/helpers/content-block-validation.ts";
 import messages from "@/constants/messages.json";
+import {getRequestErrorMessage} from "@/helpers/request-error-helper.ts";
 
 type ContentBlockEditModalProps = {
   blockMetadata: ContentPageBlockMetadata;
-  pageTitle?: string;
-  pageRelation?: string;
   onUpdate: () => void;
 } & ModalProps
 
 export default function ContentBlockEditOverlay({
   blockMetadata,
-  pageTitle = "",
-  pageRelation = "",
   onUpdate,
   opened,
   onClose,
@@ -56,12 +51,12 @@ export default function ContentBlockEditOverlay({
   const handleUpdate = async () => {
     const isNewBlock = !draftMetadata.id;
 
-    if (!isPageMetadataReady(pageTitle, pageRelation)) {
-      const { title, message } = getPageMetadataNotification(
-        pageTitle,
-        pageRelation,
-      );
-      notifications.show({ color: "yellow", title, message });
+    if (!draftMetadata.page) {
+      notifications.show({
+        color: "yellow",
+        title: messages.block.page.unsavedTitle,
+        message: messages.block.page.unsavedMessage,
+      });
       return;
     }
 
@@ -81,15 +76,15 @@ export default function ContentBlockEditOverlay({
       onUpdate();
       notifications.show({
         color: "green",
-        title: "Conteúdo atualizado",
-        message: "O conteúdo foi atualizado com sucesso."
+        title: messages.block.editor.saveSuccessTitle,
+        message: messages.block.editor.saveSuccessMessage
       })
     }
-    catch {
+    catch (saveError) {
       notifications.show({
         color: "red",
-        title: "Falha ao atualizar o conteúdo",
-        message: "Não foi possível atualizar o conteúdo. Os dados permanecem os mesmos."
+        title: messages.block.editor.saveErrorTitle,
+        message: getRequestErrorMessage(saveError)
       })
     }
     finally {
@@ -116,12 +111,12 @@ export default function ContentBlockEditOverlay({
         )}
         <Modal.Body pt={0}>
           {isLoading && !blockData ? (
-            <FeedbackState title="Carregando conteúdo..." loading />
+            <FeedbackState title={messages.block.editor.loading} loading />
           ) : (
             <Stack gap="lg">
               <TitleInput
-                label="Título"
-                placeholder="Digite um título"
+                label={messages.block.editor.titleLabel}
+                placeholder={messages.block.editor.titlePlaceholder}
                 value={draftMetadata.title}
                 onChange={(event) => {
                   const title = event.currentTarget.value;

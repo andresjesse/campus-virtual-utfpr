@@ -38,14 +38,11 @@ export default function DroppableContainer({ children, handleDrop }: DroppableCo
 
   return (
     <Box
-      flex="1 1 0"
-      mih={0}
-      h="100%"
+      mih="100%"
       bd={dragActive ? `2px dashed ${branding.colors.brand.primary}` : "2px dashed transparent"}
       bg={dragActive ? `color-mix(in srgb, ${branding.colors.brand.primary} 7%, transparent)` : "transparent"}
       bdrs={8}
       style={{
-        overflowY: "auto",
         boxShadow: dragActive
           ? `0 0 0 1px ${branding.colors.brand.primary}, 0 0 24px color-mix(in srgb, ${branding.colors.brand.primary} 35%, transparent)`
           : "none",

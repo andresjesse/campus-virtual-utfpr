@@ -1,63 +1,80 @@
 import { MantineProvider } from '@mantine/core'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import type { ReactNode } from 'react'
 
 import ContentPageForm from '@/components/content-page/content-page-form/ContentPageForm.tsx'
+import messages from '@/constants/messages.json'
 
 jest.mock('@/components/content-page/content-page-form/BlocksList.tsx', () => ({
   __esModule: true,
-  default: () => null,
+  default: ({ children }: { children?: ReactNode }) => children,
 }))
 
-function renderForm(onChange = jest.fn()) {
+function renderForm(onSubmit = jest.fn().mockResolvedValue(undefined)) {
   render(
     <MantineProvider>
       <ContentPageForm
         initialValues={{ relation: '', title: '' }}
         relatedOptions={[{ label: '3D Model — block-a', value: 'entity:entity-a' }]}
-        onChange={onChange}
+        onSubmit={onSubmit}
       />
     </MantineProvider>,
   )
 
-  return { onChange }
+  return { onSubmit }
 }
+
+const titleLabel = messages.contentPages.editor.titleLabel
+const relationLabel = messages.contentPages.editor.relationLabel
 
 describe('ContentPageForm', () => {
   it('validates fields after they are touched', async () => {
     const user = userEvent.setup()
-    const { onChange } = renderForm()
+    const { onSubmit } = renderForm()
 
-    await user.click(screen.getByLabelText('Título da Página'))
+    await user.click(screen.getByLabelText(titleLabel, { exact: false }))
     await user.tab()
-    await user.click(screen.getByRole('combobox', { name: 'Elemento Relacionado' }))
+    await user.click(screen.getByRole('combobox', { name: new RegExp(relationLabel) }))
     await user.tab()
 
-    expect(screen.getByLabelText('Título da Página')).toHaveAttribute(
+    expect(screen.getByLabelText(titleLabel, { exact: false })).toHaveAttribute(
       'aria-invalid',
       'true',
     )
     expect(
-      screen.getByRole('combobox', { name: 'Elemento Relacionado' }),
+      screen.getByRole('combobox', { name: new RegExp(relationLabel) }),
     ).toHaveAttribute('aria-invalid', 'true')
-    expect(screen.queryByText('Informe o título')).not.toBeInTheDocument()
-    expect(screen.queryByText('Selecione um elemento')).not.toBeInTheDocument()
-    expect(onChange).not.toHaveBeenCalled()
+    expect(onSubmit).not.toHaveBeenCalled()
   })
 
-  it('emits page metadata changes for auto-save', async () => {
+  it('refuses to submit an incomplete page and shows what is missing', async () => {
     const user = userEvent.setup()
-    const { onChange } = renderForm()
+    const { onSubmit } = renderForm()
 
-    await user.type(screen.getByLabelText('Título da Página'), '  Block A  ')
-    await user.click(
-      screen.getByRole('combobox', { name: 'Elemento Relacionado' }),
-    )
+    await user.click(screen.getByRole('button', { name: messages.common.save }))
+
+    expect(
+      screen.getByText(messages.contentPages.editor.titleRequiredError),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(messages.contentPages.editor.relationRequiredError),
+    ).toBeInTheDocument()
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
+  it('submits the trimmed page metadata', async () => {
+    const user = userEvent.setup()
+    const { onSubmit } = renderForm()
+
+    await user.type(screen.getByLabelText(titleLabel, { exact: false }), '  Block A  ')
+    await user.click(screen.getByRole('combobox', { name: new RegExp(relationLabel) }))
     await user.keyboard('[ArrowDown][Enter]')
+    await user.click(screen.getByRole('button', { name: messages.common.save }))
 
-    expect(onChange).toHaveBeenLastCalledWith({
+    expect(onSubmit).toHaveBeenCalledWith({
       relation: 'entity:entity-a',
-      title: '  Block A  ',
+      title: 'Block A',
     })
   })
 })

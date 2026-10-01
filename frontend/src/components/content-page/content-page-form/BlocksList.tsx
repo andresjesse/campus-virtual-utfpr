@@ -3,10 +3,11 @@ import type {
   GroupedContentPageBlockMetadata
 } from "@/types/content-page.ts";
 import BlockDisplay from "@/components/content-input/content-blocks/BlockDisplay.tsx";
-import classes from "@/components/content-page/content-page-form/content-page-form.module.css";
+// import classes from "@/components/content-page/content-page-form/content-page-form.module.css";
 import { type ContentPageBlockType } from "@/enums/content-pages-enum.ts";
 import DroppableContainer from "@/containers/DroppableContainer.tsx";
 import {useCallback, useContext, useEffect, useRef, useState} from "react";
+import type {ReactNode} from "react";
 import {useParams} from "react-router";
 import { getAllContentBlocksMetadata } from "@/helpers/content-pages-service-helper.ts";
 import FeedbackState from "@/components/feedback-state";
@@ -16,13 +17,14 @@ import {deleteBlockContent} from "@/services/content-page-service.ts";
 import ContentBlockEditOverlay from "@/components/content-input/content-blocks/overlay/ContentBlockEditOverlay.tsx";
 import {notifications} from "@mantine/notifications";
 import {PAGE_BLOCK_COLLECTIONS} from "@/constants/content-constants.ts";
+import messages from "@/constants/messages.json";
+import {formatMessage} from "@/helpers/message-helper.ts";
+import {getRequestErrorMessage} from "@/helpers/request-error-helper.ts";
 
 export default function BlocksList({
-  pageTitle,
-  pageRelation,
+  children,
 }: {
-  pageTitle: string;
-  pageRelation: string;
+  children?: ReactNode;
 }) {
   const { pageId } = useParams();
 
@@ -44,9 +46,8 @@ export default function BlocksList({
       setBlocksMetadata(
         await getAllContentBlocksMetadata(pageId, false)
       );
-    } catch(error) {
-      console.log(error);
-      setError("Houve um erro inesperado.")
+    } catch(requestError) {
+      setError(getRequestErrorMessage(requestError))
     } finally {
       setIsLoading(false);
     }
@@ -58,7 +59,7 @@ export default function BlocksList({
 
   function onDropNewBlock(blockType: string) {
     selectedContentBlock.current = {
-      title: "Título provisório",
+      title: messages.block.list.newBlockTitle,
       collectionName: blockType as ContentPageBlockType,
     }
     setIsModalOpen(true);
@@ -76,10 +77,11 @@ export default function BlocksList({
   }
 
   async function handleDelete(id: string, title: string, collectionName: string) {
+    const blockName = title || messages.block.list.untitled;
     const hasConfirmed = await dialogBox!.confirm({
-      title: "Excluir Bloco",
-      firstMessage: `Deseja mesmo excluir o bloco ${title ?? "Sem título"}?`,
-      secondMessage: "Esta ação não pode ser desfeita."
+      title: messages.block.list.deleteConfirmTitle,
+      firstMessage: formatMessage(messages.block.list.deleteConfirmFirst, blockName),
+      secondMessage: messages.block.list.deleteConfirmSecond
     })
 
     if (!hasConfirmed) return;
@@ -95,14 +97,14 @@ export default function BlocksList({
       })
       notifications.show({
         color: "green",
-        title: "Bloco excluído.",
-        message: "O bloco foi excluído corretamente.",
+        title: messages.block.list.deletedTitle,
+        message: messages.block.list.deletedMessage,
       });
-    } catch {
+    } catch (deleteError) {
       notifications.show({
         color: "red",
-        title: "Não foi possível excluir o bloco.",
-        message: "Tente novamente.",
+        title: messages.common.deleteErrorTitle,
+        message: getRequestErrorMessage(deleteError),
       });
     }
   }
@@ -115,8 +117,8 @@ export default function BlocksList({
     if (!selectedContentBlock.current) {
       notifications.show({
         color: "red",
-        title: "Recurso indisponível.",
-        message: "A ação não pôde ser completada.",
+        title: messages.block.list.unavailableTitle,
+        message: messages.block.list.unavailableMessage,
       });
       return;
     }
@@ -125,27 +127,32 @@ export default function BlocksList({
   }
 
   if (isLoading) {
-    return <FeedbackState title={"Carregando os blocos de conteúdo..."} loading />
+    return (
+      <>
+        <FeedbackState title={messages.block.list.loading} loading />
+        {children}
+      </>
+    )
   }
 
   if (error) {
-    return <FeedbackState
-      title={"Não foi possível carregar os blocos de conteúdo."}
-      description={error}
-      actionLabel={"Tentar novamente"}
-      onAction={fetchBlocksMetadata}
-    />
+    return (
+      <>
+        <FeedbackState
+          title={messages.block.list.loadErrorTitle}
+          description={error}
+          actionLabel={messages.common.retry}
+          onAction={fetchBlocksMetadata}
+        />
+        {children}
+      </>
+    )
   }
 
   return (
-    <Box
-       flex="1 1 0"
-       mih={0}
-       h="100%"
-       style={{ overflowY: "auto" }}
-    >
+    <>
       <DroppableContainer handleDrop={onDropNewBlock} >
-        <Box className={classes.blocksList} pt="lg" ml="lg" mr="lg">
+        <Box px="lg" pt="lg">
           { PAGE_BLOCK_COLLECTIONS.flatMap((collectionName) => (
               blocksMetadata?.[collectionName] ?? []).map((metadata) => (
               <BlockDisplay
@@ -160,17 +167,16 @@ export default function BlocksList({
             ))
           )}
         </Box>
+        {children}
       </DroppableContainer>
 
       <ContentBlockEditOverlay
         key={`${selectedContentBlock.current?.collectionName}-${selectedContentBlock.current?.id ?? "new"}`}
         blockMetadata={{ ...selectedContentBlock.current!, page: pageId  }}
-        pageTitle={pageTitle}
-        pageRelation={pageRelation}
         onUpdate={updateContentBlocks}
         opened={isModalOpen}
         onClose={closeContentBlockModal}
       />
-    </Box>
+    </>
   )
 }
