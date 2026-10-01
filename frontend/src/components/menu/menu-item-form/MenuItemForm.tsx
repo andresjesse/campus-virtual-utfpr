@@ -126,8 +126,7 @@ export default function MenuItemForm({
                   value={values.category}
                   error={errorFor("category")}
                   onBlur={() => touch("category")}
-                  // A parent from the old category would break the shared-category
-                  // rule, so the selection does not survive the change.
+                  // Clearing the parent keeps the child in its parent's category.
                   onChange={(category) => setValues({ ...values, category, parent: "" })}
                   onCategoryCreated={(category) => {
                     onCategoryCreated(category);

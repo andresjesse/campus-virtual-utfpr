@@ -6,10 +6,7 @@
 // that don't come from the API, such as the PocketBase dashboard.
 //
 // The cascade below is not atomic with the record's own update: event.next()
-// commits it, and everything after that runs post-commit, so a cascade that
-// failed halfway would leave the subtree split. It assigns each child exactly
-// the value the check above demands, so there is no realistic way for it to
-// fail; guarding it would mean exempting cascade writes from that check.
+// commits before it runs.
 //
 // Everything lives inside the handler on purpose: PocketBase runs each hook in
 // its own context, where file-scope helpers are not visible.

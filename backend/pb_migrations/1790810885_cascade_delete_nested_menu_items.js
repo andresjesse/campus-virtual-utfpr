@@ -1,6 +1,5 @@
-// `menu_items.parent` lets an item be nested under another one. Without the
-// cascade, deleting a parent would leave its children pointing at a dead id,
-// since the relation is optional and PocketBase would not clear it.
+// Without the cascade, deleting a parent would leave its children pointing at a
+// dead id, since the relation is optional and PocketBase would not clear it.
 const PARENT_FIELD = {
   id: "relation1032740943",
   name: "parent",
