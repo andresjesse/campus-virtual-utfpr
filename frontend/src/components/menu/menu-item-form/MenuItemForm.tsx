@@ -1,4 +1,4 @@
-import { Button, Flex, Group, Stack } from "@mantine/core";
+import { Box, Button, Flex, Group, Stack } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useState } from "react";
 import type { FormEvent } from "react";
@@ -140,15 +140,19 @@ export default function MenuItemForm({
               </Stack>
             </Flex>
 
-            <MenuItemIconDropzone
-              value={values.icon}
-              currentIcon={currentIcon}
-              error={errorFor("icon")}
-              onChange={(icon) => {
-                touch("icon");
-                setValues((current) => ({ ...current, icon }));
-              }}
-            />
+            {/* The dropzone sets flex:1 on itself; a bare flex child would get a
+                zero basis and collapse past its own height. */}
+            <Box>
+              <MenuItemIconDropzone
+                value={values.icon}
+                currentIcon={currentIcon}
+                error={errorFor("icon")}
+                onChange={(icon) => {
+                  touch("icon");
+                  setValues((current) => ({ ...current, icon }));
+                }}
+              />
+            </Box>
 
             <Group justify="flex-end" py="lg" mt="auto">
               <Button

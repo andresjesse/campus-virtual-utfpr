@@ -52,5 +52,4 @@ export type MenuItemPageOption = MenuItemOption & {
 
 export type MenuItemCurrentIcon = {
   name: string;
-  url: string;
 };
