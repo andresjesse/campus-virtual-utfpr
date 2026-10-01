@@ -4,40 +4,40 @@ import { useState } from "react";
 import DropzoneSection from "@/components/content-input/DropzoneSection.tsx";
 import FileCard from "@/components/file/FileCard.tsx";
 import {
-  MESH_FILE_ACCEPT,
-  MESH_FILE_MAX_SIZE_IN_BYTES,
-} from "@/constants/mesh-constants.ts";
+  MENU_ITEM_ICON_ACCEPT,
+  MENU_ITEM_ICON_MAX_SIZE_IN_BYTES,
+} from "@/constants/menu-constants.ts";
 import messages from "@/constants/messages.json";
 import { formatFileSize } from "@/helpers/conversion-helper.ts";
-import type { MeshCurrentFile } from "@/types/mesh.ts";
+import type { MenuItemCurrentIcon } from "@/types/menu.ts";
 import { CloudArrowUpIcon } from "@phosphor-icons/react/dist/csr/CloudArrowUp";
-import { FileArchiveIcon } from "@phosphor-icons/react/dist/csr/FileArchive";
+import { ImageIcon } from "@phosphor-icons/react/dist/csr/Image";
 import { XIcon } from "@phosphor-icons/react/dist/csr/X";
 
-type MeshGlbDropzoneProps = {
-  onChange: (file: File | null) => void;
+type MenuItemIconDropzoneProps = {
   value: File | null;
-  currentFile?: MeshCurrentFile;
+  currentIcon?: MenuItemCurrentIcon;
   error?: string;
+  onChange: (file: File | null) => void;
 };
 
-export default function MeshGlbDropzone({
-  onChange,
+export default function MenuItemIconDropzone({
   value,
-  currentFile,
+  currentIcon,
   error,
-}: MeshGlbDropzoneProps) {
+  onChange,
+}: MenuItemIconDropzoneProps) {
   const [isReplacing, setIsReplacing] = useState(false);
 
   if (value) {
     return (
       <FileCard
-        icon={FileArchiveIcon}
+        icon={ImageIcon}
         title={value.name}
         subtitle={formatFileSize(value.size)}
         action={
           <ActionIcon
-            aria-label={messages.mesh.editor.removeFileLabel}
+            aria-label={messages.menuItems.editor.removeIconLabel}
             color="red"
             variant="subtle"
             size="sm"
@@ -53,15 +53,15 @@ export default function MeshGlbDropzone({
     );
   }
 
-  if (currentFile && !isReplacing) {
+  if (currentIcon && !isReplacing) {
     return (
       <FileCard
-        icon={FileArchiveIcon}
-        title={currentFile.name}
-        subtitle={messages.mesh.editor.currentFileLabel}
+        icon={ImageIcon}
+        title={currentIcon.name}
+        subtitle={messages.menuItems.editor.currentIconLabel}
         action={
           <Button variant="subtle" color="gray" size="xs" onClick={() => setIsReplacing(true)}>
-            {messages.mesh.editor.replaceFileLabel}
+            {messages.menuItems.editor.replaceIconLabel}
           </Button>
         }
       />
@@ -74,17 +74,17 @@ export default function MeshGlbDropzone({
         layout="stacked"
         multiple={false}
         onDrop={(files) => onChange(files[0] ?? null)}
-        accept={MESH_FILE_ACCEPT}
-        maxSizeInBytes={MESH_FILE_MAX_SIZE_IN_BYTES}
+        accept={MENU_ITEM_ICON_ACCEPT}
+        maxSizeInBytes={MENU_ITEM_ICON_MAX_SIZE_IN_BYTES}
         icon={CloudArrowUpIcon}
-        title={messages.mesh.editor.dropzoneTitle}
-        description={messages.mesh.editor.dropzoneDescription}
+        title={messages.menuItems.editor.dropzoneTitle}
+        description={messages.menuItems.editor.dropzoneDescription}
         actionLabel={messages.common.selectFiles}
         error={error}
       />
-      {currentFile && (
+      {currentIcon && (
         <Button variant="outline" color="brand" size="xs" onClick={() => setIsReplacing(false)}>
-          {messages.mesh.editor.cancelReplaceLabel}
+          {messages.menuItems.editor.cancelReplaceIconLabel}
         </Button>
       )}
     </>

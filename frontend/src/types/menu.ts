@@ -47,6 +47,7 @@ export type MenuItemOption = {
 export type MenuItemPageOption = MenuItemOption & {
   disabled?: boolean;
   note?: string;
+  ownerLabel?: string;
 };
 
 export type MenuItemCurrentIcon = {

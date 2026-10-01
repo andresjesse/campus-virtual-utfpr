@@ -116,15 +116,17 @@ export function buildMenuItemPageOptions(
 
     const owner = findMenuItemPageOwner(menuItems, page.id, currentItemId);
 
-    return owner
-      ? {
-          ...option,
-          note: formatMessage(
-            messages.menuItems.editor.pageHeldByItem,
-            getMenuItemName(owner),
-          ),
-        }
-      : { ...option, note: messages.menuItems.editor.pageAvailable };
+    if (!owner) {
+      return { ...option, note: messages.menuItems.editor.pageAvailable };
+    }
+
+    const ownerLabel = getMenuItemName(owner);
+
+    return {
+      ...option,
+      ownerLabel,
+      note: formatMessage(messages.menuItems.editor.pageHeldByItem, ownerLabel),
+    };
   });
 }
 

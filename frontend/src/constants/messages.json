@@ -13,7 +13,9 @@
     "createdAt": "Criado em",
     "updatedAt": "Modificado em",
     "actions": "Ações",
-    "deleteErrorTitle": "Não foi possível excluir"
+    "deleteErrorTitle": "Não foi possível excluir",
+    "cancel": "Cancelar",
+    "delete": "Excluir"
   },
   "block": {
     "empty": {
@@ -252,7 +254,8 @@
       "dropzoneDescription": "Arraste e solte arquivo de imagem do ícone ou clique no botão abaixo para selecioná-lo.",
       "removeIconLabel": "Remover ícone",
       "currentIconLabel": "Ícone atual",
-      "replaceIconLabel": "Substituir ícone"
+      "replaceIconLabel": "Substituir ícone",
+      "cancelReplaceIconLabel": "Manter ícone atual"
     }
   },
   "menuCategories": {
