@@ -49,11 +49,6 @@ export type MenuItemPageOption = MenuItemOption & {
   note?: string;
 };
 
-export type MenuItemPageChoices = {
-  pages: ContentPageRecord[];
-  menuItems: MenuItemRecord[];
-};
-
 export type MenuItemCurrentIcon = {
   name: string;
   url: string;
