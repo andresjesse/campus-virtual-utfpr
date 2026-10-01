@@ -7,6 +7,7 @@ import classes from "@/components/content-page/content-page-form/content-page-fo
 import { type ContentPageBlockType } from "@/enums/content-pages-enum.ts";
 import DroppableContainer from "@/containers/DroppableContainer.tsx";
 import {useCallback, useContext, useEffect, useRef, useState} from "react";
+import type {ReactNode} from "react";
 import {useParams} from "react-router";
 import { getAllContentBlocksMetadata } from "@/helpers/content-pages-service-helper.ts";
 import FeedbackState from "@/components/feedback-state";
@@ -20,9 +21,11 @@ import {PAGE_BLOCK_COLLECTIONS} from "@/constants/content-constants.ts";
 export default function BlocksList({
   pageTitle,
   pageRelation,
+  children,
 }: {
   pageTitle: string;
   pageRelation: string;
+  children?: ReactNode;
 }) {
   const { pageId } = useParams();
 
@@ -125,25 +128,30 @@ export default function BlocksList({
   }
 
   if (isLoading) {
-    return <FeedbackState title={"Carregando os blocos de conteúdo..."} loading />
+    return (
+      <>
+        <FeedbackState title={"Carregando os blocos de conteúdo..."} loading />
+        {children}
+      </>
+    )
   }
 
   if (error) {
-    return <FeedbackState
-      title={"Não foi possível carregar os blocos de conteúdo."}
-      description={error}
-      actionLabel={"Tentar novamente"}
-      onAction={fetchBlocksMetadata}
-    />
+    return (
+      <>
+        <FeedbackState
+          title={"Não foi possível carregar os blocos de conteúdo."}
+          description={error}
+          actionLabel={"Tentar novamente"}
+          onAction={fetchBlocksMetadata}
+        />
+        {children}
+      </>
+    )
   }
 
   return (
-    <Box
-       flex="1 1 0"
-       mih={0}
-       h="100%"
-       style={{ overflowY: "auto" }}
-    >
+    <>
       <DroppableContainer handleDrop={onDropNewBlock} >
         <Box className={classes.blocksList} pt="lg" ml="lg" mr="lg">
           { PAGE_BLOCK_COLLECTIONS.flatMap((collectionName) => (
@@ -160,6 +168,7 @@ export default function BlocksList({
             ))
           )}
         </Box>
+        {children}
       </DroppableContainer>
 
       <ContentBlockEditOverlay
@@ -171,6 +180,6 @@ export default function BlocksList({
         opened={isModalOpen}
         onClose={closeContentBlockModal}
       />
-    </Box>
+    </>
   )
 }

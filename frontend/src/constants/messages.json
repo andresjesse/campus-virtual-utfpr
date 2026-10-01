@@ -6,8 +6,6 @@
     "showMore": "Ver mais",
     "showLess": "Ver menos",
     "selectFiles": "Selecionar Arquivos",
-    "saving": "Salvando...",
-    "saved": "Salvo",
     "saveError": "Não foi possível salvar",
     "emptyValue": "—",
     "createdAt": "Criado em",
@@ -298,7 +296,15 @@
     "editor": {
       "canvasLabel": "Conteúdo da página",
       "loading": "Carregando página",
-      "loadErrorTitle": "Não foi possível carregar a página"
+      "loadErrorTitle": "Não foi possível carregar a página",
+      "saveSuccessTitle": "Página salva",
+      "saveSuccessMessage": "A página foi salva com sucesso.",
+      "titleLabel": "Título da Página",
+      "titlePlaceholder": "Título da página",
+      "titleRequiredError": "Informe o título da página.",
+      "relationLabel": "Elemento Relacionado",
+      "relationPlaceholder": "Selecione",
+      "relationRequiredError": "Selecione o elemento relacionado."
     },
     "list": {
       "new": "Nova página",
