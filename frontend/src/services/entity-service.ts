@@ -25,6 +25,12 @@ export async function listEntities(): Promise<EntityRecord[]> {
     .getFullList({ expand: "mesh", requestKey: null, sort: "slug" });
 }
 
+export async function listActiveEntities(): Promise<EntityRecord[]> {
+  return pocketbase
+    .collection<EntityRecord>(ENTITY_COLLECTION)
+    .getFullList({ expand: "mesh", filter: "is_active = true", requestKey: null });
+}
+
 export async function getEntity(id: string): Promise<EntityRecord> {
   return pocketbase
     .collection<EntityRecord>(ENTITY_COLLECTION)

@@ -1,4 +1,5 @@
 import { MESH_COLLECTION } from "@/constants/mesh-constants.ts";
+import { getFileUrl } from "@/helpers/file-helper.ts";
 import { pocketbase } from "@/services/pocketbase.ts";
 import type { MeshFormValues, MeshRecord } from "@/types/mesh";
 
@@ -6,6 +7,10 @@ export async function listMeshes(): Promise<MeshRecord[]> {
   return pocketbase
     .collection<MeshRecord>(MESH_COLLECTION)
     .getFullList({ requestKey: null, sort: "name" });
+}
+
+export function getMeshFileUrl(mesh: MeshRecord): string {
+  return getFileUrl(mesh, mesh.file, pocketbase);
 }
 
 export async function getMesh(id: string) {
