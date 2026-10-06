@@ -20,6 +20,9 @@ export function applyBranding(brand: Branding, root = document.documentElement) 
     "--app-feedback-warning": brand.colors.feedback.warning,
     "--app-feedback-error": brand.colors.feedback.error,
     "--app-feedback-info": brand.colors.feedback.info,
+    "--app-scene-background": brand.colors.scene.background,
+    "--app-scene-ambient-light": brand.colors.scene.ambientLight,
+    "--app-scene-directional-light": brand.colors.scene.directionalLight,
     "--app-login-background": `url("${brand.assets.loginBackground}")`,
   } as const;
 

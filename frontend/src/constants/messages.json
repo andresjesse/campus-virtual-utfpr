@@ -352,5 +352,19 @@
       "deletedTitle": "Página excluída",
       "deletedMessage": "A página e seus blocos foram removidos."
     }
+  },
+  "virtualMap": {
+    "home": {
+      "adminLink": "Admin"
+    },
+    "viewer": {
+      "canvasAriaLabel": "Mapa virtual em 3D",
+      "loadingTitle": "Carregando o mapa",
+      "loadingProgress": "{percent}%",
+      "loadErrorTitle": "Não foi possível carregar o mapa",
+      "unavailableDescription": "Não foi possível exibir o mapa. Recarregue a página para tentar novamente.",
+      "modelsFailedTitle": "Alguns modelos não foram carregados",
+      "modelsFailedMessage": "{count} modelo(s) 3D não puderam ser carregados e foram omitidos do mapa."
+    }
   }
 }
