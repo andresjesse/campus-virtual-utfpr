@@ -37,6 +37,11 @@ export type Branding = {
       error: string;
       info: string;
     };
+    scene: {
+      background: string;
+      ambientLight: string;
+      directionalLight: string;
+    };
   };
 };
 
@@ -89,6 +94,11 @@ export const branding: Branding = {
       warning: "#ffd43b",
       error: "#fa5252",
       info: "#3c9dff",
+    },
+    scene: {
+      background: "#515151",
+      ambientLight: "#ffffff",
+      directionalLight: "#fff4e5",
     },
   },
 };
