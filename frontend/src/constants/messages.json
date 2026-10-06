@@ -354,7 +354,14 @@
     }
   },
   "virtualMap": {
+    "home": {
+      "adminLink": "Admin"
+    },
     "viewer": {
+      "canvasAriaLabel": "Mapa virtual em 3D",
+      "loadingTitle": "Carregando o mapa",
+      "loadingProgress": "{percent}%",
+      "loadErrorTitle": "Não foi possível carregar o mapa",
       "modelsFailedTitle": "Alguns modelos não foram carregados",
       "modelsFailedMessage": "{count} modelo(s) 3D não puderam ser carregados e foram omitidos do mapa."
     }
