@@ -5,7 +5,7 @@ import {
   Line,
   MathUtils,
   Mesh,
-  PCFSoftShadowMap,
+  PCFShadowMap,
   PerspectiveCamera,
   Points,
   Scene,
@@ -56,7 +56,7 @@ export function createVirtualMapScene(canvas: HTMLCanvasElement): VirtualMapScen
   const renderer = new WebGLRenderer({ canvas, antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, VIRTUAL_MAP_MAX_PIXEL_RATIO));
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = PCFSoftShadowMap;
+  renderer.shadowMap.type = PCFShadowMap;
 
   const scene = new Scene();
   scene.background = new Color(branding.colors.scene.background);
