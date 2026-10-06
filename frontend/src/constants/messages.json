@@ -352,5 +352,11 @@
       "deletedTitle": "Página excluída",
       "deletedMessage": "A página e seus blocos foram removidos."
     }
+  },
+  "virtualMap": {
+    "viewer": {
+      "modelsFailedTitle": "Alguns modelos não foram carregados",
+      "modelsFailedMessage": "{count} modelo(s) 3D não puderam ser carregados e foram omitidos do mapa."
+    }
   }
 }
