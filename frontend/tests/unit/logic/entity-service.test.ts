@@ -3,6 +3,7 @@ import {
   createEntity,
   deleteEntity,
   getEntity,
+  listActiveEntities,
   listEntities,
   updateEntity,
 } from '@/services/entity-service.ts'
@@ -74,6 +75,19 @@ describe('entity service', () => {
       expand: 'mesh',
       requestKey: null,
       sort: 'slug',
+    })
+  })
+
+  it('lists only active entities with the mesh expanded', async () => {
+    mockGetFullList.mockResolvedValue([])
+
+    await expect(listActiveEntities()).resolves.toEqual([])
+
+    expect(mockCollection).toHaveBeenCalledWith(ENTITY_COLLECTION)
+    expect(mockGetFullList).toHaveBeenCalledWith({
+      expand: 'mesh',
+      filter: 'is_active = true',
+      requestKey: null,
     })
   })
 
