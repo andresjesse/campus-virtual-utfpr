@@ -9,8 +9,8 @@ export const VIRTUAL_MAP_CAMERA = {
 } as const;
 
 export const VIRTUAL_MAP_ORBIT_LIMITS = {
-  minDistance: 5,
-  maxDistance: 600,
+  minDistance: 50,
+  maxDistance: 300,
   maxPolarAngle: Math.PI / 2 - 0.05,
   dampingFactor: 0.08,
   targetMin: { x: -300, y: 0, z: -300 },
