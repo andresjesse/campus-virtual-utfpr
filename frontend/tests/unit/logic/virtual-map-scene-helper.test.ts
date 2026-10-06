@@ -16,7 +16,25 @@ import {
   disposeObject3D,
   enableShadows,
   getAggregateProgress,
+  groupEntitiesByMesh,
+  loadModels,
 } from '@/helpers/virtual-map-scene-helper.ts'
+import type { EntityRecord } from '@/types/entity.ts'
+import type { MeshRecord } from '@/types/mesh.ts'
+
+const mockLoadAsync = jest.fn()
+
+jest.mock('three/addons/loaders/GLTFLoader.js', () => ({
+  GLTFLoader: jest.fn().mockImplementation(() => ({ loadAsync: mockLoadAsync })),
+}))
+
+function createMesh(id: string): MeshRecord {
+  return { id, file: `${id}.glb` } as MeshRecord
+}
+
+function createEntity(id: string, mesh?: MeshRecord): EntityRecord {
+  return { id, mesh: mesh?.id ?? '', expand: mesh ? { mesh } : undefined } as EntityRecord
+}
 
 describe('virtual map scene helper', () => {
   describe('applyEntityTransform', () => {
@@ -115,6 +133,62 @@ describe('virtual map scene helper', () => {
 
     it('reports completion when there is nothing to load', () => {
       expect(getAggregateProgress([])).toBe(100)
+    })
+  })
+
+  describe('groupEntitiesByMesh', () => {
+    it('groups entities that share a mesh so it is downloaded once', () => {
+      const library = createMesh('library')
+      const gym = createMesh('gym')
+      const first = createEntity('library-north', library)
+      const second = createEntity('gym-main', gym)
+      const third = createEntity('library-south', library)
+
+      expect(groupEntitiesByMesh([first, second, third])).toEqual([
+        { mesh: library, entities: [first, third] },
+        { mesh: gym, entities: [second] },
+      ])
+    })
+
+    it('skips entities whose mesh was not expanded', () => {
+      expect(groupEntitiesByMesh([createEntity('orphan')])).toEqual([])
+    })
+  })
+
+  describe('loadModels', () => {
+    type ProgressEvent = { lengthComputable: boolean; loaded: number; total: number }
+
+    it('reports the combined progress of every file and settles each one', async () => {
+      const progressHandlers: ((event: ProgressEvent) => void)[] = []
+      const finishers: { resolve: (value: unknown) => void; reject: (error: Error) => void }[] = []
+      mockLoadAsync.mockImplementation(
+        (_url: string, onProgress: (event: ProgressEvent) => void) =>
+          new Promise((resolve, reject) => {
+            progressHandlers.push(onProgress)
+            finishers.push({ resolve, reject })
+          }),
+      )
+      const onProgress = jest.fn()
+
+      const loading = loadModels(['/library.glb', '/gym.glb'], onProgress)
+
+      progressHandlers[0]({ lengthComputable: true, loaded: 50, total: 100 })
+      expect(onProgress).toHaveBeenLastCalledWith(25)
+
+      progressHandlers[1]({ lengthComputable: false, loaded: 10, total: 0 })
+      expect(onProgress).toHaveBeenLastCalledWith(25)
+
+      const model = { scene: new Group() }
+      finishers[0].resolve(model)
+      finishers[1].reject(new Error('Not a glTF file'))
+
+      const results = await loading
+
+      expect(onProgress).toHaveBeenLastCalledWith(100)
+      expect(results[0]).toEqual({ status: 'fulfilled', value: model })
+      expect(results[1].status).toBe('rejected')
+      expect(mockLoadAsync).toHaveBeenCalledWith('/library.glb', expect.any(Function))
+      expect(mockLoadAsync).toHaveBeenCalledWith('/gym.glb', expect.any(Function))
     })
   })
 })

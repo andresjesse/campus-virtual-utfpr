@@ -17,6 +17,7 @@ import {
   type Object3D,
 } from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { GLTFLoader, type GLTF } from "three/addons/loaders/GLTFLoader.js";
 
 import { branding } from "@/config/branding.ts";
 import {
@@ -26,6 +27,12 @@ import {
   VIRTUAL_MAP_ORBIT_LIMITS,
 } from "@/constants/virtual-map-constants.ts";
 import type { EntityRecord, EntityTransformField } from "@/types/entity.ts";
+import type { MeshRecord } from "@/types/mesh.ts";
+
+export type MeshEntityGroup = {
+  mesh: MeshRecord;
+  entities: EntityRecord[];
+};
 
 export type VirtualMapScene = {
   renderer: WebGLRenderer;
@@ -173,4 +180,41 @@ export function getAggregateProgress(fractions: number[]): number {
   );
 
   return Math.round((total / fractions.length) * 100);
+}
+
+export function groupEntitiesByMesh(entities: EntityRecord[]): MeshEntityGroup[] {
+  const groups = new Map<string, MeshEntityGroup>();
+
+  entities.forEach((entity) => {
+    const mesh = entity.expand?.mesh;
+    if (!mesh) return;
+
+    const group = groups.get(mesh.id);
+    if (group) group.entities.push(entity);
+    else groups.set(mesh.id, { mesh, entities: [entity] });
+  });
+
+  return [...groups.values()];
+}
+
+export function loadModels(
+  urls: string[],
+  onProgress: (percent: number) => void,
+): Promise<PromiseSettledResult<GLTF>[]> {
+  const loader = new GLTFLoader();
+  const fractions = urls.map(() => 0);
+  const report = (index: number, fraction: number) => {
+    fractions[index] = fraction;
+    onProgress(getAggregateProgress(fractions));
+  };
+
+  return Promise.allSettled(
+    urls.map((url, index) =>
+      loader
+        .loadAsync(url, (event) => {
+          if (event.lengthComputable) report(index, event.loaded / event.total);
+        })
+        .finally(() => report(index, 1)),
+    ),
+  );
 }
