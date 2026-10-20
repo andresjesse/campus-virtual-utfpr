@@ -10,11 +10,14 @@ import {
   Points,
   Scene,
   Texture,
+  Vector2,
   Vector3,
   WebGLRenderer,
   type BufferGeometry,
+  type Camera,
   type Material,
   type Object3D,
+  type Raycaster,
 } from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader, type GLTF } from "three/addons/loaders/GLTFLoader.js";
@@ -25,9 +28,13 @@ import {
   VIRTUAL_MAP_LIGHTING,
   VIRTUAL_MAP_MAX_PIXEL_RATIO,
   VIRTUAL_MAP_ORBIT_LIMITS,
+  VIRTUAL_MAP_POINTER,
 } from "@/constants/virtual-map-constants.ts";
 import type { EntityRecord, EntityTransformField } from "@/types/entity.ts";
 import type { MeshRecord } from "@/types/mesh.ts";
+import type { VirtualMapSelectedEntity } from "@/types/virtual-map-events.ts";
+
+type PointerPosition = Pick<PointerEvent, "clientX" | "clientY">;
 
 export type MeshEntityGroup = {
   mesh: MeshRecord;
@@ -217,4 +224,46 @@ export function loadModels(
         .finally(() => report(index, 1)),
     ),
   );
+}
+
+export function setPickableEntity(
+  object: Object3D,
+  entity: Pick<EntityRecord, "id" | "slug">,
+) {
+  const selected: VirtualMapSelectedEntity = { id: entity.id, slug: entity.slug };
+  object.userData.entity = selected;
+}
+
+export function toNormalizedPointer(event: PointerPosition, canvas: HTMLCanvasElement): Vector2 {
+  const { left, top, width, height } = canvas.getBoundingClientRect();
+
+  return new Vector2(
+    ((event.clientX - left) / width) * 2 - 1,
+    -((event.clientY - top) / height) * 2 + 1,
+  );
+}
+
+export function isPointerClick(down: PointerPosition, up: PointerPosition): boolean {
+  return (
+    Math.hypot(up.clientX - down.clientX, up.clientY - down.clientY) <=
+    VIRTUAL_MAP_POINTER.clickTolerance
+  );
+}
+
+export function pickEntity(
+  raycaster: Raycaster,
+  pointer: Vector2,
+  camera: Camera,
+  pickable: Object3D[],
+): VirtualMapSelectedEntity | null {
+  raycaster.setFromCamera(pointer, camera);
+
+  for (const { object } of raycaster.intersectObjects(pickable, true)) {
+    for (let current: Object3D | null = object; current; current = current.parent) {
+      const entity = current.userData.entity as VirtualMapSelectedEntity | undefined;
+      if (entity) return entity;
+    }
+  }
+
+  return null;
 }
