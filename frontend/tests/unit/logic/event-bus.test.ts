@@ -38,7 +38,7 @@ describe('createEventBus', () => {
 
     bus.register('cleared', listener)
     bus.unregister('cleared', listener)
-    bus.dispatch('cleared', undefined)
+    bus.dispatch('cleared')
 
     expect(listener).not.toHaveBeenCalled()
   })
@@ -49,7 +49,7 @@ describe('createEventBus', () => {
 
     const unregister = bus.register('cleared', listener)
     unregister()
-    bus.dispatch('cleared', undefined)
+    bus.dispatch('cleared')
 
     expect(listener).not.toHaveBeenCalled()
   })
@@ -58,7 +58,7 @@ describe('createEventBus', () => {
     const bus = createEventBus<TestEvents>()
 
     expect(() => {
-      bus.dispatch('cleared', undefined)
+      bus.dispatch('cleared')
       bus.unregister('cleared', jest.fn())
     }).not.toThrow()
   })
@@ -69,8 +69,8 @@ describe('createEventBus', () => {
     const unregisterFirst = bus.register('cleared', () => unregisterFirst())
     bus.register('cleared', second)
 
-    bus.dispatch('cleared', undefined)
-    bus.dispatch('cleared', undefined)
+    bus.dispatch('cleared')
+    bus.dispatch('cleared')
 
     expect(second).toHaveBeenCalledTimes(2)
   })
