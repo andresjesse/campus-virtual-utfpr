@@ -64,6 +64,9 @@ export function useVirtualMap(canvasRef: RefObject<HTMLCanvasElement | null>) {
     const handlePointerDown = (event: PointerEvent) => {
       pointerDown = event.button === 0 ? event : null;
     };
+    const handlePointerMove = (event: PointerEvent) => {
+      if (pointerDown && !isPointerClick(pointerDown, event)) pointerDown = null;
+    };
     const handlePointerUp = (event: PointerEvent) => {
       const down = pointerDown;
       pointerDown = null;
@@ -74,6 +77,7 @@ export function useVirtualMap(canvasRef: RefObject<HTMLCanvasElement | null>) {
       else virtualMapEventBus.dispatch(VIRTUAL_MAP_EVENTS.SELECTION_CLEARED);
     };
     canvas.addEventListener("pointerdown", handlePointerDown);
+    canvas.addEventListener("pointermove", handlePointerMove);
     canvas.addEventListener("pointerup", handlePointerUp);
 
     const load = async () => {
@@ -132,6 +136,7 @@ export function useVirtualMap(canvasRef: RefObject<HTMLCanvasElement | null>) {
     return () => {
       disposed = true;
       canvas.removeEventListener("pointerdown", handlePointerDown);
+      canvas.removeEventListener("pointermove", handlePointerMove);
       canvas.removeEventListener("pointerup", handlePointerUp);
       renderer.setAnimationLoop(null);
       resizeObserver.disconnect();
