@@ -1,9 +1,11 @@
 import { MantineProvider } from '@mantine/core'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 
 import VirtualMapViewer from '@/components/virtual-map/virtual-map-viewer/VirtualMapViewer.tsx'
 import messages from '@/constants/messages.json'
+import { VIRTUAL_MAP_EVENTS } from '@/constants/virtual-map-constants.ts'
 import { formatMessage } from '@/helpers/message-helper.ts'
+import { virtualMapEventBus } from '@/helpers/virtual-map-event-bus.ts'
 import { useVirtualMap } from '@/hooks/use-virtual-map.ts'
 
 jest.mock('@/hooks/use-virtual-map.ts', () => ({
@@ -68,5 +70,42 @@ describe('VirtualMapViewer', () => {
     fireEvent.click(screen.getByRole('button', { name: messages.common.retry }))
 
     expect(retry).toHaveBeenCalledTimes(1)
+  })
+
+  it('shows the selected entity slug when the map dispatches a selection', () => {
+    renderViewer({ status: 'ready' })
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+
+    act(() =>
+      virtualMapEventBus.dispatch(VIRTUAL_MAP_EVENTS.ENTITY_SELECTED, {
+        id: 'library-id',
+        slug: 'library',
+      }),
+    )
+
+    expect(
+      screen.getByRole('dialog', { name: messages.virtualMap.entityPopup.title }),
+    ).toHaveTextContent('library')
+  })
+
+  it('closes the popup and dispatches SELECTION_CLEARED from the close button', () => {
+    const cleared = jest.fn()
+    const unregister = virtualMapEventBus.register(VIRTUAL_MAP_EVENTS.SELECTION_CLEARED, cleared)
+    renderViewer({ status: 'ready' })
+    act(() =>
+      virtualMapEventBus.dispatch(VIRTUAL_MAP_EVENTS.ENTITY_SELECTED, {
+        id: 'library-id',
+        slug: 'library',
+      }),
+    )
+
+    fireEvent.click(
+      screen.getByRole('button', { name: messages.virtualMap.entityPopup.closeAriaLabel }),
+    )
+
+    expect(cleared).toHaveBeenCalledTimes(1)
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    unregister()
   })
 })
