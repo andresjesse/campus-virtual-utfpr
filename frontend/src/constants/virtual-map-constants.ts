@@ -29,6 +29,11 @@ export const VIRTUAL_MAP_LIGHTING = {
 
 export const VIRTUAL_MAP_MAX_PIXEL_RATIO = 2;
 
+export const VIRTUAL_MAP_EVENTS = {
+  ENTITY_SELECTED: "ENTITY_SELECTED",
+  SELECTION_CLEARED: "SELECTION_CLEARED",
+} as const;
+
 export const VIRTUAL_MAP_POINTER = {
   clickTolerance: 5,
 } as const;
