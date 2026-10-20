@@ -23,7 +23,7 @@ export function createEventBus<Events extends Record<string, unknown>>(): EventB
       return () => unregister(event, callback);
     },
     unregister,
-    dispatch(event, data) {
+    dispatch(event, ...[data]) {
       const callbacks = listeners.get(event);
       if (!callbacks) return;
 

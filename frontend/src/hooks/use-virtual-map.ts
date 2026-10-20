@@ -1,17 +1,24 @@
 import { notifications } from "@mantine/notifications";
 import { useCallback, useEffect, useState, type RefObject } from "react";
+import { Raycaster, type Object3D } from "three";
 
 import { branding } from "@/config/branding.ts";
 import messages from "@/constants/messages.json";
+import { VIRTUAL_MAP_EVENTS } from "@/constants/virtual-map-constants.ts";
 import { formatMessage } from "@/helpers/message-helper.ts";
 import { getRequestErrorMessage } from "@/helpers/request-error-helper.ts";
+import { virtualMapEventBus } from "@/helpers/virtual-map-event-bus.ts";
 import {
   applyEntityTransform,
   createVirtualMapScene,
   disposeObject3D,
   enableShadows,
   groupEntitiesByMesh,
+  isPointerClick,
   loadModels,
+  pickEntity,
+  setPickableEntity,
+  toNormalizedPointer,
   type MeshEntityGroup,
 } from "@/helpers/virtual-map-scene-helper.ts";
 import { listActiveEntities } from "@/services/entity-service.ts";
@@ -50,6 +57,25 @@ export function useVirtualMap(canvasRef: RefObject<HTMLCanvasElement | null>) {
       renderer.render(scene, camera);
     });
 
+    const pickable: Object3D[] = [];
+    const raycaster = new Raycaster();
+    let pointerDown: PointerEvent | null = null;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      pointerDown = event.button === 0 ? event : null;
+    };
+    const handlePointerUp = (event: PointerEvent) => {
+      const down = pointerDown;
+      pointerDown = null;
+      if (!down || !isPointerClick(down, event)) return;
+
+      const entity = pickEntity(raycaster, toNormalizedPointer(event, canvas), camera, pickable);
+      if (entity) virtualMapEventBus.dispatch(VIRTUAL_MAP_EVENTS.ENTITY_SELECTED, entity);
+      else virtualMapEventBus.dispatch(VIRTUAL_MAP_EVENTS.SELECTION_CLEARED);
+    };
+    canvas.addEventListener("pointerdown", handlePointerDown);
+    canvas.addEventListener("pointerup", handlePointerUp);
+
     const load = async () => {
       let groups: MeshEntityGroup[];
       try {
@@ -81,7 +107,9 @@ export function useVirtualMap(canvasRef: RefObject<HTMLCanvasElement | null>) {
           const instance = model.clone();
           applyEntityTransform(instance, entity);
           enableShadows(instance);
+          setPickableEntity(instance, entity);
           scene.add(instance);
+          pickable.push(instance);
         });
       });
 
@@ -103,6 +131,8 @@ export function useVirtualMap(canvasRef: RefObject<HTMLCanvasElement | null>) {
 
     return () => {
       disposed = true;
+      canvas.removeEventListener("pointerdown", handlePointerDown);
+      canvas.removeEventListener("pointerup", handlePointerUp);
       renderer.setAnimationLoop(null);
       resizeObserver.disconnect();
       controls.dispose();

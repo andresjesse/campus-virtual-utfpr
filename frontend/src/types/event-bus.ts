@@ -1,5 +1,7 @@
 export type EventCallback<Data> = (data: Data) => void;
 
+export type EventPayload<Data> = [Data] extends [undefined] ? [] : [data: Data];
+
 export type EventBus<Events extends Record<string, unknown>> = {
   register<Event extends keyof Events>(
     event: Event,
@@ -9,5 +11,5 @@ export type EventBus<Events extends Record<string, unknown>> = {
     event: Event,
     callback: EventCallback<Events[Event]>,
   ): void;
-  dispatch<Event extends keyof Events>(event: Event, data: Events[Event]): void;
+  dispatch<Event extends keyof Events>(event: Event, ...data: EventPayload<Events[Event]>): void;
 };
