@@ -305,6 +305,24 @@ describe('useVirtualMap', () => {
     expect(cleared).not.toHaveBeenCalled()
   })
 
+  it('ignores an orbit drag that ends back where it started', async () => {
+    createFakeScene()
+    listActiveEntitiesMock.mockResolvedValue([])
+    loadModelsMock.mockResolvedValue([])
+    const { selected, cleared } = listenToSelection()
+
+    const { canvas, result } = renderVirtualMap()
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+
+    fireEvent.pointerDown(canvas, { button: 0, clientX: 10, clientY: 10 })
+    fireEvent.pointerMove(canvas, { clientX: 80, clientY: 10 })
+    fireEvent.pointerUp(canvas, { button: 0, clientX: 10, clientY: 10 })
+
+    expect(pickEntityMock).not.toHaveBeenCalled()
+    expect(selected).not.toHaveBeenCalled()
+    expect(cleared).not.toHaveBeenCalled()
+  })
+
   it('stops listening to the canvas on unmount', async () => {
     createFakeScene()
     listActiveEntitiesMock.mockResolvedValue([])
