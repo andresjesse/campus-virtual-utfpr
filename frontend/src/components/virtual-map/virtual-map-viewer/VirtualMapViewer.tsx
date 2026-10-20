@@ -1,14 +1,17 @@
 import { Box } from "@mantine/core";
 import { useRef } from "react";
 
+import VirtualMapEntityPopup from "@/components/virtual-map/virtual-map-viewer/VirtualMapEntityPopup.tsx";
 import VirtualMapErrorOverlay from "@/components/virtual-map/virtual-map-viewer/VirtualMapErrorOverlay.tsx";
 import VirtualMapLoadingOverlay from "@/components/virtual-map/virtual-map-viewer/VirtualMapLoadingOverlay.tsx";
 import messages from "@/constants/messages.json";
 import { useVirtualMap } from "@/hooks/use-virtual-map.ts";
+import { useVirtualMapSelection } from "@/hooks/use-virtual-map-selection.ts";
 
 export default function VirtualMapViewer() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { status, progress, error, retry } = useVirtualMap(canvasRef);
+  const { selected, clearSelection } = useVirtualMapSelection();
 
   return (
     <Box pos="relative" w="100%" h="100dvh">
@@ -22,6 +25,7 @@ export default function VirtualMapViewer() {
       />
       {status === "loading" && <VirtualMapLoadingOverlay progress={progress} />}
       {status === "error" && <VirtualMapErrorOverlay description={error} onRetry={retry} />}
+      {selected && <VirtualMapEntityPopup entity={selected} onClose={clearSelection} />}
     </Box>
   );
 }
