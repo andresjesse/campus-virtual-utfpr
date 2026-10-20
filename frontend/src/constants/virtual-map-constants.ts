@@ -28,3 +28,7 @@ export const VIRTUAL_MAP_LIGHTING = {
 } as const;
 
 export const VIRTUAL_MAP_MAX_PIXEL_RATIO = 2;
+
+export const VIRTUAL_MAP_POINTER = {
+  clickTolerance: 5,
+} as const;
