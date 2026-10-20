@@ -28,6 +28,12 @@ Object.defineProperty(globalThis, 'ResizeObserver', {
   value: ResizeObserverMock,
 })
 
+if (!('PointerEvent' in globalThis)) {
+  Object.defineProperty(globalThis, 'PointerEvent', {
+    value: class PointerEvent extends MouseEvent {},
+  })
+}
+
 Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
   value: jest.fn(),
 })

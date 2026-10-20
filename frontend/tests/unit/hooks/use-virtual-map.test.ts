@@ -1,14 +1,17 @@
 import { notifications } from '@mantine/notifications'
-import { act, renderHook, waitFor } from '@testing-library/react'
+import { act, fireEvent, renderHook, waitFor } from '@testing-library/react'
 import { Group, PerspectiveCamera, Scene } from 'three'
 
 import messages from '@/constants/messages.json'
+import { VIRTUAL_MAP_EVENTS } from '@/constants/virtual-map-constants.ts'
 import { formatMessage } from '@/helpers/message-helper.ts'
 import { getRequestErrorMessage } from '@/helpers/request-error-helper.ts'
+import { virtualMapEventBus } from '@/helpers/virtual-map-event-bus.ts'
 import {
   createVirtualMapScene,
   disposeObject3D,
   loadModels,
+  pickEntity,
 } from '@/helpers/virtual-map-scene-helper.ts'
 import { useVirtualMap } from '@/hooks/use-virtual-map.ts'
 import { listActiveEntities } from '@/services/entity-service.ts'
@@ -25,6 +28,7 @@ jest.mock('@/helpers/virtual-map-scene-helper.ts', () => ({
   createVirtualMapScene: jest.fn(),
   disposeObject3D: jest.fn(),
   loadModels: jest.fn(),
+  pickEntity: jest.fn(),
 }))
 
 jest.mock('@/services/entity-service.ts', () => ({
@@ -38,6 +42,7 @@ jest.mock('@/services/mesh-service.ts', () => ({
 const createSceneMock = jest.mocked(createVirtualMapScene)
 const disposeMock = jest.mocked(disposeObject3D)
 const loadModelsMock = jest.mocked(loadModels)
+const pickEntityMock = jest.mocked(pickEntity)
 const listActiveEntitiesMock = jest.mocked(listActiveEntities)
 const showMock = jest.mocked(notifications.show)
 
@@ -47,6 +52,7 @@ const gym = { id: 'gym', file: 'gym.glb' } as MeshRecord
 function createEntity(id: string, mesh: MeshRecord, pos_x = 0): EntityRecord {
   return {
     id,
+    slug: id,
     mesh: mesh.id,
     expand: { mesh },
     pos_x,
@@ -93,8 +99,29 @@ function renderVirtualMap() {
   container.appendChild(canvas)
   const canvasRef = { current: canvas }
 
-  return renderHook(() => useVirtualMap(canvasRef))
+  return { canvas, ...renderHook(() => useVirtualMap(canvasRef)) }
 }
+
+function click(canvas: HTMLCanvasElement, from = { clientX: 10, clientY: 10 }, to = from) {
+  fireEvent.pointerDown(canvas, { button: 0, ...from })
+  fireEvent.pointerUp(canvas, { button: 0, ...to })
+}
+
+function listenToSelection() {
+  const selected = jest.fn()
+  const cleared = jest.fn()
+  const unregisterSelected = virtualMapEventBus.register(VIRTUAL_MAP_EVENTS.ENTITY_SELECTED, selected)
+  const unregisterCleared = virtualMapEventBus.register(VIRTUAL_MAP_EVENTS.SELECTION_CLEARED, cleared)
+  afterEachCleanups.push(unregisterSelected, unregisterCleared)
+
+  return { selected, cleared }
+}
+
+const afterEachCleanups: (() => void)[] = []
+
+afterEach(() => {
+  afterEachCleanups.splice(0).forEach((cleanup) => cleanup())
+})
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -216,5 +243,98 @@ describe('useVirtualMap', () => {
 
     expect(disposeMock).toHaveBeenCalledWith(lateModel)
     expect(scene.children).toHaveLength(0)
+  })
+
+  it('dispatches ENTITY_SELECTED with the entity under a click', async () => {
+    const { scene } = createFakeScene()
+    listActiveEntitiesMock.mockResolvedValue([createEntity('library-north', library)])
+    loadModelsMock.mockResolvedValue([fulfilled()])
+    pickEntityMock.mockReturnValue({ id: 'library-north', slug: 'library-north' })
+    const { selected, cleared } = listenToSelection()
+
+    const { canvas, result } = renderVirtualMap()
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+
+    click(canvas)
+
+    expect(scene.children[0].userData.entity).toEqual({
+      id: 'library-north',
+      slug: 'library-north',
+    })
+    expect(pickEntityMock).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+      [scene.children[0]],
+    )
+    expect(selected).toHaveBeenCalledWith({ id: 'library-north', slug: 'library-north' })
+    expect(cleared).not.toHaveBeenCalled()
+  })
+
+  it('dispatches SELECTION_CLEARED when a click hits no entity', async () => {
+    createFakeScene()
+    listActiveEntitiesMock.mockResolvedValue([])
+    loadModelsMock.mockResolvedValue([])
+    pickEntityMock.mockReturnValue(null)
+    const { selected, cleared } = listenToSelection()
+
+    const { canvas, result } = renderVirtualMap()
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+
+    click(canvas)
+
+    expect(cleared).toHaveBeenCalledTimes(1)
+    expect(selected).not.toHaveBeenCalled()
+  })
+
+  it('ignores an orbit drag and a non-primary button', async () => {
+    createFakeScene()
+    listActiveEntitiesMock.mockResolvedValue([])
+    loadModelsMock.mockResolvedValue([])
+    const { selected, cleared } = listenToSelection()
+
+    const { canvas, result } = renderVirtualMap()
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+
+    click(canvas, { clientX: 10, clientY: 10 }, { clientX: 80, clientY: 10 })
+    fireEvent.pointerDown(canvas, { button: 2, clientX: 10, clientY: 10 })
+    fireEvent.pointerUp(canvas, { button: 2, clientX: 10, clientY: 10 })
+
+    expect(pickEntityMock).not.toHaveBeenCalled()
+    expect(selected).not.toHaveBeenCalled()
+    expect(cleared).not.toHaveBeenCalled()
+  })
+
+  it('ignores an orbit drag that ends back where it started', async () => {
+    createFakeScene()
+    listActiveEntitiesMock.mockResolvedValue([])
+    loadModelsMock.mockResolvedValue([])
+    const { selected, cleared } = listenToSelection()
+
+    const { canvas, result } = renderVirtualMap()
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+
+    fireEvent.pointerDown(canvas, { button: 0, clientX: 10, clientY: 10 })
+    fireEvent.pointerMove(canvas, { clientX: 80, clientY: 10 })
+    fireEvent.pointerUp(canvas, { button: 0, clientX: 10, clientY: 10 })
+
+    expect(pickEntityMock).not.toHaveBeenCalled()
+    expect(selected).not.toHaveBeenCalled()
+    expect(cleared).not.toHaveBeenCalled()
+  })
+
+  it('stops listening to the canvas on unmount', async () => {
+    createFakeScene()
+    listActiveEntitiesMock.mockResolvedValue([])
+    loadModelsMock.mockResolvedValue([])
+    const { cleared } = listenToSelection()
+
+    const { canvas, result, unmount } = renderVirtualMap()
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+
+    unmount()
+    click(canvas)
+
+    expect(cleared).not.toHaveBeenCalled()
   })
 })

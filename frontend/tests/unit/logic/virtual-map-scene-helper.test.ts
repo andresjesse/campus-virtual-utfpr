@@ -5,11 +5,16 @@ import {
   MeshStandardMaterial,
   Object3D,
   PerspectiveCamera,
+  Raycaster,
   Texture,
+  Vector2,
   Vector3,
 } from 'three'
 
-import { VIRTUAL_MAP_ORBIT_LIMITS } from '@/constants/virtual-map-constants.ts'
+import {
+  VIRTUAL_MAP_ORBIT_LIMITS,
+  VIRTUAL_MAP_POINTER,
+} from '@/constants/virtual-map-constants.ts'
 import {
   applyEntityTransform,
   clampControlsTarget,
@@ -17,7 +22,11 @@ import {
   enableShadows,
   getAggregateProgress,
   groupEntitiesByMesh,
+  isPointerClick,
   loadModels,
+  pickEntity,
+  setPickableEntity,
+  toNormalizedPointer,
 } from '@/helpers/virtual-map-scene-helper.ts'
 import type { EntityRecord } from '@/types/entity.ts'
 import type { MeshRecord } from '@/types/mesh.ts'
@@ -189,6 +198,72 @@ describe('virtual map scene helper', () => {
       expect(results[1].status).toBe('rejected')
       expect(mockLoadAsync).toHaveBeenCalledWith('/library.glb', expect.any(Function))
       expect(mockLoadAsync).toHaveBeenCalledWith('/gym.glb', expect.any(Function))
+    })
+  })
+
+  describe('toNormalizedPointer', () => {
+    it('maps client coordinates inside the canvas to normalized device coordinates', () => {
+      const canvas = document.createElement('canvas')
+      jest.spyOn(canvas, 'getBoundingClientRect').mockReturnValue({
+        left: 100,
+        top: 50,
+        width: 200,
+        height: 100,
+      } as DOMRect)
+
+      expect(toNormalizedPointer({ clientX: 200, clientY: 100 }, canvas)).toEqual(new Vector2(0, 0))
+      expect(toNormalizedPointer({ clientX: 100, clientY: 50 }, canvas)).toEqual(new Vector2(-1, 1))
+      expect(toNormalizedPointer({ clientX: 300, clientY: 150 }, canvas)).toEqual(new Vector2(1, -1))
+    })
+  })
+
+  describe('isPointerClick', () => {
+    const down = { clientX: 10, clientY: 10 }
+
+    it('treats a release within the tolerance as a click', () => {
+      expect(isPointerClick(down, down)).toBe(true)
+      expect(
+        isPointerClick(down, { clientX: 10 + VIRTUAL_MAP_POINTER.clickTolerance, clientY: 10 }),
+      ).toBe(true)
+    })
+
+    it('treats a release beyond the tolerance as a drag', () => {
+      expect(
+        isPointerClick(down, { clientX: 10 + VIRTUAL_MAP_POINTER.clickTolerance + 1, clientY: 10 }),
+      ).toBe(false)
+    })
+  })
+
+  describe('pickEntity', () => {
+    function createPickingScene() {
+      const camera = new PerspectiveCamera(50, 1, 0.1, 100)
+      camera.position.set(0, 0, 10)
+      camera.lookAt(0, 0, 0)
+      camera.updateMatrixWorld()
+
+      const root = new Group()
+      const child = new Group()
+      child.add(new Mesh(new BoxGeometry(1, 1, 1), new MeshStandardMaterial()))
+      root.add(child)
+      setPickableEntity(root, { id: 'entity-1', slug: 'main-entrance' })
+      root.updateMatrixWorld()
+
+      return { camera, root }
+    }
+
+    it('returns the entity of the root that owns the hit mesh', () => {
+      const { camera, root } = createPickingScene()
+
+      expect(pickEntity(new Raycaster(), new Vector2(0, 0), camera, [root])).toEqual({
+        id: 'entity-1',
+        slug: 'main-entrance',
+      })
+    })
+
+    it('returns null when the pointer misses every entity', () => {
+      const { camera, root } = createPickingScene()
+
+      expect(pickEntity(new Raycaster(), new Vector2(0.9, 0.9), camera, [root])).toBeNull()
     })
   })
 })
