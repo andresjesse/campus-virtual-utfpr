@@ -9,6 +9,7 @@ import type {
   EntityMeshOption,
   EntityRecord,
   EntityTransformField,
+  EntityTransformGroup,
   EntityTransformValue,
 } from "@/types/entity.ts";
 import type { MeshRecord } from "@/types/mesh.ts";
@@ -40,15 +41,26 @@ export function toEntityNumber(value: EntityTransformValue) {
   return typeof value === "number" ? value : Number(value);
 }
 
-export function getEntityTransformError(value: EntityTransformValue) {
+export function getEntityTransformError(
+  value: EntityTransformValue,
+  group: EntityTransformGroup,
+) {
   // An empty field must be caught before Number(), which turns "" into a finite 0.
   if (typeof value === "string" && !value.trim()) {
     return messages.entities.transform.required;
   }
 
-  return Number.isFinite(toEntityNumber(value))
-    ? undefined
-    : messages.entities.transform.invalid;
+  const number = toEntityNumber(value);
+
+  if (!Number.isFinite(number)) {
+    return messages.entities.transform.invalid;
+  }
+
+  if (group === "scale" && number === 0) {
+    return messages.entities.transform.scaleZero;
+  }
+
+  return undefined;
 }
 
 export function getEntityTransformFields(): EntityTransformField[] {
@@ -69,11 +81,14 @@ export function validateEntityForm(values: EntityFormValues): EntityFormErrors {
     errors.mesh = messages.entities.editor.meshRequiredError;
   }
 
-  getEntityTransformFields().forEach((field) => {
-    const transformError = getEntityTransformError(values[field]);
-    if (transformError) {
-      errors[field] = transformError;
-    }
+  ENTITY_TRANSFORM_GROUPS.forEach((group) => {
+    ENTITY_TRANSFORM_AXES.forEach((axis) => {
+      const field: EntityTransformField = `${group}_${axis}`;
+      const transformError = getEntityTransformError(values[field], group);
+      if (transformError) {
+        errors[field] = transformError;
+      }
+    });
   });
 
   return errors;

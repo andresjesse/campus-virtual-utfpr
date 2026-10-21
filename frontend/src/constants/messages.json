@@ -140,7 +140,8 @@
     },
     "transform": {
       "required": "Informe um valor.",
-      "invalid": "Informe um número válido."
+      "invalid": "Informe um número válido.",
+      "scaleZero": "A escala não pode ser zero."
     },
     "list": {
       "title": "Entidades 3D",
