@@ -29,6 +29,25 @@ const entity = {
   expand: { mesh },
 }
 
+const contentPage = {
+  id: 'contentpage0001',
+  collectionId: 'content_page_collection',
+  collectionName: 'content_page',
+  title: 'Main Building',
+  entity: entity.id,
+}
+
+const rtfBlock = {
+  id: 'rtfblock000001',
+  collectionId: 'rtf_block_collection',
+  collectionName: 'rtf_block',
+  title: 'Opening hours',
+  page: contentPage.id,
+  content: '<p>Open from 8am to 6pm</p>',
+}
+
+const emptyList = { page: 1, perPage: 30, totalItems: 0, totalPages: 0, items: [] }
+
 function createBoxGltf(size: number) {
   const half = size / 2
   const positions = new Float32Array(
@@ -79,12 +98,30 @@ function createBoxGltf(size: number) {
   })
 }
 
-async function openMapWithOneEntity(page: Page) {
+async function openMapWithOneEntity(page: Page, { withPage = true } = {}) {
   await page.route('**/api/collections/entities/records**', (route) =>
     route.fulfill({
       json: { page: 1, perPage: 1000, totalItems: 1, totalPages: 1, items: [entity] },
     }),
   )
+  await page.route('**/api/collections/content_page/records**', (route) =>
+    route.fulfill({
+      json: withPage
+        ? { ...emptyList, totalItems: 1, totalPages: 1, items: [contentPage] }
+        : emptyList,
+    }),
+  )
+  await page.route('**/api/collections/rtf_block/records**', (route) => {
+    const isListing = new URL(route.request().url()).pathname.endsWith('/records')
+    return route.fulfill({
+      json: isListing ? { ...emptyList, totalItems: 1, totalPages: 1, items: [rtfBlock] } : rtfBlock,
+    })
+  })
+  for (const collection of ['file_block', 'diagram_block']) {
+    await page.route(`**/api/collections/${collection}/records**`, (route) =>
+      route.fulfill({ json: emptyList }),
+    )
+  }
   await page.route(`**/api/files/**/${mesh.file}**`, (route) =>
     route.fulfill({ contentType: 'model/gltf+json', body: createBoxGltf(60) }),
   )
@@ -104,36 +141,55 @@ async function openMapWithOneEntity(page: Page) {
   }
 }
 
-const popup = (page: Page) =>
-  page.getByRole('dialog', { name: messages.virtualMap.entityPopup.title })
+const modal = (page: Page) => page.getByRole('dialog', { name: contentPage.title })
 
 test.describe('virtual map selection', () => {
-  test('opens the entity popup on click and closes it from its close button', async ({
+  test('opens the content page modal on click and closes it from its close button', async ({
     page,
   }) => {
     const { center } = await openMapWithOneEntity(page)
 
     await page.mouse.click(center.x, center.y)
 
-    await expect(popup(page)).toBeVisible()
-    await expect(popup(page)).toContainText(entity.slug)
+    await expect(modal(page)).toBeVisible()
+    await expect(modal(page)).toContainText(rtfBlock.title)
+    await expect(modal(page)).toContainText('Open from 8am to 6pm')
 
     await page
-      .getByRole('button', { name: messages.virtualMap.entityPopup.closeAriaLabel })
+      .getByRole('button', { name: messages.virtualMap.entityModal.closeAriaLabel })
       .click()
 
-    await expect(popup(page)).toBeHidden()
+    await expect(modal(page)).toBeHidden()
   })
 
-  test('closes the popup when clicking empty space', async ({ page }) => {
+  test('closes the modal with Escape', async ({ page }) => {
+    const { center } = await openMapWithOneEntity(page)
+
+    await page.mouse.click(center.x, center.y)
+    await expect(modal(page)).toBeVisible()
+
+    await page.keyboard.press('Escape')
+
+    await expect(modal(page)).toBeHidden()
+  })
+
+  test('closes the modal when clicking outside of it', async ({ page }) => {
     const { center, emptySpot } = await openMapWithOneEntity(page)
 
     await page.mouse.click(center.x, center.y)
-    await expect(popup(page)).toBeVisible()
+    await expect(modal(page)).toBeVisible()
 
     await page.mouse.click(emptySpot.x, emptySpot.y)
 
-    await expect(popup(page)).toBeHidden()
+    await expect(modal(page)).toBeHidden()
+  })
+
+  test('opens nothing when the entity has no content page', async ({ page }) => {
+    const { center } = await openMapWithOneEntity(page, { withPage: false })
+
+    await page.mouse.click(center.x, center.y)
+
+    await expect(page.getByRole('dialog')).toBeHidden()
   })
 
   test('does not select anything when dragging to orbit the camera', async ({ page }) => {
@@ -145,6 +201,6 @@ test.describe('virtual map selection', () => {
     await page.mouse.move(center.x, center.y, { steps: 8 })
     await page.mouse.up()
 
-    await expect(popup(page)).toBeHidden()
+    await expect(page.getByRole('dialog')).toBeHidden()
   })
 })

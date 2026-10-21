@@ -7,12 +7,33 @@ import { VIRTUAL_MAP_EVENTS } from '@/constants/virtual-map-constants.ts'
 import { formatMessage } from '@/helpers/message-helper.ts'
 import { virtualMapEventBus } from '@/helpers/virtual-map-event-bus.ts'
 import { useVirtualMap } from '@/hooks/use-virtual-map.ts'
+import { useVirtualMapEntityPage } from '@/hooks/use-virtual-map-entity-page.ts'
 
 jest.mock('@/hooks/use-virtual-map.ts', () => ({
   useVirtualMap: jest.fn(),
 }))
 
+jest.mock('@/hooks/content-blocks/useContentBlockData.tsx', () => ({
+  __esModule: true,
+  default: jest.fn(),
+}))
+jest.mock('@/hooks/use-virtual-map-entity-page.ts', () => ({
+  useVirtualMapEntityPage: jest.fn(),
+}))
+
 const useVirtualMapMock = jest.mocked(useVirtualMap)
+const useVirtualMapEntityPageMock = jest.mocked(useVirtualMapEntityPage)
+
+function mockEntityPage(state: Partial<ReturnType<typeof useVirtualMapEntityPage>> = {}) {
+  useVirtualMapEntityPageMock.mockReturnValue({
+    status: 'ready',
+    page: { id: 'page-id', title: 'Main Library' } as never,
+    blocks: [],
+    error: null,
+    retry: jest.fn(),
+    ...state,
+  })
+}
 
 function renderViewer(state: Partial<ReturnType<typeof useVirtualMap>>) {
   const retry = jest.fn()
@@ -34,6 +55,8 @@ function renderViewer(state: Partial<ReturnType<typeof useVirtualMap>>) {
 }
 
 describe('VirtualMapViewer', () => {
+  beforeEach(() => mockEntityPage())
+
   it('passes its canvas to the virtual map hook', () => {
     renderViewer({ status: 'ready' })
 
@@ -72,7 +95,7 @@ describe('VirtualMapViewer', () => {
     expect(retry).toHaveBeenCalledTimes(1)
   })
 
-  it('shows the selected entity slug when the map dispatches a selection', () => {
+  it('opens the content page modal when the map dispatches a selection', () => {
     renderViewer({ status: 'ready' })
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
@@ -84,12 +107,28 @@ describe('VirtualMapViewer', () => {
       }),
     )
 
-    expect(
-      screen.getByRole('dialog', { name: messages.virtualMap.entityPopup.title }),
-    ).toHaveTextContent('library')
+    expect(screen.getByRole('dialog', { name: 'Main Library' })).toBeInTheDocument()
+    expect(useVirtualMapEntityPageMock).toHaveBeenLastCalledWith({
+      id: 'library-id',
+      slug: 'library',
+    })
   })
 
-  it('closes the popup and dispatches SELECTION_CLEARED from the close button', () => {
+  it('opens nothing when the selected entity has no page', () => {
+    mockEntityPage({ status: 'none', page: null })
+    renderViewer({ status: 'ready' })
+
+    act(() =>
+      virtualMapEventBus.dispatch(VIRTUAL_MAP_EVENTS.ENTITY_SELECTED, {
+        id: 'library-id',
+        slug: 'library',
+      }),
+    )
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  it('closes the modal and dispatches SELECTION_CLEARED from the close button', () => {
     const cleared = jest.fn()
     const unregister = virtualMapEventBus.register(VIRTUAL_MAP_EVENTS.SELECTION_CLEARED, cleared)
     renderViewer({ status: 'ready' })
@@ -101,11 +140,10 @@ describe('VirtualMapViewer', () => {
     )
 
     fireEvent.click(
-      screen.getByRole('button', { name: messages.virtualMap.entityPopup.closeAriaLabel }),
+      screen.getByRole('button', { name: messages.virtualMap.entityModal.closeAriaLabel }),
     )
 
     expect(cleared).toHaveBeenCalledTimes(1)
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     unregister()
   })
 })
