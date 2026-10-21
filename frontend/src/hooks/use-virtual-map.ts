@@ -23,8 +23,7 @@ import {
 } from "@/helpers/virtual-map-scene-helper.ts";
 import { listActiveEntities } from "@/services/entity-service.ts";
 import { getMeshFileUrl } from "@/services/mesh-service.ts";
-
-export type VirtualMapStatus = "loading" | "ready" | "error";
+import type { VirtualMapStatus } from "@/types/virtual-map-status.ts";
 
 export function useVirtualMap(canvasRef: RefObject<HTMLCanvasElement | null>) {
   const [status, setStatus] = useState<VirtualMapStatus>("loading");
