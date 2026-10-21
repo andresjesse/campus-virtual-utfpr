@@ -1,10 +1,11 @@
 import { Box } from "@mantine/core";
 import { useRef } from "react";
 
-import VirtualMapEntityPopup from "@/components/virtual-map/virtual-map-viewer/VirtualMapEntityPopup.tsx";
+import VirtualMapEntityModal from "@/components/virtual-map/virtual-map-viewer/VirtualMapEntityModal.tsx";
 import VirtualMapErrorOverlay from "@/components/virtual-map/virtual-map-viewer/VirtualMapErrorOverlay.tsx";
 import VirtualMapLoadingOverlay from "@/components/virtual-map/virtual-map-viewer/VirtualMapLoadingOverlay.tsx";
 import messages from "@/constants/messages.json";
+import { useVirtualMapEntityPage } from "@/hooks/use-virtual-map-entity-page.ts";
 import { useVirtualMap } from "@/hooks/use-virtual-map.ts";
 import { useVirtualMapSelection } from "@/hooks/use-virtual-map-selection.ts";
 
@@ -12,6 +13,7 @@ export default function VirtualMapViewer() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { status, progress, error, retry } = useVirtualMap(canvasRef);
   const { selected, clearSelection } = useVirtualMapSelection();
+  const entityPage = useVirtualMapEntityPage(selected);
 
   return (
     <Box pos="relative" w="100%" h="100dvh">
@@ -25,7 +27,9 @@ export default function VirtualMapViewer() {
       />
       {status === "loading" && <VirtualMapLoadingOverlay progress={progress} />}
       {status === "error" && <VirtualMapErrorOverlay description={error} onRetry={retry} />}
-      {selected && <VirtualMapEntityPopup entity={selected} onClose={clearSelection} />}
+      {selected && entityPage.status !== "none" && (
+        <VirtualMapEntityModal entity={selected} entityPage={entityPage} onClose={clearSelection} />
+      )}
     </Box>
   );
 }
