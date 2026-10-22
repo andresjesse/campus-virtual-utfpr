@@ -5,6 +5,8 @@ import VirtualMapEntityModal from "@/components/virtual-map/virtual-map-viewer/V
 import VirtualMapErrorOverlay from "@/components/virtual-map/virtual-map-viewer/VirtualMapErrorOverlay.tsx";
 import VirtualMapLoadingOverlay from "@/components/virtual-map/virtual-map-viewer/VirtualMapLoadingOverlay.tsx";
 import messages from "@/constants/messages.json";
+import { VIRTUAL_MAP_ENTITY_LOADING_DELAY_MS } from "@/constants/virtual-map-constants.ts";
+import { useDelayedFlag } from "@/hooks/use-delayed-flag.ts";
 import { useLastDefined } from "@/hooks/use-last-defined.ts";
 import { useVirtualMapEntityPage } from "@/hooks/use-virtual-map-entity-page.ts";
 import { useVirtualMap } from "@/hooks/use-virtual-map.ts";
@@ -17,7 +19,15 @@ export default function VirtualMapViewer() {
   const entityPage = useVirtualMapEntityPage(selected);
 
   const { status: pageStatus, page, blocks, error: pageError, retry: retryPage } = entityPage;
-  const isModalOpen = selected !== null && pageStatus !== "none";
+  // An entity without a page also starts as "loading", so the modal waits out the delay
+  // to avoid flashing open and shut when the lookup comes back empty.
+  const isLoadingVisible = useDelayedFlag(
+    pageStatus === "loading",
+    VIRTUAL_MAP_ENTITY_LOADING_DELAY_MS,
+  );
+  const isModalOpen =
+    selected !== null &&
+    (pageStatus === "ready" || pageStatus === "error" || isLoadingVisible);
   const liveModalContent = useMemo(
     () =>
       isModalOpen

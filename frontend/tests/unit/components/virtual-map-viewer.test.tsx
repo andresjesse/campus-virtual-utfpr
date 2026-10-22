@@ -3,7 +3,10 @@ import { act, fireEvent, render, screen } from '@testing-library/react'
 
 import VirtualMapViewer from '@/components/virtual-map/virtual-map-viewer/VirtualMapViewer.tsx'
 import messages from '@/constants/messages.json'
-import { VIRTUAL_MAP_EVENTS } from '@/constants/virtual-map-constants.ts'
+import {
+  VIRTUAL_MAP_ENTITY_LOADING_DELAY_MS,
+  VIRTUAL_MAP_EVENTS,
+} from '@/constants/virtual-map-constants.ts'
 import { formatMessage } from '@/helpers/message-helper.ts'
 import { virtualMapEventBus } from '@/helpers/virtual-map-event-bus.ts'
 import { useVirtualMap } from '@/hooks/use-virtual-map.ts'
@@ -126,6 +129,25 @@ describe('VirtualMapViewer', () => {
     )
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  it('only shows the loading modal after the delay, so a lookup with no page never flashes it', () => {
+    jest.useFakeTimers()
+    mockEntityPage({ status: 'loading', page: null })
+    renderViewer({ status: 'ready' })
+
+    act(() =>
+      virtualMapEventBus.dispatch(VIRTUAL_MAP_EVENTS.ENTITY_SELECTED, {
+        id: 'library-id',
+        slug: 'library',
+      }),
+    )
+    act(() => jest.advanceTimersByTime(VIRTUAL_MAP_ENTITY_LOADING_DELAY_MS - 1))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+
+    act(() => jest.advanceTimersByTime(1))
+    expect(screen.getByRole('dialog', { name: 'library' })).toBeInTheDocument()
+    jest.useRealTimers()
   })
 
   it('closes the modal and dispatches SELECTION_CLEARED from the close button', () => {
