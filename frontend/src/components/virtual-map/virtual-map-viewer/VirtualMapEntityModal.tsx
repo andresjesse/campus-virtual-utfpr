@@ -3,16 +3,18 @@ import { Modal } from "@mantine/core";
 import FeedbackState from "@/components/feedback-state/index.tsx";
 import VirtualMapBlock from "@/components/virtual-map/virtual-map-viewer/VirtualMapBlock.tsx";
 import messages from "@/constants/messages.json";
-import type { useVirtualMapEntityPage } from "@/hooks/use-virtual-map-entity-page.ts";
+import type { VirtualMapEntityPage } from "@/types/virtual-map-entity-page.ts";
 import type { VirtualMapSelectedEntity } from "@/types/virtual-map-events.ts";
 
 type VirtualMapEntityModalProps = {
+  opened: boolean;
   entity: VirtualMapSelectedEntity;
-  entityPage: ReturnType<typeof useVirtualMapEntityPage>;
+  entityPage: VirtualMapEntityPage;
   onClose: () => void;
 };
 
 export default function VirtualMapEntityModal({
+  opened,
   entity,
   entityPage,
   onClose,
@@ -21,7 +23,7 @@ export default function VirtualMapEntityModal({
 
   return (
     <Modal
-      opened
+      opened={opened}
       centered
       size="lg"
       onClose={onClose}

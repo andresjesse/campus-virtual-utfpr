@@ -27,6 +27,7 @@ function renderModal(entityPage: Partial<typeof baseEntityPage> = {}) {
   render(
     <MantineProvider>
       <VirtualMapEntityModal
+        opened
         entity={entity}
         entityPage={{ ...baseEntityPage, retry, ...entityPage }}
         onClose={onClose}

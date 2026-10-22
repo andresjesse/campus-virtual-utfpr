@@ -8,7 +8,7 @@ import type {
   ContentPageBlockMetadata,
   ContentPageRecord,
 } from "@/types/content-page.ts";
-import type { VirtualMapEntityPageStatus } from "@/types/virtual-map-entity-page.ts";
+import type { VirtualMapEntityPage, VirtualMapEntityPageStatus } from "@/types/virtual-map-entity-page.ts";
 import type { VirtualMapSelectedEntity } from "@/types/virtual-map-events.ts";
 
 type EntityPageResult = {
@@ -19,7 +19,11 @@ type EntityPageResult = {
   error: string | null;
 };
 
-export function useVirtualMapEntityPage(selected: VirtualMapSelectedEntity | null) {
+const NO_BLOCKS: ContentPageBlockMetadata[] = [];
+
+export function useVirtualMapEntityPage(
+  selected: VirtualMapSelectedEntity | null,
+): VirtualMapEntityPage {
   const [attempt, setAttempt] = useState(0);
   const [result, setResult] = useState<EntityPageResult | null>(null);
 
@@ -65,12 +69,12 @@ export function useVirtualMapEntityPage(selected: VirtualMapSelectedEntity | nul
   const retry = useCallback(() => setAttempt((current) => current + 1), []);
 
   if (!entityId) {
-    return { status: "none" as VirtualMapEntityPageStatus, page: null, blocks: [], error: null, retry };
+    return { status: "none", page: null, blocks: NO_BLOCKS, error: null, retry };
   }
 
   if (!result || result.key !== key) {
-    return { status: "loading" as VirtualMapEntityPageStatus, page: null, blocks: [], error: null, retry };
+    return { status: "loading", page: null, blocks: NO_BLOCKS, error: null, retry };
   }
 
-  return { ...result, retry };
+  return { status: result.status, page: result.page, blocks: result.blocks, error: result.error, retry };
 }
