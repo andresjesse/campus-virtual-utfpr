@@ -367,9 +367,10 @@
       "modelsFailedTitle": "Alguns modelos não foram carregados",
       "modelsFailedMessage": "{count} modelo(s) 3D não puderam ser carregados e foram omitidos do mapa."
     },
-    "entityPopup": {
-      "title": "Item selecionado",
-      "closeAriaLabel": "Fechar detalhes do item"
+    "entityModal": {
+      "closeAriaLabel": "Fechar detalhes do item",
+      "loadErrorTitle": "Não foi possível carregar o conteúdo deste item",
+      "emptyTitle": "Este item ainda não tem conteúdo"
     }
   }
 }

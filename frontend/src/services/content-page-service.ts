@@ -40,6 +40,17 @@ export async function listContentPages(): Promise<ContentPageListRecord[]> {
   }));
 }
 
+export async function getContentPageByEntity(entityId: string): Promise<ContentPageRecord | null> {
+  const result = await pocketbase
+    .collection<ContentPageRecord>(CONTENT_PAGE_COLLECTION)
+    .getList(1, 1, {
+      filter: pocketbase.filter("entity = {:entity}", {entity: entityId}),
+      requestKey: null,
+    });
+
+  return result.items[0] ?? null;
+}
+
 export async function getContentPageEditorData(id: string) {
   const [page, menuItems] = await Promise.all([
     pocketbase

@@ -37,3 +37,5 @@ export const VIRTUAL_MAP_EVENTS = {
 export const VIRTUAL_MAP_POINTER = {
   clickTolerance: 5,
 } as const;
+
+export const VIRTUAL_MAP_ENTITY_LOADING_DELAY_MS = 250;

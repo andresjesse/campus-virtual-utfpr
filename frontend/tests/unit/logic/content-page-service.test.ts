@@ -1,18 +1,22 @@
 import messages from '@/constants/messages.json'
 import { parseRelation } from '@/helpers/content-pages-service-helper.ts'
-import { upsertBlockContent } from '@/services/content-page-service.ts'
+import { getContentPageByEntity, upsertBlockContent } from '@/services/content-page-service.ts'
 
 const mockCreate = jest.fn()
 const mockUpdate = jest.fn()
+const mockGetList = jest.fn()
 const mockCollection = jest.fn((_name: string) => ({
   _name: _name,
   create: mockCreate,
   update: mockUpdate,
+  getList: mockGetList,
 }))
 
 jest.mock('@/services/pocketbase.ts', () => ({
   pocketbase: {
     collection: (name: string) => mockCollection(name),
+    filter: (expression: string, params: Record<string, string>) =>
+      expression.replace('{:entity}', `"${params.entity}"`),
   },
 }))
 
@@ -215,5 +219,26 @@ describe('parseRelation', () => {
     expect(() => parseRelation(relation)).toThrow(
       messages.contentPages.editor.relationInvalidError,
     )
+  })
+})
+
+describe('getContentPageByEntity', () => {
+  it('returns the page linked to the entity', async () => {
+    const page = { id: 'page-id', title: 'Library', entity: 'entity-id' }
+    mockGetList.mockResolvedValue({ items: [page] })
+
+    await expect(getContentPageByEntity('entity-id')).resolves.toBe(page)
+
+    expect(mockCollection).toHaveBeenCalledWith('content_page')
+    expect(mockGetList).toHaveBeenCalledWith(1, 1, {
+      filter: 'entity = "entity-id"',
+      requestKey: null,
+    })
+  })
+
+  it('returns null when the entity has no page', async () => {
+    mockGetList.mockResolvedValue({ items: [] })
+
+    await expect(getContentPageByEntity('entity-id')).resolves.toBeNull()
   })
 })
