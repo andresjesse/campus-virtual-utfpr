@@ -9,6 +9,8 @@ import type {
   MenuItemOption,
   MenuItemPageOption,
   MenuItemRecord,
+  MenuTreeCategory,
+  MenuTreeItem,
 } from "@/types/menu.ts";
 
 export function isValidMenuItemHref(value: string) {
@@ -189,4 +191,32 @@ export function toMenuCategoryOptions(
     value: category.id,
     label: category.label || messages.menuCategories.list.noIdentifier,
   }));
+}
+
+export function buildMenuTree(menuItems: MenuItemRecord[]): MenuTreeCategory[] {
+  const nodes = new Map<string, MenuTreeItem>(
+    menuItems.map((item) => [item.id, { item, children: [] }]),
+  );
+  const categories = new Map<string, MenuTreeCategory>();
+
+  for (const item of menuItems) {
+    const node = nodes.get(item.id)!;
+    const parent = item.parent ? nodes.get(item.parent) : undefined;
+
+    if (parent) {
+      parent.children.push(node);
+      continue;
+    }
+
+    let category = categories.get(item.category);
+
+    if (!category) {
+      category = { id: item.category, label: getMenuItemCategoryName(item), items: [] };
+      categories.set(item.category, category);
+    }
+
+    category.items.push(node);
+  }
+
+  return [...categories.values()];
 }
