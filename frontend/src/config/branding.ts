@@ -48,6 +48,7 @@ export type Branding = {
       background: string;
       ambientLight: string;
       directionalLight: string;
+      entityHighlight: string;
     };
   };
 };
@@ -108,6 +109,7 @@ export const branding: Branding = {
       background: "#515151",
       ambientLight: "#ffffff",
       directionalLight: "#fff4e5",
+      entityHighlight: "#fdc003",
     },
   },
 };
