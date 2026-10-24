@@ -8,10 +8,12 @@ import { formatMessage } from '@/helpers/message-helper.ts'
 import { getRequestErrorMessage } from '@/helpers/request-error-helper.ts'
 import { virtualMapEventBus } from '@/helpers/virtual-map-event-bus.ts'
 import {
+  applyEntityHighlight,
   createVirtualMapScene,
   disposeObject3D,
   loadModels,
   pickEntity,
+  pickEntityRoot,
 } from '@/helpers/virtual-map-scene-helper.ts'
 import { useVirtualMap } from '@/hooks/use-virtual-map.ts'
 import { listActiveEntities } from '@/services/entity-service.ts'
@@ -25,10 +27,12 @@ jest.mock('@mantine/notifications', () => ({
 
 jest.mock('@/helpers/virtual-map-scene-helper.ts', () => ({
   ...jest.requireActual('@/helpers/virtual-map-scene-helper.ts'),
+  applyEntityHighlight: jest.fn(),
   createVirtualMapScene: jest.fn(),
   disposeObject3D: jest.fn(),
   loadModels: jest.fn(),
   pickEntity: jest.fn(),
+  pickEntityRoot: jest.fn(),
 }))
 
 jest.mock('@/services/entity-service.ts', () => ({
@@ -43,6 +47,8 @@ const createSceneMock = jest.mocked(createVirtualMapScene)
 const disposeMock = jest.mocked(disposeObject3D)
 const loadModelsMock = jest.mocked(loadModels)
 const pickEntityMock = jest.mocked(pickEntity)
+const pickEntityRootMock = jest.mocked(pickEntityRoot)
+const applyHighlightMock = jest.mocked(applyEntityHighlight)
 const listActiveEntitiesMock = jest.mocked(listActiveEntities)
 const showMock = jest.mocked(notifications.show)
 
@@ -105,6 +111,12 @@ function renderVirtualMap() {
 function click(canvas: HTMLCanvasElement, from = { clientX: 10, clientY: 10 }, to = from) {
   fireEvent.pointerDown(canvas, { button: 0, ...from })
   fireEvent.pointerUp(canvas, { button: 0, ...to })
+}
+
+function hover(canvas: HTMLCanvasElement, renderer: ReturnType<typeof createFakeScene>['renderer']) {
+  fireEvent.pointerMove(canvas, { pointerType: 'mouse', buttons: 0, clientX: 10, clientY: 10 })
+  const frame = renderer.setAnimationLoop.mock.calls[0][0] as () => void
+  act(() => frame())
 }
 
 function listenToSelection() {
@@ -336,5 +348,104 @@ describe('useVirtualMap', () => {
     click(canvas)
 
     expect(cleared).not.toHaveBeenCalled()
+  })
+
+  describe('hover highlight', () => {
+    async function renderReady() {
+      const fake = createFakeScene()
+      listActiveEntitiesMock.mockResolvedValue([createEntity('library-north', library)])
+      loadModelsMock.mockResolvedValue([fulfilled()])
+      const restore = jest.fn()
+      applyHighlightMock.mockReturnValue(restore)
+
+      const view = renderVirtualMap()
+      await waitFor(() => expect(view.result.current.status).toBe('ready'))
+
+      return { ...fake, ...view, restore }
+    }
+
+    it('highlights the entity under the pointer and shows a pointer cursor', async () => {
+      const { scene, canvas, renderer } = await renderReady()
+      pickEntityRootMock.mockReturnValue(scene.children[0])
+
+      hover(canvas, renderer)
+
+      expect(applyHighlightMock).toHaveBeenCalledWith(
+        scene.children[0],
+        expect.any(String),
+        expect.any(Number),
+      )
+      expect(canvas.style.cursor).toBe('pointer')
+    })
+
+    it('only raycasts on the next frame, not on every pointer move', async () => {
+      const { scene, canvas } = await renderReady()
+      pickEntityRootMock.mockReturnValue(scene.children[0])
+
+      fireEvent.pointerMove(canvas, { pointerType: 'mouse', buttons: 0, clientX: 10, clientY: 10 })
+      fireEvent.pointerMove(canvas, { pointerType: 'mouse', buttons: 0, clientX: 12, clientY: 10 })
+
+      expect(pickEntityRootMock).not.toHaveBeenCalled()
+    })
+
+    it('restores the highlight when the pointer moves onto empty space', async () => {
+      const { scene, canvas, renderer, restore } = await renderReady()
+      pickEntityRootMock.mockReturnValueOnce(scene.children[0])
+      hover(canvas, renderer)
+
+      pickEntityRootMock.mockReturnValueOnce(null)
+      hover(canvas, renderer)
+
+      expect(restore).toHaveBeenCalledTimes(1)
+      expect(canvas.style.cursor).toBe('')
+    })
+
+    it('does not highlight the same entity twice while the pointer stays on it', async () => {
+      const { scene, canvas, renderer } = await renderReady()
+      pickEntityRootMock.mockReturnValue(scene.children[0])
+
+      hover(canvas, renderer)
+      hover(canvas, renderer)
+
+      expect(applyHighlightMock).toHaveBeenCalledTimes(1)
+    })
+
+    it('clears the highlight when a button is pressed or the pointer leaves', async () => {
+      const { scene, canvas, renderer, restore } = await renderReady()
+      pickEntityRootMock.mockReturnValue(scene.children[0])
+      hover(canvas, renderer)
+
+      fireEvent.pointerDown(canvas, { button: 0, clientX: 10, clientY: 10 })
+      expect(restore).toHaveBeenCalledTimes(1)
+      expect(canvas.style.cursor).toBe('')
+
+      hover(canvas, renderer)
+      fireEvent.pointerLeave(canvas)
+      expect(restore).toHaveBeenCalledTimes(2)
+    })
+
+    it('ignores touch pointers and moves with a button held', async () => {
+      const { canvas, renderer } = await renderReady()
+      const frame = renderer.setAnimationLoop.mock.calls[0][0] as () => void
+
+      fireEvent.pointerMove(canvas, { pointerType: 'touch', buttons: 0, clientX: 10, clientY: 10 })
+      fireEvent.pointerMove(canvas, { pointerType: 'mouse', buttons: 1, clientX: 10, clientY: 10 })
+      act(() => frame())
+
+      expect(pickEntityRootMock).not.toHaveBeenCalled()
+    })
+
+    it('restores the highlight before disposing the scene on unmount', async () => {
+      const { scene, canvas, renderer, restore, unmount } = await renderReady()
+      pickEntityRootMock.mockReturnValue(scene.children[0])
+      hover(canvas, renderer)
+
+      unmount()
+
+      expect(restore).toHaveBeenCalledTimes(1)
+      expect(restore.mock.invocationCallOrder[0]).toBeLessThan(
+        disposeMock.mock.invocationCallOrder[0],
+      )
+    })
   })
 })

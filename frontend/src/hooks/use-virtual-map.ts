@@ -1,14 +1,15 @@
 import { notifications } from "@mantine/notifications";
 import { useCallback, useEffect, useState, type RefObject } from "react";
-import { Raycaster, type Object3D } from "three";
+import { Raycaster, type Object3D, type Vector2 } from "three";
 
 import { branding } from "@/config/branding.ts";
 import messages from "@/constants/messages.json";
-import { VIRTUAL_MAP_EVENTS } from "@/constants/virtual-map-constants.ts";
+import { VIRTUAL_MAP_EVENTS, VIRTUAL_MAP_HIGHLIGHT } from "@/constants/virtual-map-constants.ts";
 import { formatMessage } from "@/helpers/message-helper.ts";
 import { getRequestErrorMessage } from "@/helpers/request-error-helper.ts";
 import { virtualMapEventBus } from "@/helpers/virtual-map-event-bus.ts";
 import {
+  applyEntityHighlight,
   applyEntityTransform,
   createVirtualMapScene,
   disposeObject3D,
@@ -17,6 +18,7 @@ import {
   isPointerClick,
   loadModels,
   pickEntity,
+  pickEntityRoot,
   setPickableEntity,
   toNormalizedPointer,
   type MeshEntityGroup,
@@ -51,20 +53,50 @@ export function useVirtualMap(canvasRef: RefObject<HTMLCanvasElement | null>) {
     resizeObserver.observe(container);
     resize();
 
+    const pickable: Object3D[] = [];
+    const raycaster = new Raycaster();
+    let pointerDown: PointerEvent | null = null;
+    let hoverPointer: Vector2 | null = null;
+    let hovered: Object3D | null = null;
+    let restoreHovered: (() => void) | null = null;
+
+    const setHovered = (root: Object3D | null) => {
+      if (root === hovered) return;
+
+      restoreHovered?.();
+      restoreHovered = root
+        ? applyEntityHighlight(
+            root,
+            branding.colors.scene.entityHighlight,
+            VIRTUAL_MAP_HIGHLIGHT.emissiveIntensity,
+          )
+        : null;
+      hovered = root;
+      canvas.style.cursor = root ? "pointer" : "";
+    };
+    const clearHover = () => {
+      hoverPointer = null;
+      setHovered(null);
+    };
+
     renderer.setAnimationLoop(() => {
+      if (hoverPointer) {
+        setHovered(pickEntityRoot(raycaster, hoverPointer, camera, pickable));
+        hoverPointer = null;
+      }
       controls.update();
       renderer.render(scene, camera);
     });
 
-    const pickable: Object3D[] = [];
-    const raycaster = new Raycaster();
-    let pointerDown: PointerEvent | null = null;
-
     const handlePointerDown = (event: PointerEvent) => {
       pointerDown = event.button === 0 ? event : null;
+      clearHover();
     };
     const handlePointerMove = (event: PointerEvent) => {
       if (pointerDown && !isPointerClick(pointerDown, event)) pointerDown = null;
+
+      if (event.pointerType !== "mouse" || event.buttons !== 0) clearHover();
+      else hoverPointer = toNormalizedPointer(event, canvas);
     };
     const handlePointerUp = (event: PointerEvent) => {
       const down = pointerDown;
@@ -78,6 +110,7 @@ export function useVirtualMap(canvasRef: RefObject<HTMLCanvasElement | null>) {
     canvas.addEventListener("pointerdown", handlePointerDown);
     canvas.addEventListener("pointermove", handlePointerMove);
     canvas.addEventListener("pointerup", handlePointerUp);
+    canvas.addEventListener("pointerleave", clearHover);
 
     const load = async () => {
       let groups: MeshEntityGroup[];
@@ -137,6 +170,8 @@ export function useVirtualMap(canvasRef: RefObject<HTMLCanvasElement | null>) {
       canvas.removeEventListener("pointerdown", handlePointerDown);
       canvas.removeEventListener("pointermove", handlePointerMove);
       canvas.removeEventListener("pointerup", handlePointerUp);
+      canvas.removeEventListener("pointerleave", clearHover);
+      clearHover();
       renderer.setAnimationLoop(null);
       resizeObserver.disconnect();
       controls.dispose();
