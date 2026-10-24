@@ -117,7 +117,7 @@ async function openMapWithOneEntity(page: Page, { withPage = true } = {}) {
       json: isListing ? { ...emptyList, totalItems: 1, totalPages: 1, items: [rtfBlock] } : rtfBlock,
     })
   })
-  for (const collection of ['file_block', 'diagram_block']) {
+  for (const collection of ['file_block', 'diagram_block', 'menu_items']) {
     await page.route(`**/api/collections/${collection}/records**`, (route) =>
       route.fulfill({ json: emptyList }),
     )
