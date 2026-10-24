@@ -23,6 +23,7 @@ import {
   toNormalizedPointer,
   type MeshEntityGroup,
 } from "@/helpers/virtual-map-scene-helper.ts";
+import { listEntityIdsWithPage } from "@/services/content-page-service.ts";
 import { listActiveEntities } from "@/services/entity-service.ts";
 import { getMeshFileUrl } from "@/services/mesh-service.ts";
 import type { VirtualMapStatus } from "@/types/virtual-map-status.ts";
@@ -114,8 +115,14 @@ export function useVirtualMap(canvasRef: RefObject<HTMLCanvasElement | null>) {
 
     const load = async () => {
       let groups: MeshEntityGroup[];
+      let entityIdsWithPage: Set<string>;
       try {
-        groups = groupEntitiesByMesh(await listActiveEntities());
+        const [entities, pageEntityIds] = await Promise.all([
+          listActiveEntities(),
+          listEntityIdsWithPage(),
+        ]);
+        groups = groupEntitiesByMesh(entities);
+        entityIdsWithPage = pageEntityIds;
       } catch (requestError) {
         if (disposed) return;
         setError(getRequestErrorMessage(requestError));
@@ -143,8 +150,10 @@ export function useVirtualMap(canvasRef: RefObject<HTMLCanvasElement | null>) {
           const instance = model.clone();
           applyEntityTransform(instance, entity);
           enableShadows(instance);
-          setPickableEntity(instance, entity);
           scene.add(instance);
+          if (!entityIdsWithPage.has(entity.id)) return;
+
+          setPickableEntity(instance, entity);
           pickable.push(instance);
         });
       });

@@ -51,6 +51,14 @@ export async function getContentPageByEntity(entityId: string): Promise<ContentP
   return result.items[0] ?? null;
 }
 
+export async function listEntityIdsWithPage(): Promise<Set<string>> {
+  const pages = await pocketbase
+    .collection<ContentPageRecord>(CONTENT_PAGE_COLLECTION)
+    .getFullList({ fields: "entity", filter: 'entity != ""', requestKey: null });
+
+  return new Set(pages.map((page) => page.entity));
+}
+
 export async function getContentPageEditorData(id: string) {
   const [page, menuItems] = await Promise.all([
     pocketbase

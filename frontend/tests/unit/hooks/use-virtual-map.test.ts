@@ -16,6 +16,7 @@ import {
   pickEntityRoot,
 } from '@/helpers/virtual-map-scene-helper.ts'
 import { useVirtualMap } from '@/hooks/use-virtual-map.ts'
+import { listEntityIdsWithPage } from '@/services/content-page-service.ts'
 import { listActiveEntities } from '@/services/entity-service.ts'
 import { getMeshFileUrl } from '@/services/mesh-service.ts'
 import type { EntityRecord } from '@/types/entity.ts'
@@ -35,6 +36,10 @@ jest.mock('@/helpers/virtual-map-scene-helper.ts', () => ({
   pickEntityRoot: jest.fn(),
 }))
 
+jest.mock('@/services/content-page-service.ts', () => ({
+  listEntityIdsWithPage: jest.fn(),
+}))
+
 jest.mock('@/services/entity-service.ts', () => ({
   listActiveEntities: jest.fn(),
 }))
@@ -50,6 +55,7 @@ const pickEntityMock = jest.mocked(pickEntity)
 const pickEntityRootMock = jest.mocked(pickEntityRoot)
 const applyHighlightMock = jest.mocked(applyEntityHighlight)
 const listActiveEntitiesMock = jest.mocked(listActiveEntities)
+const listEntityIdsWithPageMock = jest.mocked(listEntityIdsWithPage)
 const showMock = jest.mocked(notifications.show)
 
 const library = { id: 'library', file: 'library.glb' } as MeshRecord
@@ -137,6 +143,7 @@ afterEach(() => {
 
 beforeEach(() => {
   jest.clearAllMocks()
+  listEntityIdsWithPageMock.mockImplementation(async () => new Set(['library-north', 'gym-main', 'library-south']))
 })
 
 describe('useVirtualMap', () => {
@@ -348,6 +355,49 @@ describe('useVirtualMap', () => {
     click(canvas)
 
     expect(cleared).not.toHaveBeenCalled()
+  })
+
+  describe('entities without a content page', () => {
+    it('places them in the scene but leaves them out of picking', async () => {
+      const { scene } = createFakeScene()
+      listActiveEntitiesMock.mockResolvedValue([
+        createEntity('library-north', library),
+        createEntity('ground', gym),
+      ])
+      listEntityIdsWithPageMock.mockResolvedValue(new Set(['library-north']))
+      loadModelsMock.mockResolvedValue([fulfilled(), fulfilled()])
+      pickEntityMock.mockReturnValue(null)
+
+      const { canvas, result } = renderVirtualMap()
+      await waitFor(() => expect(result.current.status).toBe('ready'))
+      click(canvas)
+
+      expect(scene.children).toHaveLength(2)
+      expect(scene.children[0].userData.entity).toEqual({
+        id: 'library-north',
+        slug: 'library-north',
+      })
+      expect(scene.children[1].userData.entity).toBeUndefined()
+      expect(pickEntityMock).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+        [scene.children[0]],
+      )
+    })
+
+    it('reports a failure to list the entities that have a page', async () => {
+      createFakeScene()
+      const requestError = new Error('Network down')
+      listActiveEntitiesMock.mockResolvedValue([])
+      listEntityIdsWithPageMock.mockRejectedValue(requestError)
+
+      const { result } = renderVirtualMap()
+
+      await waitFor(() => expect(result.current.status).toBe('error'))
+      expect(result.current.error).toBe(getRequestErrorMessage(requestError))
+      expect(loadModelsMock).not.toHaveBeenCalled()
+    })
   })
 
   describe('hover highlight', () => {
