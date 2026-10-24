@@ -1,7 +1,9 @@
 import {
   BoxGeometry,
+  Color,
   Group,
   Mesh,
+  MeshBasicMaterial,
   MeshStandardMaterial,
   Object3D,
   PerspectiveCamera,
@@ -16,6 +18,7 @@ import {
   VIRTUAL_MAP_POINTER,
 } from '@/constants/virtual-map-constants.ts'
 import {
+  applyEntityHighlight,
   applyEntityTransform,
   clampControlsTarget,
   disposeObject3D,
@@ -25,6 +28,7 @@ import {
   isPointerClick,
   loadModels,
   pickEntity,
+  pickEntityRoot,
   setPickableEntity,
   toNormalizedPointer,
 } from '@/helpers/virtual-map-scene-helper.ts'
@@ -264,6 +268,90 @@ describe('virtual map scene helper', () => {
       const { camera, root } = createPickingScene()
 
       expect(pickEntity(new Raycaster(), new Vector2(0.9, 0.9), camera, [root])).toBeNull()
+    })
+  })
+
+  describe('pickEntityRoot', () => {
+    it('returns the root object that owns the hit mesh', () => {
+      const camera = new PerspectiveCamera(50, 1, 0.1, 100)
+      camera.position.set(0, 0, 10)
+      camera.lookAt(0, 0, 0)
+      camera.updateMatrixWorld()
+
+      const root = new Group()
+      root.add(new Mesh(new BoxGeometry(1, 1, 1), new MeshStandardMaterial()))
+      setPickableEntity(root, { id: 'entity-1', slug: 'main-entrance' })
+      root.updateMatrixWorld()
+
+      expect(pickEntityRoot(new Raycaster(), new Vector2(0, 0), camera, [root])).toBe(root)
+      expect(pickEntityRoot(new Raycaster(), new Vector2(0.9, 0.9), camera, [root])).toBeNull()
+    })
+  })
+
+  describe('applyEntityHighlight', () => {
+    function createInstance(material: MeshStandardMaterial | MeshBasicMaterial) {
+      const root = new Group()
+      const mesh = new Mesh(new BoxGeometry(1, 1, 1), material)
+      root.add(mesh)
+
+      return { root, mesh }
+    }
+
+    it('tints only the highlighted instance when clones share a material', () => {
+      const shared = new MeshStandardMaterial()
+      const first = createInstance(shared)
+      const second = createInstance(shared)
+
+      applyEntityHighlight(first.root, '#ff0000', 0.5)
+
+      const highlighted = first.mesh.material as MeshStandardMaterial
+      expect(highlighted).not.toBe(shared)
+      expect(highlighted.emissive.getHex()).toBe(new Color('#ff0000').getHex())
+      expect(highlighted.emissiveIntensity).toBe(0.5)
+      expect(second.mesh.material).toBe(shared)
+      expect(shared.emissive.getHex()).toBe(0)
+    })
+
+    it('restores the original materials and disposes the clones', () => {
+      const shared = new MeshStandardMaterial()
+      const { root, mesh } = createInstance(shared)
+
+      const restore = applyEntityHighlight(root, '#ff0000', 0.5)
+      const clone = mesh.material as MeshStandardMaterial
+      const disposeClone = jest.spyOn(clone, 'dispose')
+      const disposeOriginal = jest.spyOn(shared, 'dispose')
+      restore()
+
+      expect(mesh.material).toBe(shared)
+      expect(disposeClone).toHaveBeenCalledTimes(1)
+      expect(disposeOriginal).not.toHaveBeenCalled()
+    })
+
+    it('highlights every material of a multi-material mesh', () => {
+      const first = new MeshStandardMaterial()
+      const second = new MeshStandardMaterial()
+      const { root, mesh } = createInstance(first)
+      mesh.material = [first, second]
+
+      const restore = applyEntityHighlight(root, '#ff0000', 0.5)
+
+      const materials = mesh.material as MeshStandardMaterial[]
+      expect(materials).toHaveLength(2)
+      materials.forEach((material) => expect(material.emissiveIntensity).toBe(0.5))
+
+      restore()
+      expect(mesh.material).toEqual([first, second])
+    })
+
+    it('leaves materials without an emissive channel untouched', () => {
+      const basic = new MeshBasicMaterial()
+      const { root, mesh } = createInstance(basic)
+
+      const restore = applyEntityHighlight(root, '#ff0000', 0.5)
+
+      expect(mesh.material).toBe(basic)
+      expect(() => restore()).not.toThrow()
+      expect(mesh.material).toBe(basic)
     })
   })
 })

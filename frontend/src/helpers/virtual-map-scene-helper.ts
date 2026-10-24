@@ -250,20 +250,61 @@ export function isPointerClick(down: PointerPosition, up: PointerPosition): bool
   );
 }
 
+export function pickEntityRoot(
+  raycaster: Raycaster,
+  pointer: Vector2,
+  camera: Camera,
+  pickable: Object3D[],
+): Object3D | null {
+  raycaster.setFromCamera(pointer, camera);
+
+  for (const { object } of raycaster.intersectObjects(pickable, true)) {
+    for (let current: Object3D | null = object; current; current = current.parent) {
+      if (current.userData.entity) return current;
+    }
+  }
+
+  return null;
+}
+
 export function pickEntity(
   raycaster: Raycaster,
   pointer: Vector2,
   camera: Camera,
   pickable: Object3D[],
 ): VirtualMapSelectedEntity | null {
-  raycaster.setFromCamera(pointer, camera);
+  const root = pickEntityRoot(raycaster, pointer, camera, pickable);
 
-  for (const { object } of raycaster.intersectObjects(pickable, true)) {
-    for (let current: Object3D | null = object; current; current = current.parent) {
-      const entity = current.userData.entity as VirtualMapSelectedEntity | undefined;
-      if (entity) return entity;
-    }
-  }
+  return root ? (root.userData.entity as VirtualMapSelectedEntity) : null;
+}
 
-  return null;
+export function applyEntityHighlight(root: Object3D, color: string, intensity: number) {
+  const originals: [Mesh, Mesh["material"]][] = [];
+  const clones: Material[] = [];
+
+  root.traverse((child) => {
+    if (!(child instanceof Mesh)) return;
+
+    const highlight = (material: Material) => {
+      if (!("emissive" in material) || !(material.emissive instanceof Color)) return material;
+
+      const clone = material.clone() as Material & { emissive: Color; emissiveIntensity: number };
+      clone.emissive.set(color);
+      clone.emissiveIntensity = intensity;
+      clones.push(clone);
+      return clone;
+    };
+
+    originals.push([child, child.material]);
+    child.material = Array.isArray(child.material)
+      ? child.material.map(highlight)
+      : highlight(child.material);
+  });
+
+  return () => {
+    originals.forEach(([mesh, material]) => {
+      mesh.material = material;
+    });
+    clones.forEach((clone) => clone.dispose());
+  };
 }
