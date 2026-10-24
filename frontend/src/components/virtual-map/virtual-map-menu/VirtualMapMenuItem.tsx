@@ -6,6 +6,8 @@ import { getMenuItemIconUrl } from "@/services/menu-item-service.ts";
 import type { ContentPageRecord } from "@/types/content-page.ts";
 import type { MenuTreeItem } from "@/types/menu.ts";
 
+import classes from "./VirtualMapMenuItem.module.css";
+
 type VirtualMapMenuItemProps = {
   node: MenuTreeItem;
   onOpenPage: (page: ContentPageRecord) => void;
@@ -24,14 +26,15 @@ export default function VirtualMapMenuItem({ node, onOpenPage }: VirtualMapMenuI
     <Box component="li" style={{ listStyle: "none" }}>
       <UnstyledButton
         {...linkProps}
+        className={classes.item}
         w="100%"
-        p="xs"
+        p="sm"
         c={branding.colors.text.primary}
-        style={{ borderRadius: "var(--mantine-radius-md)" }}
+        style={{ display: "block", borderRadius: "var(--mantine-radius-md)" }}
       >
-        <Group gap="sm" wrap="nowrap">
-          <Image src={iconUrl} alt="" w={24} h={24} fit="contain" />
-          <Text size="sm" fw={500} flex={1}>
+        <Group gap="md" wrap="nowrap">
+          <Image src={iconUrl} alt="" w={28} h={28} fit="contain" />
+          <Text size="md" fw={500} flex={1}>
             {item.label}
           </Text>
           <CaretRightIcon aria-hidden color={branding.colors.text.primary} />

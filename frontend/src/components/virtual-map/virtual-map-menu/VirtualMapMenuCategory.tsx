@@ -16,7 +16,7 @@ export default function VirtualMapMenuCategory({
 }: VirtualMapMenuCategoryProps) {
   return (
     <Stack component="section" gap="xs">
-      <Text component="h2" size="xs" fw={700} tt="uppercase" c={branding.colors.text.muted}>
+      <Text component="h2" fz={10} fw={700} tt="uppercase" lts="0.1em" c={branding.colors.text.muted}>
         {category.label}
       </Text>
       <Stack component="ul" gap={0} p={0} m={0}>
