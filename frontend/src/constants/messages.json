@@ -371,6 +371,11 @@
       "closeAriaLabel": "Fechar detalhes do item",
       "loadErrorTitle": "Não foi possível carregar o conteúdo deste item",
       "emptyTitle": "Este item ainda não tem conteúdo"
+    },
+    "menu": {
+      "toggleLabel": "Menu",
+      "loadErrorTitle": "Não foi possível carregar o menu",
+      "emptyTitle": "Nenhum item de menu disponível"
     }
   }
 }
