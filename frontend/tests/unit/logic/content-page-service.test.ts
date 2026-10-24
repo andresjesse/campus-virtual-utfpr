@@ -1,15 +1,21 @@
 import messages from '@/constants/messages.json'
 import { parseRelation } from '@/helpers/content-pages-service-helper.ts'
-import { getContentPageByEntity, upsertBlockContent } from '@/services/content-page-service.ts'
+import {
+  getContentPageByEntity,
+  listEntityIdsWithPage,
+  upsertBlockContent,
+} from '@/services/content-page-service.ts'
 
 const mockCreate = jest.fn()
 const mockUpdate = jest.fn()
 const mockGetList = jest.fn()
+const mockGetFullList = jest.fn()
 const mockCollection = jest.fn((_name: string) => ({
   _name: _name,
   create: mockCreate,
   update: mockUpdate,
   getList: mockGetList,
+  getFullList: mockGetFullList,
 }))
 
 jest.mock('@/services/pocketbase.ts', () => ({
@@ -240,5 +246,26 @@ describe('getContentPageByEntity', () => {
     mockGetList.mockResolvedValue({ items: [] })
 
     await expect(getContentPageByEntity('entity-id')).resolves.toBeNull()
+  })
+})
+
+describe('listEntityIdsWithPage', () => {
+  it('returns the ids of the entities that have a page', async () => {
+    mockGetFullList.mockResolvedValue([{ entity: 'entity-a' }, { entity: 'entity-b' }])
+
+    await expect(listEntityIdsWithPage()).resolves.toEqual(new Set(['entity-a', 'entity-b']))
+
+    expect(mockCollection).toHaveBeenCalledWith('content_page')
+    expect(mockGetFullList).toHaveBeenCalledWith({
+      fields: 'entity',
+      filter: 'entity != ""',
+      requestKey: null,
+    })
+  })
+
+  it('returns an empty set when no entity has a page', async () => {
+    mockGetFullList.mockResolvedValue([])
+
+    await expect(listEntityIdsWithPage()).resolves.toEqual(new Set())
   })
 })

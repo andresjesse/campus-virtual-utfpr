@@ -8,12 +8,15 @@ import { formatMessage } from '@/helpers/message-helper.ts'
 import { getRequestErrorMessage } from '@/helpers/request-error-helper.ts'
 import { virtualMapEventBus } from '@/helpers/virtual-map-event-bus.ts'
 import {
+  applyEntityHighlight,
   createVirtualMapScene,
   disposeObject3D,
   loadModels,
   pickEntity,
+  pickEntityRoot,
 } from '@/helpers/virtual-map-scene-helper.ts'
 import { useVirtualMap } from '@/hooks/use-virtual-map.ts'
+import { listEntityIdsWithPage } from '@/services/content-page-service.ts'
 import { listActiveEntities } from '@/services/entity-service.ts'
 import { getMeshFileUrl } from '@/services/mesh-service.ts'
 import type { EntityRecord } from '@/types/entity.ts'
@@ -25,10 +28,16 @@ jest.mock('@mantine/notifications', () => ({
 
 jest.mock('@/helpers/virtual-map-scene-helper.ts', () => ({
   ...jest.requireActual('@/helpers/virtual-map-scene-helper.ts'),
+  applyEntityHighlight: jest.fn(),
   createVirtualMapScene: jest.fn(),
   disposeObject3D: jest.fn(),
   loadModels: jest.fn(),
   pickEntity: jest.fn(),
+  pickEntityRoot: jest.fn(),
+}))
+
+jest.mock('@/services/content-page-service.ts', () => ({
+  listEntityIdsWithPage: jest.fn(),
 }))
 
 jest.mock('@/services/entity-service.ts', () => ({
@@ -43,7 +52,10 @@ const createSceneMock = jest.mocked(createVirtualMapScene)
 const disposeMock = jest.mocked(disposeObject3D)
 const loadModelsMock = jest.mocked(loadModels)
 const pickEntityMock = jest.mocked(pickEntity)
+const pickEntityRootMock = jest.mocked(pickEntityRoot)
+const applyHighlightMock = jest.mocked(applyEntityHighlight)
 const listActiveEntitiesMock = jest.mocked(listActiveEntities)
+const listEntityIdsWithPageMock = jest.mocked(listEntityIdsWithPage)
 const showMock = jest.mocked(notifications.show)
 
 const library = { id: 'library', file: 'library.glb' } as MeshRecord
@@ -107,6 +119,12 @@ function click(canvas: HTMLCanvasElement, from = { clientX: 10, clientY: 10 }, t
   fireEvent.pointerUp(canvas, { button: 0, ...to })
 }
 
+function hover(canvas: HTMLCanvasElement, renderer: ReturnType<typeof createFakeScene>['renderer']) {
+  fireEvent.pointerMove(canvas, { pointerType: 'mouse', buttons: 0, clientX: 10, clientY: 10 })
+  const frame = renderer.setAnimationLoop.mock.calls[0][0] as () => void
+  act(() => frame())
+}
+
 function listenToSelection() {
   const selected = jest.fn()
   const cleared = jest.fn()
@@ -125,6 +143,7 @@ afterEach(() => {
 
 beforeEach(() => {
   jest.clearAllMocks()
+  listEntityIdsWithPageMock.mockImplementation(async () => new Set(['library-north', 'gym-main', 'library-south']))
 })
 
 describe('useVirtualMap', () => {
@@ -336,5 +355,147 @@ describe('useVirtualMap', () => {
     click(canvas)
 
     expect(cleared).not.toHaveBeenCalled()
+  })
+
+  describe('entities without a content page', () => {
+    it('places them in the scene but leaves them out of picking', async () => {
+      const { scene } = createFakeScene()
+      listActiveEntitiesMock.mockResolvedValue([
+        createEntity('library-north', library),
+        createEntity('ground', gym),
+      ])
+      listEntityIdsWithPageMock.mockResolvedValue(new Set(['library-north']))
+      loadModelsMock.mockResolvedValue([fulfilled(), fulfilled()])
+      pickEntityMock.mockReturnValue(null)
+
+      const { canvas, result } = renderVirtualMap()
+      await waitFor(() => expect(result.current.status).toBe('ready'))
+      click(canvas)
+
+      expect(scene.children).toHaveLength(2)
+      expect(scene.children[0].userData.entity).toEqual({
+        id: 'library-north',
+        slug: 'library-north',
+      })
+      expect(scene.children[1].userData.entity).toBeUndefined()
+      expect(pickEntityMock).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+        [scene.children[0]],
+      )
+    })
+
+    it('reports a failure to list the entities that have a page', async () => {
+      createFakeScene()
+      const requestError = new Error('Network down')
+      listActiveEntitiesMock.mockResolvedValue([])
+      listEntityIdsWithPageMock.mockRejectedValue(requestError)
+
+      const { result } = renderVirtualMap()
+
+      await waitFor(() => expect(result.current.status).toBe('error'))
+      expect(result.current.error).toBe(getRequestErrorMessage(requestError))
+      expect(loadModelsMock).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('hover highlight', () => {
+    async function renderReady() {
+      const fake = createFakeScene()
+      listActiveEntitiesMock.mockResolvedValue([createEntity('library-north', library)])
+      loadModelsMock.mockResolvedValue([fulfilled()])
+      const restore = jest.fn()
+      applyHighlightMock.mockReturnValue(restore)
+
+      const view = renderVirtualMap()
+      await waitFor(() => expect(view.result.current.status).toBe('ready'))
+
+      return { ...fake, ...view, restore }
+    }
+
+    it('highlights the entity under the pointer and shows a pointer cursor', async () => {
+      const { scene, canvas, renderer } = await renderReady()
+      pickEntityRootMock.mockReturnValue(scene.children[0])
+
+      hover(canvas, renderer)
+
+      expect(applyHighlightMock).toHaveBeenCalledWith(
+        scene.children[0],
+        expect.any(String),
+        expect.any(Number),
+      )
+      expect(canvas.style.cursor).toBe('pointer')
+    })
+
+    it('only raycasts on the next frame, not on every pointer move', async () => {
+      const { scene, canvas } = await renderReady()
+      pickEntityRootMock.mockReturnValue(scene.children[0])
+
+      fireEvent.pointerMove(canvas, { pointerType: 'mouse', buttons: 0, clientX: 10, clientY: 10 })
+      fireEvent.pointerMove(canvas, { pointerType: 'mouse', buttons: 0, clientX: 12, clientY: 10 })
+
+      expect(pickEntityRootMock).not.toHaveBeenCalled()
+    })
+
+    it('restores the highlight when the pointer moves onto empty space', async () => {
+      const { scene, canvas, renderer, restore } = await renderReady()
+      pickEntityRootMock.mockReturnValueOnce(scene.children[0])
+      hover(canvas, renderer)
+
+      pickEntityRootMock.mockReturnValueOnce(null)
+      hover(canvas, renderer)
+
+      expect(restore).toHaveBeenCalledTimes(1)
+      expect(canvas.style.cursor).toBe('')
+    })
+
+    it('does not highlight the same entity twice while the pointer stays on it', async () => {
+      const { scene, canvas, renderer } = await renderReady()
+      pickEntityRootMock.mockReturnValue(scene.children[0])
+
+      hover(canvas, renderer)
+      hover(canvas, renderer)
+
+      expect(applyHighlightMock).toHaveBeenCalledTimes(1)
+    })
+
+    it('clears the highlight when a button is pressed or the pointer leaves', async () => {
+      const { scene, canvas, renderer, restore } = await renderReady()
+      pickEntityRootMock.mockReturnValue(scene.children[0])
+      hover(canvas, renderer)
+
+      fireEvent.pointerDown(canvas, { button: 0, clientX: 10, clientY: 10 })
+      expect(restore).toHaveBeenCalledTimes(1)
+      expect(canvas.style.cursor).toBe('')
+
+      hover(canvas, renderer)
+      fireEvent.pointerLeave(canvas)
+      expect(restore).toHaveBeenCalledTimes(2)
+    })
+
+    it('ignores touch pointers and moves with a button held', async () => {
+      const { canvas, renderer } = await renderReady()
+      const frame = renderer.setAnimationLoop.mock.calls[0][0] as () => void
+
+      fireEvent.pointerMove(canvas, { pointerType: 'touch', buttons: 0, clientX: 10, clientY: 10 })
+      fireEvent.pointerMove(canvas, { pointerType: 'mouse', buttons: 1, clientX: 10, clientY: 10 })
+      act(() => frame())
+
+      expect(pickEntityRootMock).not.toHaveBeenCalled()
+    })
+
+    it('restores the highlight before disposing the scene on unmount', async () => {
+      const { scene, canvas, renderer, restore, unmount } = await renderReady()
+      pickEntityRootMock.mockReturnValue(scene.children[0])
+      hover(canvas, renderer)
+
+      unmount()
+
+      expect(restore).toHaveBeenCalledTimes(1)
+      expect(restore.mock.invocationCallOrder[0]).toBeLessThan(
+        disposeMock.mock.invocationCallOrder[0],
+      )
+    })
   })
 })

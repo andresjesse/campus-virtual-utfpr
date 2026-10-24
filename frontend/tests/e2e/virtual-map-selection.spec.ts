@@ -204,3 +204,64 @@ test.describe('virtual map selection', () => {
     await expect(page.getByRole('dialog')).toBeHidden()
   })
 })
+
+test.describe('virtual map hover', () => {
+  const canvasOf = (page: Page) => page.getByLabel(messages.virtualMap.viewer.canvasAriaLabel)
+
+  test('shows a pointer cursor over an entity and resets it elsewhere', async ({ page }) => {
+    const { center, emptySpot } = await openMapWithOneEntity(page)
+
+    await page.mouse.move(center.x, center.y)
+    await expect(canvasOf(page)).toHaveCSS('cursor', 'pointer')
+
+    await page.mouse.move(emptySpot.x, emptySpot.y)
+    await expect(canvasOf(page)).not.toHaveCSS('cursor', 'pointer')
+  })
+
+  test('highlights the hovered entity and removes the highlight when the pointer leaves', async ({
+    page,
+  }) => {
+    const { center, emptySpot } = await openMapWithOneEntity(page)
+    const clip = { x: center.x - 40, y: center.y - 40, width: 80, height: 80 }
+
+    await page.mouse.move(emptySpot.x, emptySpot.y)
+    const idle = await page.screenshot({ clip })
+
+    await page.mouse.move(center.x, center.y)
+    await expect(canvasOf(page)).toHaveCSS('cursor', 'pointer')
+    const hovered = await page.screenshot({ clip })
+    expect(hovered.equals(idle)).toBe(false)
+
+    await page.mouse.move(emptySpot.x, emptySpot.y)
+    await expect(canvasOf(page)).not.toHaveCSS('cursor', 'pointer')
+    const restored = await page.screenshot({ clip })
+    expect(restored.equals(idle)).toBe(true)
+  })
+
+  test('neither highlights nor shows a pointer on an entity without a content page', async ({
+    page,
+  }) => {
+    const { center, emptySpot } = await openMapWithOneEntity(page, { withPage: false })
+    const clip = { x: center.x - 40, y: center.y - 40, width: 80, height: 80 }
+
+    await page.mouse.move(emptySpot.x, emptySpot.y)
+    const idle = await page.screenshot({ clip })
+
+    await page.mouse.move(center.x, center.y)
+    await page.waitForTimeout(300)
+
+    await expect(canvasOf(page)).not.toHaveCSS('cursor', 'pointer')
+    expect((await page.screenshot({ clip })).equals(idle)).toBe(true)
+  })
+
+  test('clears the highlight while dragging to orbit', async ({ page }) => {
+    const { center } = await openMapWithOneEntity(page)
+
+    await page.mouse.move(center.x, center.y)
+    await expect(canvasOf(page)).toHaveCSS('cursor', 'pointer')
+
+    await page.mouse.down()
+    await expect(canvasOf(page)).not.toHaveCSS('cursor', 'pointer')
+    await page.mouse.up()
+  })
+})

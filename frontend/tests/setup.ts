@@ -30,7 +30,14 @@ Object.defineProperty(globalThis, 'ResizeObserver', {
 
 if (!('PointerEvent' in globalThis)) {
   Object.defineProperty(globalThis, 'PointerEvent', {
-    value: class PointerEvent extends MouseEvent {},
+    value: class PointerEvent extends MouseEvent {
+      pointerType: string
+
+      constructor(type: string, init: PointerEventInit = {}) {
+        super(type, init)
+        this.pointerType = init.pointerType ?? ''
+      }
+    },
   })
 }
 

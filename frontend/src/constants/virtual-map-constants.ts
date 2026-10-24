@@ -27,6 +27,10 @@ export const VIRTUAL_MAP_LIGHTING = {
   shadowBias: -0.0005,
 } as const;
 
+export const VIRTUAL_MAP_HIGHLIGHT = {
+  emissiveIntensity: 0.35,
+} as const;
+
 export const VIRTUAL_MAP_MAX_PIXEL_RATIO = 2;
 
 export const VIRTUAL_MAP_EVENTS = {
