@@ -10,3 +10,9 @@ export type VirtualMapEntityPage = {
   error: string | null;
   retry: () => void;
 };
+
+export type VirtualMapPageBlocksResult = {
+  key: string;
+  blocks: ContentPageBlockMetadata[];
+  error: string | null;
+};

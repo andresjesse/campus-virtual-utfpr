@@ -1,6 +1,7 @@
 import { Box } from "@mantine/core";
 import { useMemo, useRef } from "react";
 
+import VirtualMapMenu from "@/components/virtual-map/virtual-map-menu/VirtualMapMenu.tsx";
 import VirtualMapEntityModal from "@/components/virtual-map/virtual-map-viewer/VirtualMapEntityModal.tsx";
 import VirtualMapErrorOverlay from "@/components/virtual-map/virtual-map-viewer/VirtualMapErrorOverlay.tsx";
 import VirtualMapLoadingOverlay from "@/components/virtual-map/virtual-map-viewer/VirtualMapLoadingOverlay.tsx";
@@ -49,10 +50,11 @@ export default function VirtualMapViewer() {
       />
       {status === "loading" && <VirtualMapLoadingOverlay progress={progress} />}
       {status === "error" && <VirtualMapErrorOverlay description={error} onRetry={retry} />}
+      {status === "ready" && <VirtualMapMenu />}
       {modalContent && (
         <VirtualMapEntityModal
           opened={isModalOpen}
-          entity={modalContent.entity}
+          fallbackTitle={modalContent.entity.slug}
           entityPage={modalContent.entityPage}
           onClose={clearSelection}
         />
