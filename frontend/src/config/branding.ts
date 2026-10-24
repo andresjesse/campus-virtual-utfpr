@@ -1,7 +1,13 @@
+export type BrandingTextPart = {
+  text: string;
+  highlighted?: boolean;
+};
+
 export type Branding = {
   organizationName: string;
   productName: string;
   fullName: string;
+  location: BrandingTextPart[];
   storageNamespace: string;
   assets: {
     loginBackground: string;
@@ -21,6 +27,7 @@ export type Branding = {
       panel: string;
       interactive: string;
       interactiveHover: string;
+      shadow: string;
     };
     border: {
       default: string;
@@ -49,6 +56,7 @@ export const branding: Branding = {
   organizationName: "UTFPR",
   productName: "Virtual",
   fullName: "UTFPR Virtual",
+  location: [{ text: "Câmpus" }, { text: "GUARAPUAVA", highlighted: true }],
   storageNamespace: "campus-virtual",
   assets: {
     loginBackground: "/branding/login-background.jpeg",
@@ -79,6 +87,7 @@ export const branding: Branding = {
       panel: "#252525",
       interactive: "#2e2e2e",
       interactiveHover: "#292929",
+      shadow: "#000000",
     },
     border: {
       default: "#626262",
@@ -105,3 +114,8 @@ export const branding: Branding = {
 
 export const getStorageKey = (key: string, brand: Branding = branding) =>
   `${brand.storageNamespace}:${key}`;
+
+export const getBrandTitleParts = (brand: Branding = branding): BrandingTextPart[] => [
+  { text: brand.organizationName, highlighted: true },
+  { text: brand.productName },
+];

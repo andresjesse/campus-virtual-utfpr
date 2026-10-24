@@ -11,6 +11,7 @@ export function applyBranding(brand: Branding, root = document.documentElement) 
     "--app-surface-panel": brand.colors.surface.panel,
     "--app-surface-interactive": brand.colors.surface.interactive,
     "--app-surface-interactive-hover": brand.colors.surface.interactiveHover,
+    "--app-surface-shadow": brand.colors.surface.shadow,
     "--app-border-default": brand.colors.border.default,
     "--app-border-strong": brand.colors.border.strong,
     "--app-text-primary": brand.colors.text.primary,

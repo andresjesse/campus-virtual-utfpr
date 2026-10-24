@@ -5,6 +5,7 @@ import { MapTrifoldIcon } from "@phosphor-icons/react/dist/csr/MapTrifold";
 import { useId, useState } from "react";
 
 import FeedbackState from "@/components/feedback-state/index.tsx";
+import VirtualMapMenuHeader from "@/components/virtual-map/virtual-map-menu/VirtualMapMenuHeader.tsx";
 import VirtualMapMenuCategory from "@/components/virtual-map/virtual-map-menu/VirtualMapMenuCategory.tsx";
 import VirtualMapEntityModal from "@/components/virtual-map/virtual-map-viewer/VirtualMapEntityModal.tsx";
 import { branding } from "@/config/branding.ts";
@@ -39,14 +40,16 @@ export default function VirtualMapMenu() {
           <Paper
             bg={`color-mix(in srgb, ${branding.colors.surface.panel} 85%, transparent)`}
             c={branding.colors.text.primary}
-            p="xl"
-            mah="calc(100dvh - 4rem)"
+            py="xl"
+            px={{ base: "xl", md: "7.5rem" }}
+            h="calc(100dvh - 72px)"
             style={{
               overflowY: "auto",
               borderBottom: `1px solid ${branding.colors.brand.primary}`,
               borderRadius: "0 0 var(--mantine-radius-xl) var(--mantine-radius-xl)",
             }}
           >
+            <VirtualMapMenuHeader />
             {status === "loading" && (
               <FeedbackState loading title={messages.block.list.loading} />
             )}
@@ -77,14 +80,17 @@ export default function VirtualMapMenu() {
       </Box>
       <Box ta="center">
         <UnstyledButton
+          pos="relative"
+          mt={-1}
           w={140}
           h={56}
-          bg={`color-mix(in srgb, ${branding.colors.surface.interactive} 85%, transparent)`}
+          bg={branding.colors.surface.interactive}
           style={{
             pointerEvents: "auto",
             border: `1px solid ${branding.colors.brand.primary}`,
             borderTop: "none",
             borderRadius: "0 0 var(--mantine-radius-xl) var(--mantine-radius-xl)",
+            boxShadow: `inset 0 6px 6px -4px color-mix(in srgb, ${branding.colors.surface.shadow} 50%, transparent)`,
           }}
           aria-expanded={isOpen}
           aria-controls={panelId}
