@@ -53,3 +53,14 @@ export type MenuItemPageOption = MenuItemOption & {
 export type MenuItemCurrentIcon = {
   name: string;
 };
+
+export type MenuTreeItem = {
+  item: MenuItemRecord;
+  children: MenuTreeItem[];
+};
+
+export type MenuTreeCategory = {
+  id: string;
+  label: string;
+  items: MenuTreeItem[];
+};

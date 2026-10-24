@@ -10,6 +10,7 @@ export function auroraBrand(): Branding {
     organizationName: "Aurora",
     productName: "Portal",
     fullName: "Aurora Portal",
+    location: [{ text: "Unit" }, { text: "Riverside", highlighted: true }],
     storageNamespace: "aurora-portal",
     assets: {
       ...actual.branding.assets,
@@ -44,5 +45,8 @@ export function mockBrandingModule() {
     getStorageKey: jest.requireActual<typeof import("@/config/branding")>(
       "@/config/branding",
     ).getStorageKey,
+    getBrandTitleParts: jest.requireActual<typeof import("@/config/branding")>(
+      "@/config/branding",
+    ).getBrandTitleParts,
   };
 }

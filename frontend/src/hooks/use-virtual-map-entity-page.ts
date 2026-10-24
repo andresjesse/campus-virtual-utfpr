@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { PAGE_BLOCK_COLLECTIONS } from "@/constants/content-constants.ts";
 import { getAllContentBlocksMetadata } from "@/helpers/content-pages-service-helper.ts";
 import { getRequestErrorMessage } from "@/helpers/request-error-helper.ts";
+import { flattenBlocksMetadata } from "@/helpers/virtual-map-page-helper.ts";
 import { getContentPageByEntity } from "@/services/content-page-service.ts";
 import type {
   ContentPageBlockMetadata,
@@ -44,7 +44,7 @@ export function useVirtualMapEntityPage(
         }
 
         const grouped = await getAllContentBlocksMetadata(page.id, false);
-        const blocks = PAGE_BLOCK_COLLECTIONS.flatMap((collection) => grouped[collection] ?? []);
+        const blocks = flattenBlocksMetadata(grouped);
         if (!cancelled) setResult({ key, status: "ready", page, blocks, error: null });
       } catch (error) {
         if (!cancelled) {

@@ -24,6 +24,15 @@ jest.mock('@/hooks/use-virtual-map-entity-page.ts', () => ({
   useVirtualMapEntityPage: jest.fn(),
 }))
 
+jest.mock('@/hooks/use-virtual-map-menu.ts', () => ({
+  useVirtualMapMenu: () => ({ status: 'ready', categories: [], error: null, retry: jest.fn() }),
+}))
+
+jest.mock('@/hooks/use-virtual-map-page-blocks.ts', () => ({
+  useVirtualMapPageBlocks: () => ({ status: 'none', page: null, blocks: [], error: null, retry: jest.fn() }),
+}))
+jest.mock('@/services/menu-item-service.ts', () => ({ getMenuItemIconUrl: () => '' }))
+
 const useVirtualMapMock = jest.mocked(useVirtualMap)
 const useVirtualMapEntityPageMock = jest.mocked(useVirtualMapEntityPage)
 
