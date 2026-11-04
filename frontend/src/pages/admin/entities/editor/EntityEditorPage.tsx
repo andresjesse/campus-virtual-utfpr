@@ -2,6 +2,7 @@ import { notifications } from "@mantine/notifications";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 
+import { branding } from "@/config/branding.ts";
 import EntityForm from "@/components/entity/entity-form/EntityForm";
 import FeedbackState from "@/components/feedback-state";
 import { ENTITY_DEFAULT_TRANSFORM } from "@/constants/entity-constants";
@@ -62,11 +63,14 @@ export default function EntityEditorPage() {
       }
 
       notifications.show({
-        color: "green",
+        color: branding.colors.feedback.success,
         title: messages.entities.editor.saveSuccessTitle,
         message: messages.entities.editor.saveSuccessMessage,
       });
-      navigate("/admin/entities");
+
+      if (!entityId) {
+        navigate("/admin/entities");
+      }
     },
     [entityId, navigate],
   );
