@@ -14,10 +14,12 @@ import {
 } from 'three'
 
 import {
+  VIRTUAL_MAP_EDGE_FADE,
   VIRTUAL_MAP_ORBIT_LIMITS,
   VIRTUAL_MAP_POINTER,
 } from '@/constants/virtual-map-constants.ts'
 import {
+  applyEdgeFade,
   applyEntityHighlight,
   applyEntityTransform,
   clampControlsTarget,
@@ -86,6 +88,41 @@ describe('virtual map scene helper', () => {
 
       expect(mesh.castShadow).toBe(true)
       expect(mesh.receiveShadow).toBe(true)
+    })
+  })
+
+  describe('applyEdgeFade', () => {
+    function compile(material: MeshStandardMaterial) {
+      const shader = {
+        uniforms: {} as Record<string, { value: unknown }>,
+        vertexShader: '#include <common>\n#include <begin_vertex>',
+        fragmentShader: '#include <common>\n#include <fog_fragment>',
+      }
+      material.onBeforeCompile(shader as never, null as never)
+
+      return shader
+    }
+
+    it('injects the radial fade into every nested mesh material', () => {
+      const first = new MeshStandardMaterial()
+      const second = new MeshStandardMaterial()
+      const root = new Group()
+      root.add(new Mesh(new BoxGeometry(), first))
+      root.add(new Mesh(new BoxGeometry(), [second]))
+
+      applyEdgeFade(root)
+
+      ;[first, second].forEach((material) => {
+        const shader = compile(material)
+
+        expect(shader.uniforms.edgeFadeRange.value).toEqual(
+          new Vector2(VIRTUAL_MAP_EDGE_FADE.start, VIRTUAL_MAP_EDGE_FADE.end),
+        )
+        expect(shader.uniforms.skyTopColor).toBeDefined()
+        expect(shader.uniforms.skyBottomColor).toBeDefined()
+        expect(shader.vertexShader).toContain('vEdgeFadePosition = ')
+        expect(shader.fragmentShader).toContain('smoothstep(edgeFadeRange.x')
+      })
     })
   })
 

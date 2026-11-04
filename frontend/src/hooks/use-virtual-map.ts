@@ -9,6 +9,7 @@ import { formatMessage } from "@/helpers/message-helper.ts";
 import { getRequestErrorMessage } from "@/helpers/request-error-helper.ts";
 import { virtualMapEventBus } from "@/helpers/virtual-map-event-bus.ts";
 import {
+  applyEdgeFade,
   applyEntityHighlight,
   applyEntityTransform,
   createVirtualMapScene,
@@ -150,6 +151,7 @@ export function useVirtualMap(canvasRef: RefObject<HTMLCanvasElement | null>) {
           const instance = model.clone();
           applyEntityTransform(instance, entity);
           enableShadows(instance);
+          applyEdgeFade(instance);
           scene.add(instance);
           if (!entityIdsWithPage.has(entity.id)) return;
 
