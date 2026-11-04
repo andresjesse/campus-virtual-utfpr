@@ -2,6 +2,7 @@ import { notifications } from "@mantine/notifications";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 
+import { branding } from "@/config/branding.ts";
 import EntityForm from "@/components/entity/entity-form/EntityForm";
 import FeedbackState from "@/components/feedback-state";
 import { ENTITY_DEFAULT_TRANSFORM } from "@/constants/entity-constants";
@@ -55,18 +56,19 @@ export default function EntityEditorPage() {
 
   const handleSubmit = useCallback(
     async (values: EntityFormValues) => {
-      if (entityId) {
-        await updateEntity(entityId, values);
-      } else {
-        await createEntity(values);
-      }
+      const savedEntity = entityId
+        ? await updateEntity(entityId, values)
+        : await createEntity(values);
 
       notifications.show({
-        color: "green",
+        color: branding.colors.feedback.success,
         title: messages.entities.editor.saveSuccessTitle,
         message: messages.entities.editor.saveSuccessMessage,
       });
-      navigate("/admin/entities");
+
+      if (!entityId) {
+        navigate(`/admin/entities/${savedEntity.id}`, { replace: true });
+      }
     },
     [entityId, navigate],
   );
