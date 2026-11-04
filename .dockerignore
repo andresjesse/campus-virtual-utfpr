@@ -1,0 +1,16 @@
+# Build context for docker-compose.prod.yml (and backend/Dockerfile in development).
+.git
+**/.DS_Store
+**/node_modules
+
+# Database and uploads must never end up inside an image.
+backend/pb_data
+
+# Frontend: build output, test artifacts and local env files.
+# frontend/.env.production is intentionally NOT ignored: it is the production config.
+frontend/dist
+frontend/.env
+frontend/*.local
+frontend/test-results
+frontend/playwright-report
+frontend/playwright-artifacts
