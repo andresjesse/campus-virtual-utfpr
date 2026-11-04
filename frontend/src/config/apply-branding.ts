@@ -25,6 +25,8 @@ export function applyBranding(brand: Branding, root = document.documentElement) 
     "--app-scene-ambient-light": brand.colors.scene.ambientLight,
     "--app-scene-directional-light": brand.colors.scene.directionalLight,
     "--app-scene-entity-highlight": brand.colors.scene.entityHighlight,
+    "--app-scene-sky-top": brand.colors.scene.skyTop,
+    "--app-scene-sky-bottom": brand.colors.scene.skyBottom,
     "--app-login-background": `url("${brand.assets.loginBackground}")`,
   } as const;
 

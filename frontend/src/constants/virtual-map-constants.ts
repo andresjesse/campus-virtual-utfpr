@@ -13,8 +13,8 @@ export const VIRTUAL_MAP_ORBIT_LIMITS = {
   maxDistance: 300,
   maxPolarAngle: Math.PI / 2 - 0.05,
   dampingFactor: 0.08,
-  targetMin: { x: -300, y: 0, z: -300 },
-  targetMax: { x: 300, y: 50, z: 300 },
+  targetMin: { x: -100, y: 0, z: -100 },
+  targetMax: { x: 100, y: 50, z: 100 },
 } as const;
 
 export const VIRTUAL_MAP_LIGHTING = {
@@ -29,6 +29,21 @@ export const VIRTUAL_MAP_LIGHTING = {
 
 export const VIRTUAL_MAP_HIGHLIGHT = {
   emissiveIntensity: 0.35,
+} as const;
+
+export const VIRTUAL_MAP_SKY = {
+  radius: 1500,
+  widthSegments: 32,
+  heightSegments: 15,
+  offset: 33,
+  exponent: 0.8,
+  fogNear: 150,
+  fogFar: 520,
+} as const;
+
+export const VIRTUAL_MAP_EDGE_FADE = {
+  start: 168,
+  end: 199,
 } as const;
 
 export const VIRTUAL_MAP_MAX_PIXEL_RATIO = 2;

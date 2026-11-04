@@ -2,6 +2,7 @@ import {
   AmbientLight,
   Color,
   DirectionalLight,
+  Fog,
   Line,
   MathUtils,
   Mesh,
@@ -25,11 +26,14 @@ import { GLTFLoader, type GLTF } from "three/addons/loaders/GLTFLoader.js";
 import { branding } from "@/config/branding.ts";
 import {
   VIRTUAL_MAP_CAMERA,
+  VIRTUAL_MAP_EDGE_FADE,
   VIRTUAL_MAP_LIGHTING,
   VIRTUAL_MAP_MAX_PIXEL_RATIO,
   VIRTUAL_MAP_ORBIT_LIMITS,
   VIRTUAL_MAP_POINTER,
+  VIRTUAL_MAP_SKY,
 } from "@/constants/virtual-map-constants.ts";
+import { createSkyDome, createSkyUniforms, SKY_GRADIENT_GLSL } from "@/helpers/virtual-map-sky-helper.ts";
 import type { EntityRecord, EntityTransformField } from "@/types/entity.ts";
 import type { MeshRecord } from "@/types/mesh.ts";
 import type { VirtualMapSelectedEntity } from "@/types/virtual-map-events.ts";
@@ -67,6 +71,9 @@ export function createVirtualMapScene(canvas: HTMLCanvasElement): VirtualMapScen
 
   const scene = new Scene();
   scene.background = new Color(branding.colors.scene.background);
+  const fog = new Fog(branding.colors.scene.skyBottom);
+  scene.fog = fog;
+  scene.add(createSkyDome());
 
   const camera = new PerspectiveCamera(
     VIRTUAL_MAP_CAMERA.fov,
@@ -89,8 +96,17 @@ export function createVirtualMapScene(canvas: HTMLCanvasElement): VirtualMapScen
   controls.maxDistance = VIRTUAL_MAP_ORBIT_LIMITS.maxDistance;
   controls.maxPolarAngle = VIRTUAL_MAP_ORBIT_LIMITS.maxPolarAngle;
   controls.target.set(target.x, target.y, target.z);
-  controls.addEventListener("change", () => clampControlsTarget(controls));
+  const updateFog = () => {
+    const distance = camera.position.distanceTo(controls.target);
+    fog.near = distance + VIRTUAL_MAP_SKY.fogNear;
+    fog.far = distance + VIRTUAL_MAP_SKY.fogFar;
+  };
+  controls.addEventListener("change", () => {
+    clampControlsTarget(controls);
+    updateFog();
+  });
   controls.update();
+  updateFog();
 
   return { renderer, scene, camera, controls };
 }
@@ -149,6 +165,44 @@ export function enableShadows(root: Object3D) {
       child.castShadow = true;
       child.receiveShadow = true;
     }
+  });
+}
+
+export function applyEdgeFade(root: Object3D) {
+  const skyUniforms = createSkyUniforms();
+  const fadeRange = new Vector2(VIRTUAL_MAP_EDGE_FADE.start, VIRTUAL_MAP_EDGE_FADE.end);
+
+  root.traverse((child) => {
+    if (!(child instanceof Mesh)) return;
+
+    const materials: Material[] = Array.isArray(child.material)
+      ? child.material
+      : [child.material];
+
+    materials.forEach((material) => {
+      material.onBeforeCompile = (shader) => {
+        Object.assign(shader.uniforms, skyUniforms, { edgeFadeRange: { value: fadeRange } });
+        shader.vertexShader = shader.vertexShader
+          .replace("#include <common>", "#include <common>\nvarying vec3 vEdgeFadePosition;")
+          .replace(
+            "#include <begin_vertex>",
+            "#include <begin_vertex>\nvEdgeFadePosition = (modelMatrix * vec4(transformed, 1.0)).xyz;",
+          );
+        shader.fragmentShader = shader.fragmentShader
+          .replace(
+            "#include <common>",
+            `#include <common>\nvarying vec3 vEdgeFadePosition;\nuniform vec2 edgeFadeRange;\n${SKY_GRADIENT_GLSL}`,
+          )
+          .replace(
+            "#include <fog_fragment>",
+            `#include <fog_fragment>
+            vec3 skyBehind = skyGradient(normalize(vEdgeFadePosition - cameraPosition));
+            float edgeFade = smoothstep(edgeFadeRange.x, edgeFadeRange.y, length(vEdgeFadePosition.xz));
+            gl_FragColor.rgb = mix(gl_FragColor.rgb, linearToOutputTexel(vec4(skyBehind, 1.0)).rgb, edgeFade);`,
+          );
+      };
+      material.customProgramCacheKey = () => "virtual-map-edge-fade";
+    });
   });
 }
 
