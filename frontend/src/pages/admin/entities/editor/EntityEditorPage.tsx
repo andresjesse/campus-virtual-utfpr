@@ -56,9 +56,11 @@ export default function EntityEditorPage() {
 
   const handleSubmit = useCallback(
     async (values: EntityFormValues) => {
-      const savedEntity = entityId
-        ? await updateEntity(entityId, values)
-        : await createEntity(values);
+      if (entityId) {
+        await updateEntity(entityId, values);
+      } else {
+        await createEntity(values);
+      }
 
       notifications.show({
         color: branding.colors.feedback.success,
@@ -67,7 +69,7 @@ export default function EntityEditorPage() {
       });
 
       if (!entityId) {
-        navigate(`/admin/entities/${savedEntity.id}`, { replace: true });
+        navigate("/admin/entities");
       }
     },
     [entityId, navigate],
