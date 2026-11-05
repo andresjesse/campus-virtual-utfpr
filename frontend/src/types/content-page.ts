@@ -19,6 +19,7 @@ export type ContentPageBlockMetadata = {
   id?: string;
   title: string;
   collectionName: string;
+  position?: number;
   created?: string;
   updated?: string;
   page?: string;
@@ -35,6 +36,7 @@ export type ContentPageBlockRecord = RecordModel & {
   id?: string;
   title?: string;
   content?: ContentPageBlockValue;
+  position?: number;
   created?: string;
   updated?: string;
   page?: string;

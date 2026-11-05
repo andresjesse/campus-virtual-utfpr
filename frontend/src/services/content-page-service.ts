@@ -253,7 +253,7 @@ export async function getRtfBlocksMetadata(
   return await pocketbase
     .collection(ContentPageBlocksEnum.RTF_BLOCK).getFullList<ContentPageBlockMetadata>({
       filter: `page="${pageId}"`,
-      fields: `id,title,collectionName${withTimestamps ? `,created,updated` : ''}`,
+      fields: `id,title,collectionName,position${withTimestamps ? `,created,updated` : ''}`,
       requestKey: null
     })
 }
@@ -265,7 +265,7 @@ export async function getDiagramBlocksMetadata(
   return await pocketbase
     .collection(ContentPageBlocksEnum.DIAGRAM_BLOCK).getFullList<ContentPageBlockMetadata>({
       filter: `page="${pageId}"`,
-      fields: `id,title,collectionName${withTimestamps ? `,created,updated` : ''}`,
+      fields: `id,title,collectionName,position${withTimestamps ? `,created,updated` : ''}`,
       requestKey: null
     })
 }
@@ -277,7 +277,7 @@ export async function getFileBlocksMetadata(
   return await pocketbase
     .collection(ContentPageBlocksEnum.FILE_BLOCK).getFullList<ContentPageBlockMetadata>({
       filter: `page="${pageId}"`,
-      fields: `id,title,collectionName${withTimestamps ? `,created,updated` : ''}`,
+      fields: `id,title,collectionName,position${withTimestamps ? `,created,updated` : ''}`,
       requestKey: null
     })
 }

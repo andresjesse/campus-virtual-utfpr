@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { getAllContentBlocksMetadata } from "@/helpers/content-pages-service-helper.ts";
 import { getRequestErrorMessage } from "@/helpers/request-error-helper.ts";
-import { flattenBlocksMetadata } from "@/helpers/virtual-map-page-helper.ts";
+import { flattenBlocksMetadata } from "@/helpers/content-block-order-helper.ts";
 import { getContentPageByEntity } from "@/services/content-page-service.ts";
 import type {
   ContentPageBlockMetadata,

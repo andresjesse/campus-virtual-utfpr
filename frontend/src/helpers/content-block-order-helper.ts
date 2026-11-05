@@ -4,5 +4,7 @@ import type { ContentPageBlockMetadata } from "@/types/content-page.ts";
 export function flattenBlocksMetadata(
   grouped: Record<string, ContentPageBlockMetadata[] | undefined>,
 ): ContentPageBlockMetadata[] {
-  return PAGE_BLOCK_COLLECTIONS.flatMap((collection) => grouped[collection] ?? []);
+  return PAGE_BLOCK_COLLECTIONS
+    .flatMap((collection) => grouped[collection] ?? [])
+    .sort((a, b) => (a.position ?? Infinity) - (b.position ?? Infinity));
 }
