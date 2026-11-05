@@ -3,6 +3,7 @@ import { parseRelation } from '@/helpers/content-pages-service-helper.ts'
 import {
   getContentPageByEntity,
   listEntityIdsWithPage,
+  reorderBlocks,
   upsertBlockContent,
 } from '@/services/content-page-service.ts'
 
@@ -210,6 +211,73 @@ describe('upsertBlockContent', () => {
       },
       { requestKey: null },
     )
+  })
+
+  it('does not write the position carried by the block metadata', async () => {
+    mockUpdate.mockResolvedValue(true)
+
+    await upsertBlockContent({
+      id: 'diagram-id',
+      title: 'Flow',
+      collectionName: 'diagram_block',
+      page: 'page-id',
+      position: 4,
+      content: ['node-a'],
+    })
+
+    expect(mockUpdate).toHaveBeenCalledWith(
+      'diagram-id',
+      {
+        id: 'diagram-id',
+        title: 'Flow',
+        collectionName: 'diagram_block',
+        page: 'page-id',
+        content: ['node-a'],
+      },
+      { requestKey: null },
+    )
+  })
+})
+
+describe('reorderBlocks', () => {
+  it('updates the position of the moved blocks in their own collections', async () => {
+    mockUpdate.mockResolvedValue(true)
+
+    const reordered = await reorderBlocks([
+      { id: 'file-1', title: 'Gallery', collectionName: 'file_block', position: 1 },
+      { id: 'rtf-1', title: 'Introduction', collectionName: 'rtf_block', position: 0 },
+      { id: 'diagram-1', title: 'Flow', collectionName: 'diagram_block', position: 2 },
+    ])
+
+    expect(mockUpdate).toHaveBeenCalledTimes(2)
+    expect(mockCollection).toHaveBeenCalledWith('file_block')
+    expect(mockCollection).toHaveBeenCalledWith('rtf_block')
+    expect(mockCollection).not.toHaveBeenCalledWith('diagram_block')
+    expect(mockUpdate).toHaveBeenCalledWith('file-1', { position: 0 }, { requestKey: null })
+    expect(mockUpdate).toHaveBeenCalledWith('rtf-1', { position: 1 }, { requestKey: null })
+    expect(reordered.map(({ id, position }) => ({ id, position }))).toEqual([
+      { id: 'file-1', position: 0 },
+      { id: 'rtf-1', position: 1 },
+      { id: 'diagram-1', position: 2 },
+    ])
+  })
+
+  it('sends nothing when the order did not change', async () => {
+    await reorderBlocks([
+      { id: 'rtf-1', title: 'Introduction', collectionName: 'rtf_block', position: 0 },
+      { id: 'file-1', title: 'Gallery', collectionName: 'file_block', position: 1 },
+    ])
+
+    expect(mockUpdate).not.toHaveBeenCalled()
+  })
+
+  it('rejects when one of the updates fails', async () => {
+    mockUpdate.mockResolvedValueOnce(true).mockRejectedValueOnce(new Error('Update failed'))
+
+    await expect(reorderBlocks([
+      { id: 'file-1', title: 'Gallery', collectionName: 'file_block', position: 1 },
+      { id: 'rtf-1', title: 'Introduction', collectionName: 'rtf_block', position: 0 },
+    ])).rejects.toThrow('Update failed')
   })
 })
 

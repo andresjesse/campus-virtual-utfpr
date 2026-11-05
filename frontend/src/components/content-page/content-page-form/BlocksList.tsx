@@ -1,22 +1,28 @@
-import type {
-  ContentPageBlockMetadata,
-  GroupedContentPageBlockMetadata
-} from "@/types/content-page.ts";
+import type { BlockDropPlacement, ContentPageBlockMetadata } from "@/types/content-page.ts";
 import BlockDisplay from "@/components/content-input/content-blocks/BlockDisplay.tsx";
 // import classes from "@/components/content-page/content-page-form/content-page-form.module.css";
 import { type ContentPageBlockType } from "@/enums/content-pages-enum.ts";
 import DroppableContainer from "@/containers/DroppableContainer.tsx";
 import {useCallback, useContext, useEffect, useRef, useState} from "react";
-import type {ReactNode} from "react";
+import type {DragEvent, ReactNode} from "react";
 import {useParams} from "react-router";
 import { getAllContentBlocksMetadata } from "@/helpers/content-pages-service-helper.ts";
+import {
+  flattenBlocksMetadata,
+  getBlockKey,
+  getDropIndex,
+  getDropSlot,
+  moveBlock,
+} from "@/helpers/content-block-order-helper.ts";
+import SortableBlockItem from "@/components/content-page/content-page-form/SortableBlockItem.tsx";
+import BlockMoveButtons from "@/components/content-input/content-blocks/BlockMoveButtons.tsx";
+import {branding} from "@/config/branding.ts";
 import FeedbackState from "@/components/feedback-state";
 import { Box } from "@mantine/core";
 import {DialogContext} from "@/contexts/dialog-context.ts";
-import {deleteBlockContent} from "@/services/content-page-service.ts";
+import {deleteBlockContent, reorderBlocks} from "@/services/content-page-service.ts";
 import ContentBlockEditOverlay from "@/components/content-input/content-blocks/overlay/ContentBlockEditOverlay.tsx";
 import {notifications} from "@mantine/notifications";
-import {PAGE_BLOCK_COLLECTIONS} from "@/constants/content-constants.ts";
 import messages from "@/constants/messages.json";
 import {formatMessage} from "@/helpers/message-helper.ts";
 import {getRequestErrorMessage} from "@/helpers/request-error-helper.ts";
@@ -28,9 +34,11 @@ export default function BlocksList({
 }) {
   const { pageId } = useParams();
 
-  const [blocksMetadata, setBlocksMetadata] = useState<GroupedContentPageBlockMetadata>();
+  const [blocksMetadata, setBlocksMetadata] = useState<ContentPageBlockMetadata[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isReordering, setIsReordering] = useState(false);
+  const [dropSlot, setDropSlot] = useState<number | null>(null);
   const [error, setError] = useState<string>("");
 
   const selectedContentBlock = useRef<ContentPageBlockMetadata>(undefined)
@@ -44,7 +52,7 @@ export default function BlocksList({
 
     try {
       setBlocksMetadata(
-        await getAllContentBlocksMetadata(pageId, false)
+        flattenBlocksMetadata(await getAllContentBlocksMetadata(pageId, false))
       );
     } catch(requestError) {
       setError(getRequestErrorMessage(requestError))
@@ -88,13 +96,9 @@ export default function BlocksList({
 
     try {
       await deleteBlockContent(id, collectionName as ContentPageBlockType)
-      setBlocksMetadata((currentVal) => {
-        return {
-        ...currentVal,
-          [collectionName as ContentPageBlockType]: currentVal?.[collectionName as ContentPageBlockType]
-            ?.filter((el) => el.id !== id)
-        }
-      })
+      setBlocksMetadata((currentVal) => currentVal.filter((el) =>
+        el.id !== id || el.collectionName !== collectionName
+      ))
       notifications.show({
         color: "green",
         title: messages.block.list.deletedTitle,
@@ -109,10 +113,50 @@ export default function BlocksList({
     }
   }
 
+  async function handleMove(fromIndex: number, toIndex: number) {
+    const moved = moveBlock(blocksMetadata, fromIndex, toIndex);
+    if (moved === blocksMetadata) return;
+
+    setBlocksMetadata(moved);
+    setIsReordering(true);
+
+    try {
+      setBlocksMetadata(await reorderBlocks(moved));
+    } catch (reorderError) {
+      notifications.show({
+        color: branding.colors.feedback.error,
+        title: messages.block.list.reorderErrorTitle,
+        message: getRequestErrorMessage(reorderError),
+      });
+      void fetchBlocksMetadata();
+    } finally {
+      setIsReordering(false);
+    }
+  }
+
+  function getDropIndicator(index: number): BlockDropPlacement | null {
+    if (dropSlot === index) return "before";
+    if (dropSlot === index + 1 && index === blocksMetadata.length - 1) return "after";
+    return null;
+  }
+
+  function clearDropSlotOnLeave(evt: DragEvent<HTMLElement>) {
+    if (!evt.currentTarget.contains(evt.relatedTarget as Node | null)) setDropSlot(null);
+  }
+
+  function handleBlockDrop(draggedId: string, targetIndex: number, placement: BlockDropPlacement) {
+    setDropSlot(null);
+
+    const fromIndex = blocksMetadata.findIndex((block) => getBlockKey(block) === draggedId);
+    if (fromIndex === -1) return;
+
+    void handleMove(fromIndex, getDropIndex(fromIndex, targetIndex, placement));
+  }
+
   async function openModal(blockId: string, collectionName: ContentPageBlockType) {
-    selectedContentBlock.current
-      = blocksMetadata?.[collectionName as ContentPageBlockType]
-      ?.find((el) => el.id === blockId)
+    selectedContentBlock.current = blocksMetadata.find((el) =>
+      el.id === blockId && el.collectionName === collectionName
+    )
 
     if (!selectedContentBlock.current) {
       notifications.show({
@@ -152,20 +196,42 @@ export default function BlocksList({
   return (
     <>
       <DroppableContainer handleDrop={onDropNewBlock} >
-        <Box px="lg" pt="lg">
-          { PAGE_BLOCK_COLLECTIONS.flatMap((collectionName) => (
-              blocksMetadata?.[collectionName] ?? []).map((metadata) => (
+        <Box
+          px="lg"
+          pt="lg"
+          onDragLeave={clearDropSlotOnLeave}
+          onDragEnd={() => setDropSlot(null)}
+        >
+          { blocksMetadata.map((metadata, index) => (
+            <SortableBlockItem
+              key={getBlockKey(metadata)}
+              dragId={getBlockKey(metadata)}
+              index={index}
+              disabled={isReordering}
+              indicator={getDropIndicator(index)}
+              onDragOverBlock={(placement) => setDropSlot(getDropSlot(index, placement))}
+              onDropBlock={handleBlockDrop}
+            >
               <BlockDisplay
-                key={metadata.id}
                 metadata={metadata}
+                actions={
+                  <BlockMoveButtons
+                    blockName={metadata.title || messages.block.list.untitled}
+                    canMoveUp={index > 0}
+                    canMoveDown={index < blocksMetadata.length - 1}
+                    disabled={isReordering}
+                    onMoveUp={() => void handleMove(index, index - 1)}
+                    onMoveDown={() => void handleMove(index, index + 1)}
+                  />
+                }
                 onDelete={() => handleDelete(metadata.id!, metadata.title, metadata.collectionName)}
                 onEdit={(
                   blockId: string,
                   collectionName: ContentPageBlockType
                 ) => openModal(blockId, collectionName)}
               />
-            ))
-          )}
+            </SortableBlockItem>
+          ))}
         </Box>
         {children}
       </DroppableContainer>

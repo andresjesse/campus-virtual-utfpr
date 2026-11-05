@@ -5,23 +5,33 @@ import {branding} from "@/config/branding.ts";
 type DroppableContainerProps = {
   children: React.ReactNode,
   handleDrop: (rawData: string) => void
+  acceptType?: string
 }
 
-export default function DroppableContainer({ children, handleDrop }: DroppableContainerProps) {
+export default function DroppableContainer({
+  children,
+  handleDrop,
+  acceptType = "text/plain",
+}: DroppableContainerProps) {
   const [dragActive, setDragActive] = React.useState(false);
   const dragDepth = React.useRef(0);
 
-  function onDragEnter() {
+  const accepts = (evt: React.DragEvent) => evt.dataTransfer.types.includes(acceptType);
+
+  function onDragEnter(evt: React.DragEvent) {
+    if (!accepts(evt)) return;
     dragDepth.current += 1;
     setDragActive(true);
   }
 
   function onDragOver(evt: React.DragEvent) {
+    if (!accepts(evt)) return;
     evt.preventDefault();
     evt.dataTransfer.dropEffect = "copy";
   }
 
-  function onDragLeave() {
+  function onDragLeave(evt: React.DragEvent) {
+    if (!accepts(evt)) return;
     dragDepth.current = Math.max(0, dragDepth.current - 1);
     if (dragDepth.current === 0) {
       setDragActive(false);
@@ -29,10 +39,11 @@ export default function DroppableContainer({ children, handleDrop }: DroppableCo
   }
 
   function onDrop(evt: React.DragEvent) {
+    if (!accepts(evt)) return;
     evt.preventDefault();
     dragDepth.current = 0;
     setDragActive(false);
-    const rawData = evt.dataTransfer.getData("text/plain");
+    const rawData = evt.dataTransfer.getData(acceptType);
     handleDrop(rawData);
   }
 
