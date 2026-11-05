@@ -1,4 +1,8 @@
-import { flattenBlocksMetadata } from '@/helpers/content-block-order-helper.ts'
+import {
+  flattenBlocksMetadata,
+  getBlockPositionChanges,
+  moveBlock,
+} from '@/helpers/content-block-order-helper.ts'
 import type { ContentPageBlockMetadata } from '@/types/content-page.ts'
 
 function createBlock(
@@ -63,5 +67,69 @@ describe('flattenBlocksMetadata', () => {
     })
 
     expect(ids(blocks)).toEqual(['intro'])
+  })
+})
+
+describe('moveBlock', () => {
+  const blocks = [
+    createBlock('intro', 'rtf_block', 0),
+    createBlock('gallery', 'file_block', 1),
+    createBlock('flow', 'diagram_block', 2),
+  ]
+
+  it('moves the first block to the end', () => {
+    expect(ids(moveBlock(blocks, 0, 2))).toEqual(['gallery', 'flow', 'intro'])
+  })
+
+  it('moves the last block to the start', () => {
+    expect(ids(moveBlock(blocks, 2, 0))).toEqual(['flow', 'intro', 'gallery'])
+  })
+
+  it('swaps neighboring blocks', () => {
+    expect(ids(moveBlock(blocks, 1, 0))).toEqual(['gallery', 'intro', 'flow'])
+  })
+
+  it('does not change the original list', () => {
+    moveBlock(blocks, 0, 2)
+
+    expect(ids(blocks)).toEqual(['intro', 'gallery', 'flow'])
+  })
+
+  it.each([
+    ['the same index', 1, 1],
+    ['a source out of range', 3, 0],
+    ['a target out of range', 0, -1],
+  ])('returns the list unchanged for %s', (_case, fromIndex, toIndex) => {
+    expect(moveBlock(blocks, fromIndex, toIndex)).toBe(blocks)
+  })
+})
+
+describe('getBlockPositionChanges', () => {
+  it('lists only the blocks whose index differs from their position', () => {
+    expect(getBlockPositionChanges([
+      createBlock('gallery', 'file_block', 1),
+      createBlock('intro', 'rtf_block', 0),
+      createBlock('flow', 'diagram_block', 2),
+    ])).toEqual([
+      { id: 'gallery', collectionName: 'file_block', position: 0 },
+      { id: 'intro', collectionName: 'rtf_block', position: 1 },
+    ])
+  })
+
+  it('renumbers blocks after a gap or without a position', () => {
+    expect(getBlockPositionChanges([
+      createBlock('intro', 'rtf_block', 0),
+      createBlock('gallery', 'file_block', 5),
+      createBlock('flow', 'diagram_block'),
+    ])).toEqual([
+      { id: 'gallery', collectionName: 'file_block', position: 1 },
+      { id: 'flow', collectionName: 'diagram_block', position: 2 },
+    ])
+  })
+
+  it('skips blocks that were never saved', () => {
+    expect(getBlockPositionChanges([
+      { title: 'Draft', collectionName: 'rtf_block' },
+    ])).toEqual([])
   })
 })

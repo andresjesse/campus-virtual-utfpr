@@ -16,6 +16,7 @@ import {encodeRelation, generateFilesUrl, parseRelation} from "@/helpers/content
 import {ContentPageBlocksEnum, type ContentPageBlockType} from "@/enums/content-pages-enum.ts";
 import sanitizeRichText from "@/helpers/sanitize-rich-text.ts";
 import {getFilenameFromUrl} from "@/helpers/file-helper.ts";
+import {getBlockPositionChanges} from "@/helpers/content-block-order-helper.ts";
 
 // #####################################################################
 // #### == #### == #### CONTENT PAGES #### == #### == #### == #### == ##
@@ -216,7 +217,22 @@ export async function upsertBlockContent(
   });
 }
 
-function prepareRecordToSave(record: Omit<ContentPageBlockRecord, 'collectionId'>) {
+export async function reorderBlocks(ordered: ContentPageBlockMetadata[]): Promise<ContentPageBlockMetadata[]> {
+  await Promise.all(
+    getBlockPositionChanges(ordered).map(({ id, collectionName, position }) =>
+      pocketbase
+        .collection(collectionName)
+        .update(id, { position }, { requestKey: null }),
+    ),
+  );
+
+  return ordered.map((block, position) => ({ ...block, position }));
+}
+
+function prepareRecordToSave(blockRecord: Omit<ContentPageBlockRecord, 'collectionId'>) {
+  const record = { ...blockRecord };
+  delete record.position;
+
   if (record.collectionName === ContentPageBlocksEnum.RTF_BLOCK && typeof record.content === "string") {
     return { ...record, content: sanitizeRichText(record.content) };
   }
