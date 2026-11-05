@@ -151,6 +151,25 @@ describe('BlocksList', () => {
     )
   })
 
+  it('renders blocks of different collections by their stored position', async () => {
+    getAllContentBlocksMetadataMock.mockResolvedValue({
+      rtf_block: [
+        { id: 'rtf-1', title: 'Introduction', collectionName: 'rtf_block', position: 0 },
+        { id: 'rtf-2', title: 'Conclusion', collectionName: 'rtf_block', position: 2 },
+      ],
+      file_block: [
+        { id: 'file-1', title: 'Gallery', collectionName: 'file_block', position: 1 },
+      ],
+    })
+    renderBlocksList()
+
+    await screen.findByText('Introduction')
+
+    expect(
+      screen.getAllByRole('article').map((block) => block.firstChild?.textContent),
+    ).toEqual(['Introduction', 'Gallery', 'Conclusion'])
+  })
+
   it('creates draft metadata after a block is dropped', async () => {
     const user = userEvent.setup()
     getAllContentBlocksMetadataMock.mockResolvedValue({ rtf_block: [] })

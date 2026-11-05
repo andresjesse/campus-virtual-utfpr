@@ -1,7 +1,4 @@
-import type {
-  ContentPageBlockMetadata,
-  GroupedContentPageBlockMetadata
-} from "@/types/content-page.ts";
+import type { ContentPageBlockMetadata } from "@/types/content-page.ts";
 import BlockDisplay from "@/components/content-input/content-blocks/BlockDisplay.tsx";
 // import classes from "@/components/content-page/content-page-form/content-page-form.module.css";
 import { type ContentPageBlockType } from "@/enums/content-pages-enum.ts";
@@ -10,13 +7,13 @@ import {useCallback, useContext, useEffect, useRef, useState} from "react";
 import type {ReactNode} from "react";
 import {useParams} from "react-router";
 import { getAllContentBlocksMetadata } from "@/helpers/content-pages-service-helper.ts";
+import { flattenBlocksMetadata } from "@/helpers/content-block-order-helper.ts";
 import FeedbackState from "@/components/feedback-state";
 import { Box } from "@mantine/core";
 import {DialogContext} from "@/contexts/dialog-context.ts";
 import {deleteBlockContent} from "@/services/content-page-service.ts";
 import ContentBlockEditOverlay from "@/components/content-input/content-blocks/overlay/ContentBlockEditOverlay.tsx";
 import {notifications} from "@mantine/notifications";
-import {PAGE_BLOCK_COLLECTIONS} from "@/constants/content-constants.ts";
 import messages from "@/constants/messages.json";
 import {formatMessage} from "@/helpers/message-helper.ts";
 import {getRequestErrorMessage} from "@/helpers/request-error-helper.ts";
@@ -28,7 +25,7 @@ export default function BlocksList({
 }) {
   const { pageId } = useParams();
 
-  const [blocksMetadata, setBlocksMetadata] = useState<GroupedContentPageBlockMetadata>();
+  const [blocksMetadata, setBlocksMetadata] = useState<ContentPageBlockMetadata[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -44,7 +41,7 @@ export default function BlocksList({
 
     try {
       setBlocksMetadata(
-        await getAllContentBlocksMetadata(pageId, false)
+        flattenBlocksMetadata(await getAllContentBlocksMetadata(pageId, false))
       );
     } catch(requestError) {
       setError(getRequestErrorMessage(requestError))
@@ -88,13 +85,9 @@ export default function BlocksList({
 
     try {
       await deleteBlockContent(id, collectionName as ContentPageBlockType)
-      setBlocksMetadata((currentVal) => {
-        return {
-        ...currentVal,
-          [collectionName as ContentPageBlockType]: currentVal?.[collectionName as ContentPageBlockType]
-            ?.filter((el) => el.id !== id)
-        }
-      })
+      setBlocksMetadata((currentVal) => currentVal.filter((el) =>
+        el.id !== id || el.collectionName !== collectionName
+      ))
       notifications.show({
         color: "green",
         title: messages.block.list.deletedTitle,
@@ -110,9 +103,9 @@ export default function BlocksList({
   }
 
   async function openModal(blockId: string, collectionName: ContentPageBlockType) {
-    selectedContentBlock.current
-      = blocksMetadata?.[collectionName as ContentPageBlockType]
-      ?.find((el) => el.id === blockId)
+    selectedContentBlock.current = blocksMetadata.find((el) =>
+      el.id === blockId && el.collectionName === collectionName
+    )
 
     if (!selectedContentBlock.current) {
       notifications.show({
@@ -153,19 +146,17 @@ export default function BlocksList({
     <>
       <DroppableContainer handleDrop={onDropNewBlock} >
         <Box px="lg" pt="lg">
-          { PAGE_BLOCK_COLLECTIONS.flatMap((collectionName) => (
-              blocksMetadata?.[collectionName] ?? []).map((metadata) => (
-              <BlockDisplay
-                key={metadata.id}
-                metadata={metadata}
-                onDelete={() => handleDelete(metadata.id!, metadata.title, metadata.collectionName)}
-                onEdit={(
-                  blockId: string,
-                  collectionName: ContentPageBlockType
-                ) => openModal(blockId, collectionName)}
-              />
-            ))
-          )}
+          { blocksMetadata.map((metadata) => (
+            <BlockDisplay
+              key={`${metadata.collectionName}-${metadata.id}`}
+              metadata={metadata}
+              onDelete={() => handleDelete(metadata.id!, metadata.title, metadata.collectionName)}
+              onEdit={(
+                blockId: string,
+                collectionName: ContentPageBlockType
+              ) => openModal(blockId, collectionName)}
+            />
+          ))}
         </Box>
         {children}
       </DroppableContainer>

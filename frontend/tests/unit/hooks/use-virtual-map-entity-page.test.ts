@@ -45,6 +45,19 @@ describe('useVirtualMapEntityPage', () => {
     expect(result.current.blocks).toEqual([file, rtf])
   })
 
+  it('orders the blocks by their stored position across collections', async () => {
+    getContentPageByEntityMock.mockResolvedValue(page)
+    getAllContentBlocksMetadataMock.mockResolvedValue({
+      rtf_block: [{ ...rtf, position: 0 }],
+      file_block: [{ ...file, position: 1 }],
+    })
+
+    const { result } = renderHook(() => useVirtualMapEntityPage(library))
+
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+    expect(result.current.blocks.map((block) => block.id)).toEqual(['rtf-1', 'file-1'])
+  })
+
   it('reports none when the entity has no page', async () => {
     getContentPageByEntityMock.mockResolvedValue(null)
 
