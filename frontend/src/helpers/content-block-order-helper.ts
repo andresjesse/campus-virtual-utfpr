@@ -1,5 +1,5 @@
 import { PAGE_BLOCK_COLLECTIONS } from "@/constants/content-constants.ts";
-import type { ContentPageBlockMetadata } from "@/types/content-page.ts";
+import type { BlockDropPlacement, ContentPageBlockMetadata } from "@/types/content-page.ts";
 
 export function flattenBlocksMetadata(
   grouped: Record<string, ContentPageBlockMetadata[] | undefined>,
@@ -25,6 +25,24 @@ export function moveBlock(
   moved.splice(toIndex, 0, block);
 
   return moved;
+}
+
+export function getBlockKey(block: ContentPageBlockMetadata) {
+  return `${block.collectionName}:${block.id}`;
+}
+
+export function getDropIndex(
+  fromIndex: number,
+  targetIndex: number,
+  placement: BlockDropPlacement,
+) {
+  const slot = getDropSlot(targetIndex, placement);
+
+  return slot > fromIndex ? slot - 1 : slot;
+}
+
+export function getDropSlot(targetIndex: number, placement: BlockDropPlacement) {
+  return placement === "before" ? targetIndex : targetIndex + 1;
 }
 
 export function getBlockPositionChanges(ordered: ContentPageBlockMetadata[]) {

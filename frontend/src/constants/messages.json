@@ -43,6 +43,7 @@
       "moveUpAriaLabel": "Mover bloco {name} para cima",
       "moveDownAriaLabel": "Mover bloco {name} para baixo",
       "reorderErrorTitle": "Não foi possível reordenar os blocos",
+      "dragHandleTitle": "Arraste para reordenar",
       "deleteConfirmTitle": "Excluir bloco",
       "deleteConfirmFirst": "Deseja realmente excluir permanentemente o bloco {name}?",
       "deleteConfirmSecond": "Esta ação não pode ser desfeita.",

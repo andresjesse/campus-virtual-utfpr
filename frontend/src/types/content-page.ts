@@ -25,6 +25,8 @@ export type ContentPageBlockMetadata = {
   page?: string;
 }
 
+export type BlockDropPlacement = "before" | "after";
+
 // TODO: Align this with the single source or truth on content-constants
 export type GroupedContentPageBlockMetadata = {
   rtf_block?: ContentPageBlockMetadata[];

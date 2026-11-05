@@ -1,6 +1,9 @@
 import {
   flattenBlocksMetadata,
+  getBlockKey,
   getBlockPositionChanges,
+  getDropIndex,
+  getDropSlot,
   moveBlock,
 } from '@/helpers/content-block-order-helper.ts'
 import type { ContentPageBlockMetadata } from '@/types/content-page.ts'
@@ -131,5 +134,33 @@ describe('getBlockPositionChanges', () => {
     expect(getBlockPositionChanges([
       { title: 'Draft', collectionName: 'rtf_block' },
     ])).toEqual([])
+  })
+})
+
+describe('getBlockKey', () => {
+  it('combines the collection and the id', () => {
+    expect(getBlockKey(createBlock('intro', 'rtf_block'))).toBe('rtf_block:intro')
+  })
+})
+
+describe('getDropIndex', () => {
+  it.each([
+    ['before a later block', 0, 2, 'before', 1],
+    ['after a later block', 0, 2, 'after', 2],
+    ['before an earlier block', 2, 0, 'before', 0],
+    ['after an earlier block', 2, 0, 'after', 1],
+    ['before itself', 1, 1, 'before', 1],
+    ['after itself', 1, 1, 'after', 1],
+    ['after the previous block', 1, 0, 'after', 1],
+    ['before the next block', 1, 2, 'before', 1],
+  ] as const)('drops a block %s', (_case, fromIndex, targetIndex, placement, expected) => {
+    expect(getDropIndex(fromIndex, targetIndex, placement)).toBe(expected)
+  })
+})
+
+describe('getDropSlot', () => {
+  it('gives the gap after one block and before the next the same slot', () => {
+    expect(getDropSlot(0, 'after')).toBe(1)
+    expect(getDropSlot(1, 'before')).toBe(1)
   })
 })
