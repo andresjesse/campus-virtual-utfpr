@@ -5,20 +5,29 @@ import type {ContentPageBlockMetadata} from "@/types/content-page.ts";
 import type {ContentPageBlockType} from "@/enums/content-pages-enum.ts";
 import messages from "@/constants/messages.json";
 import {formatMessage} from "@/helpers/message-helper.ts";
+import type {ReactNode} from "react";
 
 type RtfBlockDisplayHeaderProps = {
   metadata: ContentPageBlockMetadata
+  actions?: ReactNode
   onDelete: () => Promise<void>
   onEdit: (blockId: string, collectionName: ContentPageBlockType) => void
 }
 
-export default function BlockDisplayHeader({ metadata, onDelete, onEdit }: RtfBlockDisplayHeaderProps) {
+export default function BlockDisplayHeader({ metadata, actions, onDelete, onEdit }: RtfBlockDisplayHeaderProps) {
   const blockName = metadata.title || messages.block.list.untitled;
 
   return (
     <Flex mb="xs" pb="0" flex={1} justify="space-between">
       <Title order={4}>{metadata.title}</Title>
       <Flex align="center">
+        {actions && (
+          <>
+            {actions}
+            <Space w="sm" />
+          </>
+        )}
+
         <ActionIcon
           aria-label={formatMessage(messages.block.list.editAriaLabel, blockName)}
           color="blue"

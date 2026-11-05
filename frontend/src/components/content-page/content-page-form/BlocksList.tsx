@@ -7,11 +7,13 @@ import {useCallback, useContext, useEffect, useRef, useState} from "react";
 import type {ReactNode} from "react";
 import {useParams} from "react-router";
 import { getAllContentBlocksMetadata } from "@/helpers/content-pages-service-helper.ts";
-import { flattenBlocksMetadata } from "@/helpers/content-block-order-helper.ts";
+import { flattenBlocksMetadata, moveBlock } from "@/helpers/content-block-order-helper.ts";
+import BlockMoveButtons from "@/components/content-input/content-blocks/BlockMoveButtons.tsx";
+import {branding} from "@/config/branding.ts";
 import FeedbackState from "@/components/feedback-state";
 import { Box } from "@mantine/core";
 import {DialogContext} from "@/contexts/dialog-context.ts";
-import {deleteBlockContent} from "@/services/content-page-service.ts";
+import {deleteBlockContent, reorderBlocks} from "@/services/content-page-service.ts";
 import ContentBlockEditOverlay from "@/components/content-input/content-blocks/overlay/ContentBlockEditOverlay.tsx";
 import {notifications} from "@mantine/notifications";
 import messages from "@/constants/messages.json";
@@ -28,6 +30,7 @@ export default function BlocksList({
   const [blocksMetadata, setBlocksMetadata] = useState<ContentPageBlockMetadata[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isReordering, setIsReordering] = useState(false);
   const [error, setError] = useState<string>("");
 
   const selectedContentBlock = useRef<ContentPageBlockMetadata>(undefined)
@@ -102,6 +105,27 @@ export default function BlocksList({
     }
   }
 
+  async function handleMove(fromIndex: number, toIndex: number) {
+    const moved = moveBlock(blocksMetadata, fromIndex, toIndex);
+    if (moved === blocksMetadata) return;
+
+    setBlocksMetadata(moved);
+    setIsReordering(true);
+
+    try {
+      setBlocksMetadata(await reorderBlocks(moved));
+    } catch (reorderError) {
+      notifications.show({
+        color: branding.colors.feedback.error,
+        title: messages.block.list.reorderErrorTitle,
+        message: getRequestErrorMessage(reorderError),
+      });
+      void fetchBlocksMetadata();
+    } finally {
+      setIsReordering(false);
+    }
+  }
+
   async function openModal(blockId: string, collectionName: ContentPageBlockType) {
     selectedContentBlock.current = blocksMetadata.find((el) =>
       el.id === blockId && el.collectionName === collectionName
@@ -146,10 +170,20 @@ export default function BlocksList({
     <>
       <DroppableContainer handleDrop={onDropNewBlock} >
         <Box px="lg" pt="lg">
-          { blocksMetadata.map((metadata) => (
+          { blocksMetadata.map((metadata, index) => (
             <BlockDisplay
               key={`${metadata.collectionName}-${metadata.id}`}
               metadata={metadata}
+              actions={
+                <BlockMoveButtons
+                  blockName={metadata.title || messages.block.list.untitled}
+                  canMoveUp={index > 0}
+                  canMoveDown={index < blocksMetadata.length - 1}
+                  disabled={isReordering}
+                  onMoveUp={() => void handleMove(index, index - 1)}
+                  onMoveDown={() => void handleMove(index, index + 1)}
+                />
+              }
               onDelete={() => handleDelete(metadata.id!, metadata.title, metadata.collectionName)}
               onEdit={(
                 blockId: string,
