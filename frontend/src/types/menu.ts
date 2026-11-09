@@ -24,11 +24,11 @@ export type MenuItemRecord = RecordModel & {
   };
 };
 
-export type MenuItemLinkType = "link" | "page";
+export type MenuItemLinkType = "link" | "page" | "none";
 
 export type MenuItemFormValues = {
   label: string;
-  linkType: MenuItemLinkType;
+  linkType: MenuItemLinkType | "";
   href: string;
   page: string;
   isNested: boolean;

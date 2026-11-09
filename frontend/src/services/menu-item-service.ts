@@ -7,13 +7,11 @@ import type { ContentPageRecord } from "@/types/content-page.ts";
 import type { MenuItemFormValues, MenuItemRecord } from "@/types/menu.ts";
 
 function toMenuItemPayload(values: MenuItemFormValues) {
-  const linksToPage = values.linkType === "page";
-
   return {
     label: values.label.trim(),
     category: values.category,
-    href: linksToPage ? "" : values.href.trim(),
-    page: linksToPage ? values.page : "",
+    href: values.linkType === "link" ? values.href.trim() : "",
+    page: values.linkType === "page" ? values.page : "",
     parent: values.isNested ? values.parent : "",
     ...(values.icon ? { icon: values.icon } : {}),
   };

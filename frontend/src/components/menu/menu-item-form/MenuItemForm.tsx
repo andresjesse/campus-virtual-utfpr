@@ -113,6 +113,7 @@ export default function MenuItemForm({
                   href={values.href}
                   page={values.page}
                   pageOptions={pageOptions}
+                  linkTypeError={errorFor("linkType")}
                   hrefError={errorFor("href")}
                   pageError={errorFor("page")}
                   onLinkTypeChange={(linkType) => setValues({ ...values, linkType })}

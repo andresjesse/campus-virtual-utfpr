@@ -115,7 +115,7 @@ export async function createContentPage(values: ContentPageFormValues) {
   if (relation.type === "menu_item") {
     await pocketbase
       .collection<MenuItemRecord>(MENU_ITEM_COLLECTION)
-      .update(relation.id, { page: page.id }, { requestKey: null });
+      .update(relation.id, { page: page.id, href: "" }, { requestKey: null });
   }
 
   return page;
@@ -140,7 +140,7 @@ export async function updateContentPage(
   await unlinkMenuItems(id, relation.id);
   await pocketbase
     .collection<MenuItemRecord>(MENU_ITEM_COLLECTION)
-    .update(relation.id, { page: id }, { requestKey: null });
+    .update(relation.id, { page: id, href: "" }, { requestKey: null });
 
   return page;
 }

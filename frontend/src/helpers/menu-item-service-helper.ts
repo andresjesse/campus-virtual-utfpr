@@ -47,12 +47,14 @@ export function validateMenuItemForm(
     errors.label = messages.menuItems.label.empty;
   }
 
-  if (values.linkType === "link") {
+  if (!values.linkType) {
+    errors.linkType = messages.menuItems.editor.linkTypeRequiredError;
+  } else if (values.linkType === "link") {
     const hrefError = getMenuItemHrefError(values.href);
     if (hrefError) {
       errors.href = hrefError;
     }
-  } else if (!values.page) {
+  } else if (values.linkType === "page" && !values.page) {
     errors.page = messages.menuItems.editor.pageRequiredError;
   }
 
@@ -74,7 +76,7 @@ export function validateMenuItemForm(
 export function toMenuItemFormValues(record: MenuItemRecord): MenuItemFormValues {
   return {
     label: record.label,
-    linkType: record.page ? "page" : "link",
+    linkType: record.page ? "page" : record.href ? "link" : "none",
     href: record.href,
     page: record.page,
     isNested: Boolean(record.parent),
@@ -193,6 +195,16 @@ export function toMenuCategoryOptions(
   }));
 }
 
+function hasMenuItemTarget(item: MenuItemRecord) {
+  return Boolean(item.href || item.page);
+}
+
+function pruneItemsWithoutTarget(nodes: MenuTreeItem[]): MenuTreeItem[] {
+  return nodes
+    .filter((node) => hasMenuItemTarget(node.item))
+    .map((node) => ({ ...node, children: pruneItemsWithoutTarget(node.children) }));
+}
+
 export function buildMenuTree(menuItems: MenuItemRecord[]): MenuTreeCategory[] {
   const nodes = new Map<string, MenuTreeItem>(
     menuItems.map((item) => [item.id, { item, children: [] }]),
@@ -218,5 +230,7 @@ export function buildMenuTree(menuItems: MenuItemRecord[]): MenuTreeCategory[] {
     category.items.push(node);
   }
 
-  return [...categories.values()];
+  return [...categories.values()]
+    .map((category) => ({ ...category, items: pruneItemsWithoutTarget(category.items) }))
+    .filter((category) => category.items.length > 0);
 }

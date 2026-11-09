@@ -55,4 +55,45 @@ describe('buildMenuTree', () => {
 
     expect(category.items.map((node) => node.item.id)).toEqual(['orphan'])
   })
+
+  it('keeps items that link to a page', () => {
+    const [category] = buildMenuTree([createItem({ id: 'page-item', href: '', page: 'page-id' })])
+
+    expect(category.items.map((node) => node.item.id)).toEqual(['page-item'])
+  })
+
+  it('leaves out an item without a target together with everything nested under it', () => {
+    const [category] = buildMenuTree([
+      createItem({ id: 'kept' }),
+      createItem({ id: 'blank', href: '' }),
+      createItem({ id: 'child', parent: 'blank' }),
+      createItem({ id: 'grandchild', parent: 'child' }),
+    ])
+
+    expect(category.items.map((node) => node.item.id)).toEqual(['kept'])
+  })
+
+  it('leaves out a nested item without a target', () => {
+    const [category] = buildMenuTree([
+      createItem({ id: 'root' }),
+      createItem({ id: 'blank-child', href: '', parent: 'root' }),
+      createItem({ id: 'child', parent: 'root' }),
+    ])
+
+    expect(category.items[0].children.map((node) => node.item.id)).toEqual(['child'])
+  })
+
+  it('drops a category left with no items to show', () => {
+    const tree = buildMenuTree([
+      createItem({ id: 'kept' }),
+      createItem({
+        id: 'blank',
+        href: '',
+        category: 'social',
+        expand: { category: { id: 'social', label: 'Social Media' } },
+      }),
+    ] as MenuItemRecord[])
+
+    expect(tree.map((category) => category.label)).toEqual(['Main Menu'])
+  })
 })

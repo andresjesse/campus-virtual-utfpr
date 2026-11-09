@@ -13,6 +13,8 @@ const listMenuItemsMock = jest.mocked(listMenuItems)
 const item = {
   id: 'item-1',
   label: 'Admissions',
+  href: 'https://example.com/admissions',
+  page: '',
   category: 'main',
   parent: '',
   expand: { category: { id: 'main', label: 'Main Menu' } },
@@ -32,6 +34,19 @@ describe('useVirtualMapMenu', () => {
     expect(result.current.categories).toHaveLength(1)
     expect(result.current.categories[0].label).toBe('Main Menu')
     expect(result.current.categories[0].items[0].item.id).toBe('item-1')
+  })
+
+  it('leaves out items without a target', async () => {
+    listMenuItemsMock.mockResolvedValue([
+      item,
+      { ...item, id: 'item-2', href: '', page: '' } as MenuItemRecord,
+    ])
+
+    const { result } = renderHook(() => useVirtualMapMenu())
+
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+
+    expect(result.current.categories[0].items.map((node) => node.item.id)).toEqual(['item-1'])
   })
 
   it('reports an error and recovers on retry', async () => {
