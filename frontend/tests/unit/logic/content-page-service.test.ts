@@ -1,9 +1,11 @@
 import messages from '@/constants/messages.json'
 import { parseRelation } from '@/helpers/content-pages-service-helper.ts'
 import {
+  createContentPage,
   getContentPageByEntity,
   listEntityIdsWithPage,
   reorderBlocks,
+  updateContentPage,
   upsertBlockContent,
 } from '@/services/content-page-service.ts'
 
@@ -293,6 +295,41 @@ describe('parseRelation', () => {
     expect(() => parseRelation(relation)).toThrow(
       messages.contentPages.editor.relationInvalidError,
     )
+  })
+})
+
+describe('linking a page to a menu item', () => {
+  beforeEach(() => {
+    mockCreate.mockResolvedValue({ id: 'page-id' })
+    mockUpdate.mockResolvedValue({ id: 'page-id' })
+    mockGetFullList.mockResolvedValue([])
+  })
+
+  it('clears the link of the menu item a new page is linked to', async () => {
+    await createContentPage({ title: 'Library', relation: 'menu_item:item-id' })
+
+    expect(mockCollection).toHaveBeenCalledWith('menu_items')
+    expect(mockUpdate).toHaveBeenCalledWith(
+      'item-id',
+      { page: 'page-id', href: '' },
+      { requestKey: null },
+    )
+  })
+
+  it('clears the link of the menu item an existing page is moved to', async () => {
+    await updateContentPage('page-id', { title: 'Library', relation: 'menu_item:item-id' })
+
+    expect(mockUpdate).toHaveBeenCalledWith(
+      'item-id',
+      { page: 'page-id', href: '' },
+      { requestKey: null },
+    )
+  })
+
+  it('does not touch menu items when a new page is linked to an entity', async () => {
+    await createContentPage({ title: 'Library', relation: 'entity:entity-id' })
+
+    expect(mockUpdate).not.toHaveBeenCalled()
   })
 })
 
