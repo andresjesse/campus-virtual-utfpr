@@ -412,6 +412,14 @@
     "description": "O endereço pode estar incorreto ou a página que você procura não está mais disponível.",
     "backButton": "Voltar para o início"
   },
+  "palette": {
+    "ariaLabel": "Elementos de conteúdo",
+    "title": "Elementos",
+    "images": "Imagens",
+    "richText": "Texto (RTF)",
+    "richTextSample": "Lorem Ipsum",
+    "previewAriaLabel": "{label} (indisponível)"
+  },
   "login": {
     "subtitle": "ACESSO AO PORTAL ADMINISTRATIVO",
     "form": {
