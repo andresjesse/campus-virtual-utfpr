@@ -8,6 +8,7 @@ import AdminBrand from "@/components/admin-brand";
 import AdminNavigation from "@/components/admin-navigation";
 import AdminUserSummary from "@/components/admin-user-summary";
 import { getStorageKey } from "@/config/branding";
+import messages from "@/constants/messages.json";
 
 import classes from "./admin-layout.module.css";
 
@@ -48,7 +49,7 @@ export default function AdminLayout() {
             onClick={toggle}
             hiddenFrom="sm"
             size="sm"
-            aria-label="Abrir navegação"
+            aria-label={messages.adminLayout.openNavigationLabel}
           />
           <AdminBrand />
         </Group>
@@ -68,7 +69,11 @@ export default function AdminLayout() {
             type="button"
             className={classes.collapseButton}
             onClick={() => setDesktopCollapsed((collapsed) => !collapsed)}
-            aria-label={desktopCollapsed ? "Expandir menu" : "Recolher menu"}
+            aria-label={
+              desktopCollapsed
+                ? messages.adminLayout.expandMenuLabel
+                : messages.adminLayout.collapseMenuLabel
+            }
           >
             <CaretDoubleLeftIcon
               size={18}
