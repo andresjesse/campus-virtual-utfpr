@@ -47,12 +47,14 @@ export function validateMenuItemForm(
     errors.label = messages.menuItems.label.empty;
   }
 
-  if (values.linkType === "link") {
+  if (!values.linkType) {
+    errors.linkType = messages.menuItems.editor.linkTypeRequiredError;
+  } else if (values.linkType === "link") {
     const hrefError = getMenuItemHrefError(values.href);
     if (hrefError) {
       errors.href = hrefError;
     }
-  } else if (!values.page) {
+  } else if (values.linkType === "page" && !values.page) {
     errors.page = messages.menuItems.editor.pageRequiredError;
   }
 
@@ -74,7 +76,7 @@ export function validateMenuItemForm(
 export function toMenuItemFormValues(record: MenuItemRecord): MenuItemFormValues {
   return {
     label: record.label,
-    linkType: record.page ? "page" : "link",
+    linkType: record.page ? "page" : record.href ? "link" : "none",
     href: record.href,
     page: record.page,
     isNested: Boolean(record.parent),

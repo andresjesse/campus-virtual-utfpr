@@ -30,7 +30,7 @@ import type {
 
 const EMPTY_MENU_ITEM: MenuItemFormValues = {
   label: "",
-  linkType: "link",
+  linkType: "",
   href: "",
   page: "",
   isNested: false,

@@ -132,6 +132,18 @@ describe('menu item service', () => {
     )
   })
 
+  it('clears both the href and the page when the item has no target', async () => {
+    await createMenuItem(
+      createFormValues({ linkType: 'none', href: 'https://example.com', page: 'page-id' }),
+    )
+
+    expect(mockCreate).toHaveBeenCalledWith(
+      expect.objectContaining({ href: '', page: '' }),
+      { requestKey: null },
+    )
+    expect(mockGetFullList).not.toHaveBeenCalled()
+  })
+
   it('clears the parent when the item is not nested', async () => {
     await createMenuItem(createFormValues({ isNested: false, parent: 'parent-id' }))
 

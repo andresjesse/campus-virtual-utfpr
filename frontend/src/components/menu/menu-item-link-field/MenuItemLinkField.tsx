@@ -6,7 +6,7 @@ import messages from "@/constants/messages.json";
 import type { MenuItemLinkType, MenuItemPageOption } from "@/types/menu.ts";
 
 type MenuItemLinkFieldProps = {
-  linkType: MenuItemLinkType;
+  linkType: MenuItemLinkType | "";
   href: string;
   page: string;
   pageOptions: MenuItemPageOption[];

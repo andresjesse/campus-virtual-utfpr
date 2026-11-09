@@ -110,6 +110,23 @@ describe('validateMenuItemForm', () => {
     expect(errors.href).toBeUndefined()
   })
 
+  it('requires the target type to be chosen', () => {
+    const errors = validateMenuItemForm(createFormValues({ linkType: '' }), false)
+
+    expect(errors.linkType).toBe(messages.menuItems.editor.linkTypeRequiredError)
+    expect(errors.href).toBeUndefined()
+    expect(errors.page).toBeUndefined()
+  })
+
+  it('accepts an item explicitly left without a target', () => {
+    const errors = validateMenuItemForm(
+      createFormValues({ linkType: 'none', href: '', page: '' }),
+      false,
+    )
+
+    expect(errors).toEqual({})
+  })
+
   it('requires a parent once the item is nested', () => {
     const errors = validateMenuItemForm(
       createFormValues({ isNested: true, parent: '' }),
@@ -153,6 +170,12 @@ describe('toMenuItemFormValues', () => {
     )
 
     expect(values).toMatchObject({ linkType: 'link', isNested: false })
+  })
+
+  it('reads an item with neither a link nor a page as having no target', () => {
+    const values = toMenuItemFormValues(createMenuItem())
+
+    expect(values.linkType).toBe('none')
   })
 })
 
