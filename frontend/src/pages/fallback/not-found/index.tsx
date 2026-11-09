@@ -11,6 +11,8 @@ import {
 import { ArrowLeftIcon, MapTrifoldIcon} from "@phosphor-icons/react";
 import { Link } from "react-router";
 
+import messages from "@/constants/messages.json";
+
 export default function NotFound() {
   return (
     <Center component="main" mih="100dvh" px="md" py="xl">
@@ -45,11 +47,10 @@ export default function NotFound() {
 
             <Stack gap="xs">
               <Title order={1} fz={{ base: 28, sm: 34 }}>
-                Página não encontrada
+                {messages.notFound.title}
               </Title>
               <Text c="dimmed" fz="lg" maw={440}>
-                O endereço pode estar incorreto ou a página que você procura não
-                está mais disponível.
+                {messages.notFound.description}
               </Text>
             </Stack>
 
@@ -61,7 +62,7 @@ export default function NotFound() {
               variant="outline"
               size="md"
             >
-              Voltar para o início
+              {messages.notFound.backButton}
             </Button>
           </Stack>
         </Paper>

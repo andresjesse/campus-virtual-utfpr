@@ -407,6 +407,11 @@
     "entities": "Entidades 3D",
     "meshes": "Arquivos Mesh"
   },
+  "notFound": {
+    "title": "Página não encontrada",
+    "description": "O endereço pode estar incorreto ou a página que você procura não está mais disponível.",
+    "backButton": "Voltar para o início"
+  },
   "login": {
     "subtitle": "ACESSO AO PORTAL ADMINISTRATIVO",
     "form": {
