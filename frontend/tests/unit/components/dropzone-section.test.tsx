@@ -7,7 +7,9 @@ import { ImageIcon } from '@phosphor-icons/react'
 import type { FileRejection } from 'react-dropzone'
 
 import DropzoneSection from '@/components/content-input/DropzoneSection.tsx'
+import messages from '@/constants/messages.json'
 import { FILE_UPLOAD_REJECTION_NOTIFICATION } from '@/helpers/file-helper.ts'
+import { formatMessage } from '@/helpers/message-helper.ts'
 
 const mockRejections: FileRejection[] = [
   {
@@ -89,7 +91,7 @@ describe('DropzoneSection', () => {
     expect(notificationsShowMock).toHaveBeenCalledTimes(1)
     expect(notificationsShowMock).toHaveBeenCalledWith({
       ...FILE_UPLOAD_REJECTION_NOTIFICATION,
-      message: '"big.png" excede o tamanho máximo de 15MB.',
+      message: formatMessage(messages.files.rejection.tooLarge, { fileName: 'big.png', maxSizeMb: '15' }),
     })
   })
 
@@ -100,7 +102,7 @@ describe('DropzoneSection', () => {
 
     expect(notificationsShowMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: '"big.png" excede o tamanho máximo de 50MB.',
+        message: formatMessage(messages.files.rejection.tooLarge, { fileName: 'big.png', maxSizeMb: '50' }),
       }),
     )
   })

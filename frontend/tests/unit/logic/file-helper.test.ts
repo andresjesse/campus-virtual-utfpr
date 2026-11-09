@@ -9,6 +9,9 @@ import {
 } from '@/helpers/file-helper.ts'
 import type { FileRejection } from 'react-dropzone'
 
+import messages from '@/constants/messages.json'
+import { formatMessage } from '@/helpers/message-helper.ts'
+
 const limits = {
   maxSizeInBytes: 1000 * 1000 * 15,
   allowedMimeTypes: ['image/png', 'image/jpg', 'video/mp4'],
@@ -30,13 +33,15 @@ describe('file-helper', () => {
     it('maps a file-too-large error to the size message', () => {
       expect(
         getFileRejectionMessage(rejection('big.png', 'file-too-large'), limits),
-      ).toBe('"big.png" excede o tamanho máximo de 15MB.')
+      ).toBe(
+        formatMessage(messages.files.rejection.tooLarge, { fileName: 'big.png', maxSizeMb: '15' }),
+      )
     })
 
     it('maps a file-invalid-type error to the format message', () => {
       expect(
         getFileRejectionMessage(rejection('doc.pdf', 'file-invalid-type'), limits),
-      ).toBe('"doc.pdf" tem um formato não suportado.')
+      ).toBe(formatMessage(messages.files.rejection.invalidType, 'doc.pdf'))
     })
 
     it('falls back to the rejection message for unknown codes', () => {
@@ -80,8 +85,9 @@ describe('file-helper', () => {
       expect(result).toEqual({
         ...FILE_UPLOAD_REJECTION_NOTIFICATION,
         message:
-          '"a.png" excede o tamanho máximo de 15MB.\n' +
-          '"b.pdf" tem um formato não suportado.',
+          formatMessage(messages.files.rejection.tooLarge, { fileName: 'a.png', maxSizeMb: '15' }) +
+          '\n' +
+          formatMessage(messages.files.rejection.invalidType, 'b.pdf'),
       })
     })
   })

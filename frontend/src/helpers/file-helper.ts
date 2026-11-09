@@ -1,7 +1,9 @@
 import type PocketBase from "pocketbase";
 import type { FileRejection } from "react-dropzone";
 
+import messages from "@/constants/messages.json";
 import { bytesToMegabytes } from "@/helpers/conversion-helper.ts";
+import { formatMessage } from "@/helpers/message-helper.ts";
 import type {
   DragStatus,
   DropzoneAccept,
@@ -30,7 +32,7 @@ export function getDragStatus(
 
 export const FILE_UPLOAD_REJECTION_NOTIFICATION = {
   color: "red",
-  title: "Arquivo(s) não aceito(s)",
+  title: messages.files.rejection.title,
   style: { whiteSpace: "pre-line" as const },
 } as const;
 
@@ -65,11 +67,17 @@ export function getFileRejectionMessage(
     .map((error) => {
       switch (error.code) {
         case FILE_TOO_LARGE:
-          return `"${fileName}" excede o tamanho máximo de ${maxSizeMb}MB.`;
+          return formatMessage(messages.files.rejection.tooLarge, {
+            fileName,
+            maxSizeMb: String(maxSizeMb),
+          });
         case FILE_INVALID_TYPE:
-          return `"${fileName}" tem um formato não suportado.`;
+          return formatMessage(messages.files.rejection.invalidType, fileName);
         default:
-          return `"${fileName}" — ${error.message}`;
+          return formatMessage(messages.files.rejection.unknown, {
+            fileName,
+            reason: error.message,
+          });
       }
     })
     .join("\n");

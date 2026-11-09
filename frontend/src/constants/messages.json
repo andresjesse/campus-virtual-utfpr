@@ -65,6 +65,12 @@
     }
   },
   "files": {
+    "rejection": {
+      "title": "Arquivo(s) não aceito(s)",
+      "tooLarge": "\"{fileName}\" excede o tamanho máximo de {maxSizeMb}MB.",
+      "invalidType": "\"{fileName}\" tem um formato não suportado.",
+      "unknown": "\"{fileName}\" — {reason}"
+    },
     "dropzone": {
       "images": {
         "title": "Arraste imagens aqui ou clique para selecionar arquivos",
@@ -326,6 +332,8 @@
   "contentPages": {
     "editor": {
       "canvasLabel": "Conteúdo da página",
+      "relationEntityOption": "Modelo 3D — {name}",
+      "relationMenuItemOption": "Item de Menu — {name}",
       "loading": "Carregando página",
       "loadErrorTitle": "Não foi possível carregar a página",
       "saveSuccessTitle": "Página salva",
@@ -345,6 +353,8 @@
       "tableRelatedType": "Tipo relacionado",
       "relatedEntity": "Modelo 3D",
       "relatedMenuItem": "Item de Menu",
+      "searchLabel": "Pesquisar páginas pelo nome",
+      "searchPlaceholder": "Pesquise pelo nome",
       "untitled": "Sem título",
       "editAriaLabel": "Editar página {name}",
       "deleteAriaLabel": "Excluir página {name}",
