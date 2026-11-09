@@ -1,6 +1,8 @@
 import { Box, Group, Text, Title } from "@mantine/core";
 import type { PropsWithChildren } from "react";
 
+import messages from "@/constants/messages.json";
+
 import classes from "./authentication-layout.module.css";
 
 type AuthenticationLayoutProps = PropsWithChildren<{
@@ -37,9 +39,15 @@ export default function AuthenticationLayout({
         </Box>
 
         <Group component="footer" className={classes.footer}>
-          <Text className={classes.footerText}>TERMOS DE PRIVACIDADE</Text>
-          <Text className={classes.footerText}>TERMOS DE SERVIÇO</Text>
-          <Text className={classes.footerText}>SYSTEM STATUS</Text>
+          <Text className={classes.footerText}>
+            {messages.authentication.footer.privacyTerms}
+          </Text>
+          <Text className={classes.footerText}>
+            {messages.authentication.footer.serviceTerms}
+          </Text>
+          <Text className={classes.footerText}>
+            {messages.authentication.footer.systemStatus}
+          </Text>
         </Group>
       </Box>
     </Box>

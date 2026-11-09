@@ -1,5 +1,6 @@
 import { Avatar, Group, Stack, Text, UnstyledButton } from "@mantine/core";
 
+import messages from "@/constants/messages.json";
 import { useAuthentication } from "@/hooks/use-authentication";
 import { pocketbase } from "@/services/pocketbase";
 
@@ -26,8 +27,8 @@ export default function AdminUserSummary({
     <UnstyledButton
       className={`${classes.user} ${collapsed ? classes.collapsed : ""}`}
       onClick={logout}
-      aria-label="Sair da conta"
-      title="Sair da conta"
+      aria-label={messages.adminLayout.logoutLabel}
+      title={messages.adminLayout.logoutLabel}
     >
       <Group wrap="nowrap" gap={0}>
         <span className={classes.avatarSlot}>

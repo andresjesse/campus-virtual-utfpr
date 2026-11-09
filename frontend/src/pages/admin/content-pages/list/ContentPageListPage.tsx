@@ -39,7 +39,12 @@ export default function ContentPageList() {
     <Flex direction="column" px="lg" pt="lg" pb={0} mih="calc(100dvh - 60px)" >
       <Group justify="space-between" gap="xl" w="100%" mx={0} mt="auto" mb="lg" px="lg">
         <Flex flex={1}>
-          <PageSearch value={query} onChange={setQuery} />
+          <PageSearch
+            value={query}
+            onChange={setQuery}
+            ariaLabel={messages.contentPages.list.searchLabel}
+            placeholder={messages.contentPages.list.searchPlaceholder}
+          />
         </Flex>
         <Button
           variant="outline"

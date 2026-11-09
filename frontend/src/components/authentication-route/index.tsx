@@ -1,6 +1,7 @@
 import { Center, Loader } from "@mantine/core";
 import { Navigate, Outlet, useLocation } from "react-router";
 
+import messages from "@/constants/messages.json";
 import { useAuthentication } from "@/hooks/use-authentication";
 
 type LoginLocationState = {
@@ -12,7 +13,7 @@ type LoginLocationState = {
 function AuthenticationLoader() {
   return (
     <Center mih="100dvh">
-      <Loader aria-label="Verificando autenticação" />
+      <Loader aria-label={messages.authentication.route.verifyingLabel} />
     </Center>
   );
 }

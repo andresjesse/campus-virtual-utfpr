@@ -4,16 +4,16 @@ import { MagnifyingGlassIcon } from "@phosphor-icons/react/dist/csr/MagnifyingGl
 import classes from "./page-search.module.css";
 
 type PageSearchProps = {
-  ariaLabel?: string;
+  ariaLabel: string;
   onChange: (value: string) => void;
-  placeholder?: string;
+  placeholder: string;
   value: string;
 };
 
 export default function PageSearch({
-  ariaLabel = "Pesquisar páginas pelo nome",
+  ariaLabel,
   onChange,
-  placeholder = "Pesquise pelo nome",
+  placeholder,
   value,
 }: PageSearchProps) {
   return (

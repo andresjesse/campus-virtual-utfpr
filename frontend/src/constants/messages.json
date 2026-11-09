@@ -65,6 +65,12 @@
     }
   },
   "files": {
+    "rejection": {
+      "title": "Arquivo(s) não aceito(s)",
+      "tooLarge": "\"{fileName}\" excede o tamanho máximo de {maxSizeMb}MB.",
+      "invalidType": "\"{fileName}\" tem um formato não suportado.",
+      "unknown": "\"{fileName}\" — {reason}"
+    },
     "dropzone": {
       "images": {
         "title": "Arraste imagens aqui ou clique para selecionar arquivos",
@@ -326,6 +332,8 @@
   "contentPages": {
     "editor": {
       "canvasLabel": "Conteúdo da página",
+      "relationEntityOption": "Modelo 3D — {name}",
+      "relationMenuItemOption": "Item de Menu — {name}",
       "loading": "Carregando página",
       "loadErrorTitle": "Não foi possível carregar a página",
       "saveSuccessTitle": "Página salva",
@@ -345,6 +353,8 @@
       "tableRelatedType": "Tipo relacionado",
       "relatedEntity": "Modelo 3D",
       "relatedMenuItem": "Item de Menu",
+      "searchLabel": "Pesquisar páginas pelo nome",
+      "searchPlaceholder": "Pesquise pelo nome",
       "untitled": "Sem título",
       "editAriaLabel": "Editar página {name}",
       "deleteAriaLabel": "Excluir página {name}",
@@ -380,6 +390,64 @@
       "toggleLabel": "Menu",
       "loadErrorTitle": "Não foi possível carregar o menu",
       "emptyTitle": "Nenhum item de menu disponível"
+    }
+  },
+  "authentication": {
+    "footer": {
+      "privacyTerms": "TERMOS DE PRIVACIDADE",
+      "serviceTerms": "TERMOS DE SERVIÇO",
+      "systemStatus": "Status do sistema"
+    },
+    "route": {
+      "verifyingLabel": "Verificando autenticação",
+      "restrictedTitle": "Acesso restrito",
+      "restrictedMessage": "Você não tem permissão para acessar esta área."
+    }
+  },
+  "adminLayout": {
+    "openNavigationLabel": "Abrir navegação",
+    "expandMenuLabel": "Expandir menu",
+    "collapseMenuLabel": "Recolher menu",
+    "logoutLabel": "Sair da conta"
+  },
+  "adminNavigation": {
+    "ariaLabel": "Administração",
+    "pages": "Páginas",
+    "menu": "Itens e Categorias do Menu",
+    "entities": "Entidades 3D",
+    "meshes": "Arquivos Mesh"
+  },
+  "notFound": {
+    "title": "Página não encontrada",
+    "description": "O endereço pode estar incorreto ou a página que você procura não está mais disponível.",
+    "backButton": "Voltar para o início"
+  },
+  "palette": {
+    "ariaLabel": "Elementos de conteúdo",
+    "title": "Elementos",
+    "images": "Imagens",
+    "richText": "Texto (RTF)",
+    "richTextSample": "Lorem Ipsum",
+    "previewAriaLabel": "{label} (indisponível)"
+  },
+  "login": {
+    "subtitle": "ACESSO AO PORTAL ADMINISTRATIVO",
+    "form": {
+      "emailLabel": "E-MAIL",
+      "emailPlaceholder": "Digite seu e-mail",
+      "passwordLabel": "SENHA",
+      "passwordPlaceholder": "Digite sua senha",
+      "forgotPassword": "Esqueceu sua senha?",
+      "submit": "ENTRAR"
+    },
+    "validation": {
+      "emailRequired": "Informe seu e-mail",
+      "emailInvalid": "Informe um e-mail válido",
+      "passwordRequired": "Informe sua senha"
+    },
+    "authentication": {
+      "failedTitle": "Não foi possível entrar",
+      "invalidCredentials": "E-mail ou senha inválidos"
     }
   }
 }

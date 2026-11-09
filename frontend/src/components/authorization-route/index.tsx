@@ -2,6 +2,7 @@ import { notifications } from "@mantine/notifications";
 import { useEffect } from "react";
 import { Navigate, Outlet } from "react-router";
 
+import messages from "@/constants/messages.json";
 import {
   canAccessAdminCapability,
   type AdminCapability,
@@ -22,8 +23,8 @@ export default function AuthorizationRoute({
     if (!isAllowed) {
       notifications.show({
         color: "red",
-        title: "Acesso restrito",
-        message: "Você não tem permissão para acessar esta área.",
+        title: messages.authentication.route.restrictedTitle,
+        message: messages.authentication.route.restrictedMessage,
       });
     }
   }, [isAllowed]);

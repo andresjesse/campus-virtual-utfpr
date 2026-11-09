@@ -17,6 +17,8 @@ import {ContentPageBlocksEnum, type ContentPageBlockType} from "@/enums/content-
 import sanitizeRichText from "@/helpers/sanitize-rich-text.ts";
 import {getFilenameFromUrl} from "@/helpers/file-helper.ts";
 import {getBlockPositionChanges} from "@/helpers/content-block-order-helper.ts";
+import {formatMessage} from "@/helpers/message-helper.ts";
+import messages from "@/constants/messages.json";
 
 // #####################################################################
 // #### == #### == #### CONTENT PAGES #### == #### == #### == #### == ##
@@ -90,11 +92,11 @@ export async function listRelatedOptions(): Promise<RelatedOption[]> {
 
   return [
     ...entities.map((entity) => ({
-      label: `Modelo 3D — ${entity.slug || entity.id}`,
+      label: formatMessage(messages.contentPages.editor.relationEntityOption, entity.slug || entity.id),
       value: encodeRelation("entity", entity.id),
     })),
     ...menuItems.map((item) => ({
-      label: `Item de Menu — ${item.label || item.id}`,
+      label: formatMessage(messages.contentPages.editor.relationMenuItemOption, item.label || item.id),
       value: encodeRelation("menu_item", item.id),
     })),
   ];

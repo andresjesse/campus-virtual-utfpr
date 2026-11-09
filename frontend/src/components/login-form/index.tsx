@@ -13,6 +13,7 @@ import { UserIcon } from "@phosphor-icons/react/dist/csr/User";
 import { useState } from "react";
 import type { FormEvent } from "react";
 
+import messages from "@/constants/messages.json";
 import {
   validateLoginForm,
   type LoginFormErrors,
@@ -20,8 +21,6 @@ import {
 import { useAuthentication } from "@/hooks/use-authentication";
 
 import classes from "./login-form.module.css";
-
-const AUTHENTICATION_ERROR = "E-mail ou senha inválidos";
 
 export default function LoginForm() {
   const { authenticate } = useAuthentication();
@@ -50,8 +49,8 @@ export default function LoginForm() {
       setPassword("");
       notifications.show({
         color: "red",
-        title: "Não foi possível entrar",
-        message: AUTHENTICATION_ERROR,
+        title: messages.login.authentication.failedTitle,
+        message: messages.login.authentication.invalidCredentials,
       });
     } finally {
       setIsSubmitting(false);
@@ -63,8 +62,8 @@ export default function LoginForm() {
       <Stack gap={20}>
         <TextInput
           autoComplete="email"
-          label="E-MAIL"
-          placeholder="Digite seu e-mail"
+          label={messages.login.form.emailLabel}
+          placeholder={messages.login.form.emailPlaceholder}
           value={email}
           error={formErrors.email}
           disabled={isSubmitting}
@@ -88,8 +87,8 @@ export default function LoginForm() {
 
         <PasswordInput
           autoComplete="current-password"
-          label="SENHA"
-          placeholder="Digite sua senha"
+          label={messages.login.form.passwordLabel}
+          placeholder={messages.login.form.passwordPlaceholder}
           value={password}
           error={formErrors.password}
           disabled={isSubmitting}
@@ -119,7 +118,7 @@ export default function LoginForm() {
         />
 
         <Text className={classes.forgotPassword}>
-          Esqueceu sua senha?
+          {messages.login.form.forgotPassword}
         </Text>
 
         <Button
@@ -127,7 +126,7 @@ export default function LoginForm() {
           loading={isSubmitting}
           className={classes.submitButton}
         >
-          ENTRAR
+          {messages.login.form.submit}
         </Button>
       </Stack>
     </form>

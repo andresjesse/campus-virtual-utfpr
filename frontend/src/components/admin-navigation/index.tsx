@@ -13,6 +13,7 @@ import { useAuthentication } from "@/hooks/use-authentication";
 
 import classes from "./admin-navigation.module.css";
 import {branding} from "@/config/branding.ts";
+import messages from "@/constants/messages.json";
 
 type NavigationItem = {
   capability: AdminCapability;
@@ -29,25 +30,25 @@ const NAVIGATION_ITEMS: NavigationItem[] = [
   {
     capability: "pages.manage",
     icon: HouseIcon,
-    label: "Páginas",
+    label: messages.adminNavigation.pages,
     to: "/admin/pages",
   },
   {
     capability: "menu.manage",
     icon: ListBulletsIcon,
-    label: "Itens e Categorias do Menu",
+    label: messages.adminNavigation.menu,
     to: "/admin/menu",
   },
   {
     capability: "entities.manage",
     icon: CubeIcon,
-    label: "Entidades 3D",
+    label: messages.adminNavigation.entities,
     to: "/admin/entities",
   },
   {
     capability: "meshes.manage",
     icon: PackageIcon,
-    label: "Arquivos Mesh",
+    label: messages.adminNavigation.meshes,
     to: "/admin/meshes",
   },
 ];
@@ -81,7 +82,7 @@ export default function AdminNavigation({ collapsed = false }: AdminNavigationPr
   const { user } = useAuthentication();
 
   return (
-    <Stack component="nav" aria-label="Administração" gap={8}>
+    <Stack component="nav" aria-label={messages.adminNavigation.ariaLabel} gap={8}>
       {NAVIGATION_ITEMS.filter(({ capability }) =>
         canAccessAdminCapability(user, capability),
       ).map((item) => (
