@@ -19,10 +19,13 @@ export type ContentPageBlockMetadata = {
   id?: string;
   title: string;
   collectionName: string;
+  position?: number;
   created?: string;
   updated?: string;
   page?: string;
 }
+
+export type BlockDropPlacement = "before" | "after";
 
 // TODO: Align this with the single source or truth on content-constants
 export type GroupedContentPageBlockMetadata = {
@@ -35,6 +38,7 @@ export type ContentPageBlockRecord = RecordModel & {
   id?: string;
   title?: string;
   content?: ContentPageBlockValue;
+  position?: number;
   created?: string;
   updated?: string;
   page?: string;
