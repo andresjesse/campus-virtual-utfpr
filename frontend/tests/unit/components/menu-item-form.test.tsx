@@ -40,7 +40,7 @@ const menuItems = [
 
 const EMPTY_VALUES: MenuItemFormValues = {
   label: '',
-  linkType: 'link',
+  linkType: '',
   href: '',
   page: '',
   isNested: false,
@@ -104,15 +104,64 @@ describe('MenuItemForm', () => {
 
     expect(onSubmit).not.toHaveBeenCalled()
     expect(screen.getByText(messages.menuItems.label.empty)).toBeInTheDocument()
-    expect(screen.getByText(messages.menuItems.link.empty)).toBeInTheDocument()
+    expect(
+      screen.getByText(messages.menuItems.editor.linkTypeRequiredError),
+    ).toBeInTheDocument()
     expect(
       screen.getByText(messages.menuItems.editor.categoryRequiredError),
     ).toBeInTheDocument()
   })
 
+  it('shows no target field until a target type is chosen', () => {
+    renderForm()
+
+    for (const option of [
+      messages.menuItems.editor.linkOptionLink,
+      messages.menuItems.editor.linkOptionPage,
+      messages.menuItems.editor.linkOptionNone,
+    ]) {
+      expect(screen.getByRole('radio', { name: option })).not.toBeChecked()
+    }
+
+    expect(
+      screen.queryByPlaceholderText(messages.menuItems.editor.hrefPlaceholder),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByPlaceholderText(messages.menuItems.editor.pagePlaceholder),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByText(messages.menuItems.editor.noTargetNotice),
+    ).not.toBeInTheDocument()
+  })
+
+  it('reports a missing link once the link target is chosen', async () => {
+    renderForm({ label: 'Student Area', category: 'general', linkType: 'link' })
+
+    await submit()
+
+    expect(screen.getByText(messages.menuItems.link.empty)).toBeInTheDocument()
+  })
+
+  it('warns that an item without a target stays out of the menu and submits it', async () => {
+    const onSubmit = renderForm({ label: 'Student Area', category: 'general' })
+
+    await act(async () => {
+      fireEvent.click(screen.getByText(messages.menuItems.editor.linkOptionNone))
+    })
+
+    expect(screen.getByText(messages.menuItems.editor.noTargetNotice)).toBeInTheDocument()
+
+    await submit()
+
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({ label: 'Student Area', linkType: 'none' }),
+    )
+  })
+
   it('submits a complete link item', async () => {
     const onSubmit = renderForm({
       label: 'Student Area',
+      linkType: 'link',
       href: 'https://example.com',
       category: 'general',
     })
@@ -130,7 +179,7 @@ describe('MenuItemForm', () => {
   })
 
   it('swaps the href input for the page selector', async () => {
-    renderForm({ label: 'Student Area', category: 'general' })
+    renderForm({ label: 'Student Area', category: 'general', linkType: 'link' })
 
     expect(
       screen.getByPlaceholderText(messages.menuItems.editor.hrefPlaceholder),
@@ -176,6 +225,7 @@ describe('MenuItemForm', () => {
   it('clears a chosen parent when the category changes', async () => {
     renderForm({
       label: 'Student Area',
+      linkType: 'link',
       href: 'https://example.com',
       category: 'general',
       isNested: true,
@@ -192,6 +242,7 @@ describe('MenuItemForm', () => {
   it('keeps the stored icon when no new file is chosen', async () => {
     const onSubmit = renderForm({
       label: 'Student Area',
+      linkType: 'link',
       href: 'https://example.com',
       category: 'general',
     })
