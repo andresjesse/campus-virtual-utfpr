@@ -4,6 +4,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import LoginForm from '@/components/login-form'
+import messages from '@/constants/messages.json'
 import { AuthenticationContext } from '@/contexts/authentication-context'
 import type { AuthenticationContextValue } from '@/types/authentication'
 import { createAuthenticationContextValue } from '../mocks/authentication'
@@ -33,17 +34,17 @@ describe('LoginForm', () => {
     const user = userEvent.setup()
     const { authenticate } = renderLoginForm()
 
-    await user.click(screen.getByRole('button', { name: 'ENTRAR' }))
+    await user.click(screen.getByRole('button', { name: messages.login.form.submit }))
 
-    expect(screen.getByText('Informe seu e-mail')).toBeInTheDocument()
-    expect(screen.getByText('Informe sua senha')).toBeInTheDocument()
+    expect(screen.getByText(messages.login.validation.emailRequired)).toBeInTheDocument()
+    expect(screen.getByText(messages.login.validation.passwordRequired)).toBeInTheDocument()
     expect(authenticate).not.toHaveBeenCalled()
 
-    await user.type(screen.getByLabelText('E-MAIL'), 'invalid-email')
-    await user.type(screen.getByLabelText('SENHA'), 'password')
-    await user.click(screen.getByRole('button', { name: 'ENTRAR' }))
+    await user.type(screen.getByLabelText(messages.login.form.emailLabel), 'invalid-email')
+    await user.type(screen.getByLabelText(messages.login.form.passwordLabel), 'password')
+    await user.click(screen.getByRole('button', { name: messages.login.form.submit }))
 
-    expect(screen.getByText('Informe um e-mail válido')).toBeInTheDocument()
+    expect(screen.getByText(messages.login.validation.emailInvalid)).toBeInTheDocument()
     expect(authenticate).not.toHaveBeenCalled()
   })
 
@@ -57,9 +58,9 @@ describe('LoginForm', () => {
     authenticate.mockResolvedValue(null as never)
     renderLoginForm(authenticate)
 
-    await user.type(screen.getByLabelText('E-MAIL'), 'editor@example.com')
-    await user.type(screen.getByLabelText('SENHA'), 'password')
-    await user.click(screen.getByRole('button', { name: 'ENTRAR' }))
+    await user.type(screen.getByLabelText(messages.login.form.emailLabel), 'editor@example.com')
+    await user.type(screen.getByLabelText(messages.login.form.passwordLabel), 'password')
+    await user.click(screen.getByRole('button', { name: messages.login.form.submit }))
 
     await waitFor(() => {
       expect(authenticate).toHaveBeenCalledWith(
@@ -79,14 +80,14 @@ describe('LoginForm', () => {
     authenticate.mockRejectedValue(new Error('Invalid credentials'))
     renderLoginForm(authenticate)
 
-    await user.type(screen.getByLabelText('E-MAIL'), 'editor@example.com')
-    await user.type(screen.getByLabelText('SENHA'), 'incorrect-password')
-    await user.click(screen.getByRole('button', { name: 'ENTRAR' }))
+    await user.type(screen.getByLabelText(messages.login.form.emailLabel), 'editor@example.com')
+    await user.type(screen.getByLabelText(messages.login.form.passwordLabel), 'incorrect-password')
+    await user.click(screen.getByRole('button', { name: messages.login.form.submit }))
 
-    expect(await screen.findByText('Não foi possível entrar')).toBeVisible()
-    expect(screen.getByText('E-mail ou senha inválidos')).toBeVisible()
-    expect(screen.getByLabelText('SENHA')).toHaveValue('')
-    expect(screen.getByLabelText('E-MAIL')).toHaveValue('editor@example.com')
+    expect(await screen.findByText(messages.login.authentication.failedTitle)).toBeVisible()
+    expect(screen.getByText(messages.login.authentication.invalidCredentials)).toBeVisible()
+    expect(screen.getByLabelText(messages.login.form.passwordLabel)).toHaveValue('')
+    expect(screen.getByLabelText(messages.login.form.emailLabel)).toHaveValue('editor@example.com')
   })
 
   it('disables the form while authentication is pending', async () => {
@@ -99,9 +100,9 @@ describe('LoginForm', () => {
     authenticate.mockImplementation(() => new Promise<never>(() => undefined))
     renderLoginForm(authenticate)
 
-    const emailInput = screen.getByLabelText('E-MAIL')
-    const passwordInput = screen.getByLabelText('SENHA')
-    const submitButton = screen.getByRole('button', { name: 'ENTRAR' })
+    const emailInput = screen.getByLabelText(messages.login.form.emailLabel)
+    const passwordInput = screen.getByLabelText(messages.login.form.passwordLabel)
+    const submitButton = screen.getByRole('button', { name: messages.login.form.submit })
 
     await user.type(emailInput, 'editor@example.com')
     await user.type(passwordInput, 'password')

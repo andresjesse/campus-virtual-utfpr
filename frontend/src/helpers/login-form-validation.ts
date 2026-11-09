@@ -1,3 +1,5 @@
+import messages from "@/constants/messages.json";
+
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export type LoginFormErrors = {
@@ -12,13 +14,13 @@ export function validateLoginForm(
   const errors: LoginFormErrors = {};
 
   if (!email.trim()) {
-    errors.email = "Informe seu e-mail";
+    errors.email = messages.login.validation.emailRequired;
   } else if (!EMAIL_PATTERN.test(email.trim())) {
-    errors.email = "Informe um e-mail válido";
+    errors.email = messages.login.validation.emailInvalid;
   }
 
   if (!password) {
-    errors.password = "Informe sua senha";
+    errors.password = messages.login.validation.passwordRequired;
   }
 
   return errors;

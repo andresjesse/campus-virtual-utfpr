@@ -381,5 +381,25 @@
       "loadErrorTitle": "Não foi possível carregar o menu",
       "emptyTitle": "Nenhum item de menu disponível"
     }
+  },
+  "login": {
+    "subtitle": "ACESSO AO PORTAL ADMINISTRATIVO",
+    "form": {
+      "emailLabel": "E-MAIL",
+      "emailPlaceholder": "Digite seu e-mail",
+      "passwordLabel": "SENHA",
+      "passwordPlaceholder": "Digite sua senha",
+      "forgotPassword": "Esqueceu sua senha?",
+      "submit": "ENTRAR"
+    },
+    "validation": {
+      "emailRequired": "Informe seu e-mail",
+      "emailInvalid": "Informe um e-mail válido",
+      "passwordRequired": "Informe sua senha"
+    },
+    "authentication": {
+      "failedTitle": "Não foi possível entrar",
+      "invalidCredentials": "E-mail ou senha inválidos"
+    }
   }
 }
