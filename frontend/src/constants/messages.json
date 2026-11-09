@@ -382,6 +382,18 @@
       "emptyTitle": "Nenhum item de menu disponível"
     }
   },
+  "authentication": {
+    "footer": {
+      "privacyTerms": "TERMOS DE PRIVACIDADE",
+      "serviceTerms": "TERMOS DE SERVIÇO",
+      "systemStatus": "Status do sistema"
+    },
+    "route": {
+      "verifyingLabel": "Verificando autenticação",
+      "restrictedTitle": "Acesso restrito",
+      "restrictedMessage": "Você não tem permissão para acessar esta área."
+    }
+  },
   "login": {
     "subtitle": "ACESSO AO PORTAL ADMINISTRATIVO",
     "form": {
