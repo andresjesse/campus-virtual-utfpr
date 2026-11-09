@@ -195,6 +195,16 @@ export function toMenuCategoryOptions(
   }));
 }
 
+function hasMenuItemTarget(item: MenuItemRecord) {
+  return Boolean(item.href || item.page);
+}
+
+function pruneItemsWithoutTarget(nodes: MenuTreeItem[]): MenuTreeItem[] {
+  return nodes
+    .filter((node) => hasMenuItemTarget(node.item))
+    .map((node) => ({ ...node, children: pruneItemsWithoutTarget(node.children) }));
+}
+
 export function buildMenuTree(menuItems: MenuItemRecord[]): MenuTreeCategory[] {
   const nodes = new Map<string, MenuTreeItem>(
     menuItems.map((item) => [item.id, { item, children: [] }]),
@@ -220,5 +230,7 @@ export function buildMenuTree(menuItems: MenuItemRecord[]): MenuTreeCategory[] {
     category.items.push(node);
   }
 
-  return [...categories.values()];
+  return [...categories.values()]
+    .map((category) => ({ ...category, items: pruneItemsWithoutTarget(category.items) }))
+    .filter((category) => category.items.length > 0);
 }
