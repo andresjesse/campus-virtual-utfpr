@@ -27,13 +27,11 @@ beforeEach(() => {
 })
 
 describe('Home', () => {
-  it('lazy-loads the virtual map with the administrator navigation link', async () => {
+  it('lazy-loads the virtual map without an administrator link', async () => {
     renderHome()
 
     expect(await screen.findByTestId('virtual-map-viewer')).toBeInTheDocument()
-    expect(
-      screen.getByRole('link', { name: messages.virtualMap.home.adminLink }),
-    ).toHaveAttribute('href', '/admin')
+    expect(screen.queryByRole('link')).not.toBeInTheDocument()
   })
 
   it('keeps the page usable when the virtual map cannot be shown', async () => {
@@ -48,8 +46,5 @@ describe('Home', () => {
       await screen.findByText(messages.virtualMap.viewer.unavailableDescription),
     ).toBeInTheDocument()
     expect(screen.getByRole('button', { name: messages.common.retry })).toBeInTheDocument()
-    expect(
-      screen.getByRole('link', { name: messages.virtualMap.home.adminLink }),
-    ).toHaveAttribute('href', '/admin')
   })
 })

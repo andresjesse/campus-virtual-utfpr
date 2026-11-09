@@ -359,9 +359,6 @@
     }
   },
   "virtualMap": {
-    "home": {
-      "adminLink": "Admin"
-    },
     "viewer": {
       "canvasAriaLabel": "Mapa virtual em 3D",
       "loadingTitle": "Carregando o mapa",

@@ -1,6 +1,5 @@
-import { Anchor, Box } from "@mantine/core";
+import { Box } from "@mantine/core";
 import { lazy, Suspense } from "react";
-import { Link } from "react-router";
 
 import ErrorBoundary from "@/components/error-boundary/ErrorBoundary.tsx";
 import VirtualMapErrorOverlay from "@/components/virtual-map/virtual-map-viewer/VirtualMapErrorOverlay.tsx";
@@ -26,17 +25,6 @@ export default function Home() {
           <VirtualMapViewer />
         </Suspense>
       </ErrorBoundary>
-      <Anchor
-        component={Link}
-        to="/admin"
-        pos="absolute"
-        top="1rem"
-        right="1rem"
-        fw={600}
-        style={{ zIndex: 2 }}
-      >
-        {messages.virtualMap.home.adminLink}
-      </Anchor>
     </Box>
   );
 }

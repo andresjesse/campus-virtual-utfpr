@@ -10,7 +10,7 @@ test('redirects unauthenticated users from the administrator page to login', asy
   await expect(
     page.getByLabel(messages.virtualMap.viewer.canvasAriaLabel),
   ).toBeAttached()
-  await page.getByRole('link', { name: messages.virtualMap.home.adminLink }).click()
+  await page.goto('/admin')
 
   await expect(page).toHaveURL('/login')
   await expect(
