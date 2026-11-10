@@ -1,6 +1,7 @@
 import type PocketBase from "pocketbase";
 import type { FileRejection } from "react-dropzone";
 
+import { VIDEO_FILE_EXTENSIONS } from "@/constants/content-constants.ts";
 import messages from "@/constants/messages.json";
 import { bytesToMegabytes } from "@/helpers/conversion-helper.ts";
 import { formatMessage } from "@/helpers/message-helper.ts";
@@ -54,6 +55,11 @@ export function getFilenameFromUrl(url: string): string {
   } catch {
     return "";
   }
+}
+
+export function isVideoUrl(url: string): boolean {
+  const extension = getFilenameFromUrl(url).split(".").pop()?.toLowerCase() ?? "";
+  return VIDEO_FILE_EXTENSIONS.includes(extension);
 }
 
 export function getFileRejectionMessage(

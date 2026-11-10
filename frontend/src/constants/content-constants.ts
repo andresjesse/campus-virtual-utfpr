@@ -8,6 +8,8 @@ export const CONTENT_COLLECTIONS = [CONTENT_PAGE_COLLECTION, ...PAGE_BLOCK_COLLE
 
 export const FILE_BLOCK_MIME_TYPES = ["image/png", "image/jpg", "image/jpeg", "video/mp4"];
 
+export const VIDEO_FILE_EXTENSIONS = ["mp4"];
+
 export const FILE_BLOCK_MAX_SIZE_IN_BYTES = 1000 * 1000 * 15
 
 export const FILE_PREVIEW_CARD_SIZE = 120
