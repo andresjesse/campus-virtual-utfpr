@@ -1,0 +1,72 @@
+import {
+  Button,
+  Center,
+  Container,
+  Paper,
+  Stack,
+  Text,
+  ThemeIcon,
+  Title,
+} from "@mantine/core";
+import { ArrowLeftIcon, MapTrifoldIcon} from "@phosphor-icons/react";
+import { Link } from "react-router";
+
+import messages from "@/constants/messages.json";
+
+export default function NotFound() {
+  return (
+    <Center component="main" mih="100dvh" px="md" py="xl">
+      <Container size={560} w="100%">
+        <Paper
+          p={{ base: "xl", sm: 48 }}
+          radius="lg"
+          withBorder
+          ta="center"
+          shadow="xl"
+        >
+          <Stack align="center" gap="lg">
+            <ThemeIcon
+              size={72}
+              radius="xl"
+              variant="light"
+              color="brand"
+              aria-hidden="true"
+            >
+              <MapTrifoldIcon size={38} weight="duotone" />
+            </ThemeIcon>
+
+            <Text
+              fw={900}
+              fz={{ base: 72, sm: 96 }}
+              lh={0.8}
+              c="var(--app-brand-primary)"
+              aria-hidden="true"
+            >
+              404
+            </Text>
+
+            <Stack gap="xs">
+              <Title order={1} fz={{ base: 28, sm: 34 }}>
+                {messages.notFound.title}
+              </Title>
+              <Text c="dimmed" fz="lg" maw={440}>
+                {messages.notFound.description}
+              </Text>
+            </Stack>
+
+            <Button
+              component={Link}
+              to="/"
+              leftSection={<ArrowLeftIcon size={18} />}
+              color="brand"
+              variant="outline"
+              size="md"
+            >
+              {messages.notFound.backButton}
+            </Button>
+          </Stack>
+        </Paper>
+      </Container>
+    </Center>
+  );
+}

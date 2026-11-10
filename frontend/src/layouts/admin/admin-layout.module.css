@@ -1,0 +1,46 @@
+.header {
+  background: var(--app-surface-header);
+  border-bottom: 2px solid var(--app-border-default);
+}
+
+.navbar {
+  overflow: hidden;
+  background: var(--app-surface-sidebar);
+  border-inline-end: 0;
+  transition: width 180ms ease;
+}
+
+.main {
+  min-height: 100dvh;
+  background: var(--app-surface-page);
+}
+
+.collapseSection {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 3.1rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--app-border-default);
+}
+
+.collapseSectionFolded {
+  justify-content: center;
+}
+
+.collapseButton {
+  display: grid;
+  width: 1.8rem;
+  height: 1.8rem;
+  padding: 0;
+  color: var(--app-text-muted);
+  background: transparent;
+  border: 2px solid currentColor;
+  border-radius: 0.3rem;
+  cursor: pointer;
+  place-items: center;
+}
+
+.rotated {
+  transform: rotate(180deg);
+}

@@ -1,0 +1,115 @@
+name: Frontend CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - development
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frontend-ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: frontend
+
+jobs:
+  static-analysis:
+    name: Static Analysis
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - name: Restore dependencies
+        id: dependencies
+        uses: actions/cache@v5
+        with:
+          path: frontend/node_modules
+          key: ${{ runner.os }}-node-24-yarn-${{ hashFiles('frontend/yarn.lock') }}
+      - name: Install dependencies
+        if: steps.dependencies.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile
+      - name: Run ESLint
+        run: yarn lint
+
+  unit-integration:
+    name: Unit & Integration
+    needs: static-analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - name: Restore dependencies
+        id: dependencies
+        uses: actions/cache@v5
+        with:
+          path: frontend/node_modules
+          key: ${{ runner.os }}-node-24-yarn-${{ hashFiles('frontend/yarn.lock') }}
+      - name: Install dependencies
+        if: steps.dependencies.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile
+      - name: Run Jest and React Testing Library
+        run: yarn test:ci
+
+  end-to-end:
+    name: End-to-End
+    needs: static-analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - name: Restore dependencies
+        id: dependencies
+        uses: actions/cache@v5
+        with:
+          path: frontend/node_modules
+          key: ${{ runner.os }}-node-24-yarn-${{ hashFiles('frontend/yarn.lock') }}
+      - name: Install dependencies
+        if: steps.dependencies.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile
+      - name: Restore Playwright browsers
+        id: playwright-browsers
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('frontend/yarn.lock') }}
+      - name: Install Chromium and system dependencies
+        if: steps.playwright-browsers.outputs.cache-hit != 'true'
+        run: yarn playwright install --with-deps chromium
+      - name: Install Chromium system dependencies
+        if: steps.playwright-browsers.outputs.cache-hit == 'true'
+        run: yarn playwright install-deps chromium
+      - name: Create Playwright artifact directory
+        run: mkdir -p playwright-artifacts
+      - name: Run Playwright
+        run: yarn test:e2e 2>&1 | tee playwright-artifacts/playwright.log
+      - name: Upload Playwright failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v5
+        with:
+          name: playwright-failure-${{ github.run_id }}
+          path: |
+            frontend/playwright-report/
+            frontend/test-results/
+            frontend/playwright-artifacts/playwright.log
+          if-no-files-found: ignore
+          retention-days: 14

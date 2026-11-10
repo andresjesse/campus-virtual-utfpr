@@ -1,0 +1,267 @@
+import { expect, test, type Page } from '@playwright/test'
+
+import messages from '../../src/constants/messages.json' with { type: 'json' }
+
+const mesh = {
+  id: 'boxmesh0000001',
+  collectionId: 'mesh_collection',
+  collectionName: 'mesh',
+  name: 'Box',
+  file: 'box.glb',
+}
+
+const entity = {
+  id: 'boxentity00001',
+  collectionId: 'entities_collection',
+  collectionName: 'entities',
+  slug: 'main-building',
+  mesh: mesh.id,
+  is_active: true,
+  pos_x: 0,
+  pos_y: 0,
+  pos_z: 0,
+  rotation_x: 0,
+  rotation_y: 0,
+  rotation_z: 0,
+  scale_x: 1,
+  scale_y: 1,
+  scale_z: 1,
+  expand: { mesh },
+}
+
+const contentPage = {
+  id: 'contentpage0001',
+  collectionId: 'content_page_collection',
+  collectionName: 'content_page',
+  title: 'Main Building',
+  entity: entity.id,
+}
+
+const rtfBlock = {
+  id: 'rtfblock000001',
+  collectionId: 'rtf_block_collection',
+  collectionName: 'rtf_block',
+  title: 'Opening hours',
+  page: contentPage.id,
+  content: '<p>Open from 8am to 6pm</p>',
+}
+
+const emptyList = { page: 1, perPage: 30, totalItems: 0, totalPages: 0, items: [] }
+
+function createBoxGltf(size: number) {
+  const half = size / 2
+  const positions = new Float32Array(
+    [
+      [-half, -half, -half],
+      [half, -half, -half],
+      [half, half, -half],
+      [-half, half, -half],
+      [-half, -half, half],
+      [half, -half, half],
+      [half, half, half],
+      [-half, half, half],
+    ].flat(),
+  )
+  const indices = new Uint16Array([
+    0, 2, 1, 0, 3, 2, 4, 5, 6, 4, 6, 7, 0, 1, 5, 0, 5, 4,
+    3, 6, 2, 3, 7, 6, 0, 4, 7, 0, 7, 3, 1, 2, 6, 1, 6, 5,
+  ])
+  const buffer = Buffer.concat([Buffer.from(positions.buffer), Buffer.from(indices.buffer)])
+
+  return JSON.stringify({
+    asset: { version: '2.0' },
+    scene: 0,
+    scenes: [{ nodes: [0] }],
+    nodes: [{ mesh: 0 }],
+    meshes: [{ primitives: [{ attributes: { POSITION: 0 }, indices: 1 }] }],
+    buffers: [
+      {
+        byteLength: buffer.byteLength,
+        uri: `data:application/octet-stream;base64,${buffer.toString('base64')}`,
+      },
+    ],
+    bufferViews: [
+      { buffer: 0, byteOffset: 0, byteLength: positions.byteLength },
+      { buffer: 0, byteOffset: positions.byteLength, byteLength: indices.byteLength },
+    ],
+    accessors: [
+      {
+        bufferView: 0,
+        componentType: 5126,
+        count: 8,
+        type: 'VEC3',
+        min: [-half, -half, -half],
+        max: [half, half, half],
+      },
+      { bufferView: 1, componentType: 5123, count: indices.length, type: 'SCALAR' },
+    ],
+  })
+}
+
+async function openMapWithOneEntity(page: Page, { withPage = true } = {}) {
+  await page.route('**/api/collections/entities/records**', (route) =>
+    route.fulfill({
+      json: { page: 1, perPage: 1000, totalItems: 1, totalPages: 1, items: [entity] },
+    }),
+  )
+  await page.route('**/api/collections/content_page/records**', (route) =>
+    route.fulfill({
+      json: withPage
+        ? { ...emptyList, totalItems: 1, totalPages: 1, items: [contentPage] }
+        : emptyList,
+    }),
+  )
+  await page.route('**/api/collections/rtf_block/records**', (route) => {
+    const isListing = new URL(route.request().url()).pathname.endsWith('/records')
+    return route.fulfill({
+      json: isListing ? { ...emptyList, totalItems: 1, totalPages: 1, items: [rtfBlock] } : rtfBlock,
+    })
+  })
+  for (const collection of ['file_block', 'diagram_block', 'menu_items']) {
+    await page.route(`**/api/collections/${collection}/records**`, (route) =>
+      route.fulfill({ json: emptyList }),
+    )
+  }
+  await page.route(`**/api/files/**/${mesh.file}**`, (route) =>
+    route.fulfill({ contentType: 'model/gltf+json', body: createBoxGltf(60) }),
+  )
+
+  await page.goto('/')
+
+  const canvas = page.getByLabel(messages.virtualMap.viewer.canvasAriaLabel)
+  await expect(canvas).toBeVisible()
+  await expect(page.getByRole('status')).toBeHidden()
+
+  const box = await canvas.boundingBox()
+  if (!box) throw new Error('The map canvas has no layout box')
+
+  return {
+    center: { x: box.x + box.width / 2, y: box.y + box.height / 2 },
+    emptySpot: { x: box.x + 40, y: box.y + 40 },
+  }
+}
+
+const modal = (page: Page) => page.getByRole('dialog', { name: contentPage.title })
+
+test.describe('virtual map selection', () => {
+  test('opens the content page modal on click and closes it from its close button', async ({
+    page,
+  }) => {
+    const { center } = await openMapWithOneEntity(page)
+
+    await page.mouse.click(center.x, center.y)
+
+    await expect(modal(page)).toBeVisible()
+    await expect(modal(page)).toContainText(rtfBlock.title)
+    await expect(modal(page)).toContainText('Open from 8am to 6pm')
+
+    await page
+      .getByRole('button', { name: messages.virtualMap.entityModal.closeAriaLabel })
+      .click()
+
+    await expect(modal(page)).toBeHidden()
+  })
+
+  test('closes the modal with Escape', async ({ page }) => {
+    const { center } = await openMapWithOneEntity(page)
+
+    await page.mouse.click(center.x, center.y)
+    await expect(modal(page)).toBeVisible()
+
+    await page.keyboard.press('Escape')
+
+    await expect(modal(page)).toBeHidden()
+  })
+
+  test('closes the modal when clicking outside of it', async ({ page }) => {
+    const { center, emptySpot } = await openMapWithOneEntity(page)
+
+    await page.mouse.click(center.x, center.y)
+    await expect(modal(page)).toBeVisible()
+
+    await page.mouse.click(emptySpot.x, emptySpot.y)
+
+    await expect(modal(page)).toBeHidden()
+  })
+
+  test('opens nothing when the entity has no content page', async ({ page }) => {
+    const { center } = await openMapWithOneEntity(page, { withPage: false })
+
+    await page.mouse.click(center.x, center.y)
+
+    await expect(page.getByRole('dialog')).toBeHidden()
+  })
+
+  test('does not select anything when dragging to orbit the camera', async ({ page }) => {
+    const { center } = await openMapWithOneEntity(page)
+
+    await page.mouse.move(center.x, center.y)
+    await page.mouse.down()
+    await page.mouse.move(center.x + 80, center.y + 20, { steps: 8 })
+    await page.mouse.move(center.x, center.y, { steps: 8 })
+    await page.mouse.up()
+
+    await expect(page.getByRole('dialog')).toBeHidden()
+  })
+})
+
+test.describe('virtual map hover', () => {
+  const canvasOf = (page: Page) => page.getByLabel(messages.virtualMap.viewer.canvasAriaLabel)
+
+  test('shows a pointer cursor over an entity and resets it elsewhere', async ({ page }) => {
+    const { center, emptySpot } = await openMapWithOneEntity(page)
+
+    await page.mouse.move(center.x, center.y)
+    await expect(canvasOf(page)).toHaveCSS('cursor', 'pointer')
+
+    await page.mouse.move(emptySpot.x, emptySpot.y)
+    await expect(canvasOf(page)).not.toHaveCSS('cursor', 'pointer')
+  })
+
+  test('highlights the hovered entity and removes the highlight when the pointer leaves', async ({
+    page,
+  }) => {
+    const { center, emptySpot } = await openMapWithOneEntity(page)
+    const clip = { x: center.x - 40, y: center.y - 40, width: 80, height: 80 }
+
+    await page.mouse.move(emptySpot.x, emptySpot.y)
+    const idle = await page.screenshot({ clip })
+
+    await page.mouse.move(center.x, center.y)
+    await expect(canvasOf(page)).toHaveCSS('cursor', 'pointer')
+    const hovered = await page.screenshot({ clip })
+    expect(hovered.equals(idle)).toBe(false)
+
+    await page.mouse.move(emptySpot.x, emptySpot.y)
+    await expect(canvasOf(page)).not.toHaveCSS('cursor', 'pointer')
+    const restored = await page.screenshot({ clip })
+    expect(restored.equals(idle)).toBe(true)
+  })
+
+  test('neither highlights nor shows a pointer on an entity without a content page', async ({
+    page,
+  }) => {
+    const { center, emptySpot } = await openMapWithOneEntity(page, { withPage: false })
+    const clip = { x: center.x - 40, y: center.y - 40, width: 80, height: 80 }
+
+    await page.mouse.move(emptySpot.x, emptySpot.y)
+    const idle = await page.screenshot({ clip })
+
+    await page.mouse.move(center.x, center.y)
+    await page.waitForTimeout(300)
+
+    await expect(canvasOf(page)).not.toHaveCSS('cursor', 'pointer')
+    expect((await page.screenshot({ clip })).equals(idle)).toBe(true)
+  })
+
+  test('clears the highlight while dragging to orbit', async ({ page }) => {
+    const { center } = await openMapWithOneEntity(page)
+
+    await page.mouse.move(center.x, center.y)
+    await expect(canvasOf(page)).toHaveCSS('cursor', 'pointer')
+
+    await page.mouse.down()
+    await expect(canvasOf(page)).not.toHaveCSS('cursor', 'pointer')
+    await page.mouse.up()
+  })
+})

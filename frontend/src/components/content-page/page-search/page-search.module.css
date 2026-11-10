@@ -1,0 +1,12 @@
+.input {
+  height: 2.4rem;
+  color: var(--app-text-primary);
+  font-size: 0.8rem;
+  background: var(--app-surface-interactive);
+  border: 2px solid var(--app-border-strong);
+  border-radius: 1.5rem;
+}
+
+.input:focus {
+  border-color: var(--app-brand-primary);
+}

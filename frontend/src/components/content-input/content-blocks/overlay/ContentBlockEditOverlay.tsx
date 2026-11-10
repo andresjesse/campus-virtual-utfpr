@@ -1,0 +1,166 @@
+import {
+  Button,
+  Group,
+  Modal,
+  Stack,
+  type ModalProps,
+} from "@mantine/core";
+import type {ContentPageBlockMetadata, ContentPageBlockValue} from "@/types/content-page.ts";
+import useContentBlockData from "@/hooks/content-blocks/useContentBlockData.tsx";
+import FeedbackState from "@/components/feedback-state";
+import {CheckIcon} from "@phosphor-icons/react";
+import {useEffect, useRef, useState} from "react";
+import TitleInput from "@/components/text-input/TitleInput.tsx";
+import {CONTENT_BLOCK_EDITOR_OVERLAY_BODY} from "@/components/content-input/content-blocks/overlay/registry.ts";
+import {type ContentPageBlockType} from "@/enums/content-pages-enum.ts";
+import {notifications} from "@mantine/notifications";
+import {
+  getEmptyContentNotification,
+  isBlockContentEmpty,
+} from "@/helpers/content-block-validation.ts";
+import messages from "@/constants/messages.json";
+import {getRequestErrorMessage} from "@/helpers/request-error-helper.ts";
+
+type ContentBlockEditModalProps = {
+  blockMetadata: ContentPageBlockMetadata;
+  onUpdate: () => void;
+} & ModalProps
+
+export default function ContentBlockEditOverlay({
+  blockMetadata,
+  onUpdate,
+  opened,
+  onClose,
+  withOverlay = true,
+  overlayProps,
+  ...props
+}: ContentBlockEditModalProps) {
+  const [draftMetadata, setDraftMetadata] = useState(blockMetadata);
+  const [isSaving, setIsSaving] = useState(false);
+  const [contentError, setContentError] = useState<string>();
+  const { blockData, isLoading, upsertBlockContent } = useContentBlockData(draftMetadata);
+  const content = useRef<ContentPageBlockValue>(blockData);
+
+  const EditorBody
+    = CONTENT_BLOCK_EDITOR_OVERLAY_BODY[blockMetadata.collectionName as ContentPageBlockType];
+
+  useEffect(() => {
+    content.current = blockData;
+  }, [blockData, blockMetadata.collectionName]);
+
+  const handleUpdate = async () => {
+    const isNewBlock = !draftMetadata.id;
+
+    if (!draftMetadata.page) {
+      notifications.show({
+        color: "yellow",
+        title: messages.block.page.unsavedTitle,
+        message: messages.block.page.unsavedMessage,
+      });
+      return;
+    }
+
+    if (isBlockContentEmpty(blockMetadata.collectionName, content.current)) {
+      const { title, message } = getEmptyContentNotification(
+        blockMetadata.collectionName,
+        isNewBlock,
+      );
+      setContentError(message);
+      notifications.show({ color: "yellow", title, message });
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      await upsertBlockContent(content.current);
+      onUpdate();
+      notifications.show({
+        color: "green",
+        title: messages.block.editor.saveSuccessTitle,
+        message: messages.block.editor.saveSuccessMessage
+      })
+    }
+    catch (saveError) {
+      notifications.show({
+        color: "red",
+        title: messages.block.editor.saveErrorTitle,
+        message: getRequestErrorMessage(saveError)
+      })
+    }
+    finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <Modal.Root
+      {...props}
+      centered
+      opened={opened}
+      onClose={onClose}
+      closeOnClickOutside={!isLoading}
+      closeOnEscape={!isLoading}
+      size="xl"
+    >
+      {withOverlay && <Modal.Overlay {...overlayProps} />}
+      <Modal.Content>
+        {!isLoading && (
+          <Modal.Header mb={0} pb={0}>
+            <Modal.CloseButton />
+          </Modal.Header>
+        )}
+        <Modal.Body pt={0}>
+          {isLoading && !blockData ? (
+            <FeedbackState title={messages.block.editor.loading} loading />
+          ) : (
+            <Stack gap="lg">
+              <TitleInput
+                label={messages.block.editor.titleLabel}
+                placeholder={messages.block.editor.titlePlaceholder}
+                value={draftMetadata.title}
+                onChange={(event) => {
+                  const title = event.currentTarget.value;
+                  setDraftMetadata((current) => ({ ...current, title }));
+                }}
+                disabled={isLoading}
+              />
+
+              <EditorBody
+                content={blockData}
+                onChange={(value) => {
+                  content.current = value;
+                  setContentError(undefined);
+                }}
+                error={contentError}
+              />
+            </Stack>
+          )}
+
+          <Group
+            justify="flex-end"
+            mt="lg"
+            style={{
+              position: 'sticky',
+              bottom: 0,
+              zIndex: 1,
+              paddingTop: 8,
+              paddingBottom: 8,
+              backgroundColor: 'var(--mantine-color-body)',
+            }}
+          >
+            <Button
+              variant="outline"
+              color="brand"
+              size="sm"
+              loading={isSaving}
+              leftSection={<CheckIcon aria-hidden size={16} />}
+              onClick={() => void handleUpdate()}
+            >
+              {messages.common.save}
+            </Button>
+          </Group>
+        </Modal.Body>
+      </Modal.Content>
+    </Modal.Root>
+  );
+}

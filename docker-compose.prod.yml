@@ -1,0 +1,29 @@
+# Production stack (single container). Do not run by hand on the server:
+# use ./deploy/deploy.sh, which also backs up the database. See "Deploy" in Readme.md.
+#
+# Variables (exported by deploy.sh):
+#   CAMPUS_DATA_DIR  host directory with the PocketBase data (database + uploads)
+#   CAMPUS_UID/GID   host user that owns CAMPUS_DATA_DIR
+
+name: campus-virtual
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+    image: campus-virtual:latest
+    container_name: campus-virtual
+    restart: unless-stopped
+    user: "${CAMPUS_UID:-1000}:${CAMPUS_GID:-1000}"
+    # Only reachable from the host itself (nginx). Never publish on 0.0.0.0:
+    # Docker bypasses the host firewall.
+    ports:
+      - "127.0.0.1:8090:8090"
+    volumes:
+      - "${CAMPUS_DATA_DIR:-/srv/campus-virtual/data/pb_data}:/pb/pb_data"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"

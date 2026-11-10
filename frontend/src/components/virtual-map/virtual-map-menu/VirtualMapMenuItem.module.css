@@ -1,0 +1,8 @@
+.item {
+  transition: background-color 150ms ease;
+}
+
+.item:not(:disabled):hover,
+.item:focus-visible {
+  background-color: color-mix(in srgb, var(--app-brand-primary) 12%, transparent);
+}

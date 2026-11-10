@@ -1,0 +1,7 @@
+.tab {
+  background: transparent;
+}
+
+.tab:hover {
+  background: var(--app-surface-interactive-hover);
+}
