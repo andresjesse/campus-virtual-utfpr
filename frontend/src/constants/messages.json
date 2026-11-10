@@ -330,6 +330,9 @@
     }
   },
   "contentPages": {
+    "errors": {
+      "duplicate": "Já existe uma página relacionada a esse Modelo 3D."
+    },
     "editor": {
       "canvasLabel": "Conteúdo da página",
       "relationEntityOption": "Modelo 3D — {name}",
