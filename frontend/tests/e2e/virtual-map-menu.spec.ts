@@ -70,6 +70,9 @@ async function openMapWithMenu(page: Page) {
   await page.route('**/api/collections/entities/records**', (route) =>
     route.fulfill({ json: emptyList }),
   )
+  await page.route('**/api/collections/content_page/records**', (route) =>
+    route.fulfill({ json: emptyList }),
+  )
   await page.route('**/api/collections/menu_items/records**', (route) =>
     route.fulfill({ json: listOf([linkItem, pageItem, nestedItem]) }),
   )
