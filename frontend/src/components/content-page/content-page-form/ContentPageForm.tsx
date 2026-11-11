@@ -56,7 +56,7 @@ export default function ContentPageForm({
       notifications.show({
         color: "red",
         title: messages.common.saveError,
-        message: getRequestErrorMessage(submitError),
+        message: getRequestErrorMessage(submitError, messages.contentPages.errors),
       });
     } finally {
       setIsSaving(false);

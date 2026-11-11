@@ -65,6 +65,10 @@
     }
   },
   "files": {
+    "video": {
+      "ariaLabel": "Vídeo: {name}",
+      "unsupported": "Seu navegador não suporta a reprodução deste vídeo."
+    },
     "rejection": {
       "title": "Arquivo(s) não aceito(s)",
       "tooLarge": "\"{fileName}\" excede o tamanho máximo de {maxSizeMb}MB.",
@@ -330,6 +334,9 @@
     }
   },
   "contentPages": {
+    "errors": {
+      "duplicate": "Já existe uma página relacionada a esse Modelo 3D."
+    },
     "editor": {
       "canvasLabel": "Conteúdo da página",
       "relationEntityOption": "Modelo 3D — {name}",
