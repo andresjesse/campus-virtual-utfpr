@@ -7,6 +7,7 @@ import {
   VIRTUAL_MAP_ENTITY_LOADING_DELAY_MS,
   VIRTUAL_MAP_EVENTS,
 } from '@/constants/virtual-map-constants.ts'
+import { VIRTUAL_MAP_TOUR_STORAGE_KEY } from '@/constants/virtual-map-tour-constants.ts'
 import { formatMessage } from '@/helpers/message-helper.ts'
 import { virtualMapEventBus } from '@/helpers/virtual-map-event-bus.ts'
 import { useVirtualMap } from '@/hooks/use-virtual-map.ts'
@@ -67,7 +68,12 @@ function renderViewer(state: Partial<ReturnType<typeof useVirtualMap>>) {
 }
 
 describe('VirtualMapViewer', () => {
-  beforeEach(() => mockEntityPage())
+  beforeEach(() => {
+    window.localStorage.setItem(VIRTUAL_MAP_TOUR_STORAGE_KEY, 'true')
+    mockEntityPage()
+  })
+
+  afterEach(() => window.localStorage.clear())
 
   it('passes its canvas to the virtual map hook', () => {
     renderViewer({ status: 'ready' })
