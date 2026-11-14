@@ -2,6 +2,8 @@ import { expect, test, type Page } from '@playwright/test'
 
 import messages from '../../src/constants/messages.json' with { type: 'json' }
 
+import { skipVirtualMapTour } from './skip-virtual-map-tour.ts'
+
 const category = {
   id: 'category000001',
   collectionId: 'menu_categories_collection',
@@ -92,6 +94,7 @@ async function openMapWithMenu(page: Page) {
     }),
   )
 
+  await skipVirtualMapTour(page)
   await page.goto('/')
   await expect(page.getByRole('status')).toBeHidden()
 
