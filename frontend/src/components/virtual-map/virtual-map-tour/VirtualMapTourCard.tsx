@@ -32,9 +32,8 @@ export default function VirtualMapTourCard({
   const bodyId = useId();
 
   return (
-    <FocusTrap active>
+    <FocusTrap active innerRef={ref}>
       <Paper
-        ref={ref}
         role="dialog"
         aria-modal
         aria-labelledby={titleId}
