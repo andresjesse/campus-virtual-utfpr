@@ -401,8 +401,12 @@
       "loadErrorTitle": "Não foi possível carregar o menu",
       "emptyTitle": "Nenhum item de menu disponível"
     },
+    "toolbar": {
+      "ariaLabel": "Ferramentas do mapa"
+    },
     "tour": {
       "stepCounter": "{current} de {total}",
+      "restartLabel": "Ver o tour novamente",
       "steps": {
         "welcome": {
           "title": "Boas-vindas ao Campus Virtual - UTFPR Guarapuava!",

@@ -64,3 +64,15 @@ export function getTourMaskPath(
     `V${top + r}A${r} ${r} 0 0 1 ${left + r} ${top}Z`
   );
 }
+
+export function restartTour(
+  storage: Storage = window.localStorage,
+  reload: () => void = () => window.location.reload(),
+): void {
+  try {
+    storage.removeItem(VIRTUAL_MAP_TOUR_STORAGE_KEY);
+  } catch {
+    // Unreadable storage already makes the tour show on load, so reload anyway.
+  }
+  reload();
+}

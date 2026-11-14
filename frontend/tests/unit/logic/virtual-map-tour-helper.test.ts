@@ -9,6 +9,7 @@ import {
   getTourTargetSelector,
   hasCompletedTour,
   markTourCompleted,
+  restartTour,
 } from '@/helpers/virtual-map-tour-helper.ts'
 
 function createThrowingStorage(): Storage {
@@ -16,7 +17,9 @@ function createThrowingStorage(): Storage {
     length: 0,
     clear: jest.fn(),
     key: jest.fn(),
-    removeItem: jest.fn(),
+    removeItem: jest.fn(() => {
+      throw new Error('storage disabled')
+    }),
     getItem: jest.fn(() => {
       throw new Error('storage disabled')
     }),
@@ -46,6 +49,24 @@ describe('virtual map tour helper', () => {
     window.localStorage.setItem(VIRTUAL_MAP_TOUR_STORAGE_KEY, 'yes')
 
     expect(hasCompletedTour()).toBe(false)
+  })
+
+  it('clears the completed flag and reloads when restarting the tour', () => {
+    markTourCompleted()
+    const reload = jest.fn()
+
+    restartTour(window.localStorage, reload)
+
+    expect(hasCompletedTour()).toBe(false)
+    expect(reload).toHaveBeenCalledTimes(1)
+  })
+
+  it('still reloads when restarting with unavailable storage', () => {
+    const reload = jest.fn()
+
+    restartTour(createThrowingStorage(), reload)
+
+    expect(reload).toHaveBeenCalledTimes(1)
   })
 
   it('treats unavailable storage as not completed without throwing', () => {
