@@ -2,11 +2,14 @@ import { Box } from "@mantine/core";
 import { useMemo, useRef } from "react";
 
 import VirtualMapMenu from "@/components/virtual-map/virtual-map-menu/VirtualMapMenu.tsx";
+import VirtualMapTopLeftToolbar from "@/components/virtual-map/virtual-map-toolbar/VirtualMapTopLeftToolbar.tsx";
+import VirtualMapTour from "@/components/virtual-map/virtual-map-tour/VirtualMapTour.tsx";
 import VirtualMapEntityModal from "@/components/virtual-map/virtual-map-viewer/VirtualMapEntityModal.tsx";
 import VirtualMapErrorOverlay from "@/components/virtual-map/virtual-map-viewer/VirtualMapErrorOverlay.tsx";
 import VirtualMapLoadingOverlay from "@/components/virtual-map/virtual-map-viewer/VirtualMapLoadingOverlay.tsx";
 import messages from "@/constants/messages.json";
 import { VIRTUAL_MAP_ENTITY_LOADING_DELAY_MS } from "@/constants/virtual-map-constants.ts";
+import { VIRTUAL_MAP_TOUR_TARGETS } from "@/constants/virtual-map-tour-constants.ts";
 import { useDelayedFlag } from "@/hooks/use-delayed-flag.ts";
 import { useLastDefined } from "@/hooks/use-last-defined.ts";
 import { useVirtualMapEntityPage } from "@/hooks/use-virtual-map-entity-page.ts";
@@ -47,10 +50,13 @@ export default function VirtualMapViewer() {
         w="100%"
         h="100%"
         aria-label={messages.virtualMap.viewer.canvasAriaLabel}
+        data-tour={VIRTUAL_MAP_TOUR_TARGETS.canvas}
       />
       {status === "loading" && <VirtualMapLoadingOverlay progress={progress} />}
       {status === "error" && <VirtualMapErrorOverlay description={error} onRetry={retry} />}
+      {status === "ready" && <VirtualMapTopLeftToolbar />}
       {status === "ready" && <VirtualMapMenu />}
+      <VirtualMapTour enabled={status === "ready"} />
       {modalContent && (
         <VirtualMapEntityModal
           opened={isModalOpen}

@@ -2,6 +2,8 @@ import { expect, test, type Page } from '@playwright/test'
 
 import messages from '../../src/constants/messages.json' with { type: 'json' }
 
+import { skipVirtualMapTour } from './skip-virtual-map-tour.ts'
+
 const mesh = {
   id: 'boxmesh0000001',
   collectionId: 'mesh_collection',
@@ -126,6 +128,7 @@ async function openMapWithOneEntity(page: Page, { withPage = true } = {}) {
     route.fulfill({ contentType: 'model/gltf+json', body: createBoxGltf(60) }),
   )
 
+  await skipVirtualMapTour(page)
   await page.goto('/')
 
   const canvas = page.getByLabel(messages.virtualMap.viewer.canvasAriaLabel)
