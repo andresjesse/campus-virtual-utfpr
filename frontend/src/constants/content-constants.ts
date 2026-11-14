@@ -15,3 +15,7 @@ export const FILE_BLOCK_MAX_SIZE_IN_BYTES = 1000 * 1000 * 15
 export const FILE_PREVIEW_CARD_SIZE = 120
 
 export const FILE_PREVIEW_GAP = 16
+
+export const FILE_CAROUSEL_MAX_HEIGHT = "70vh"
+
+export const FILE_CAROUSEL_ASPECT_RATIO = "16 / 9"

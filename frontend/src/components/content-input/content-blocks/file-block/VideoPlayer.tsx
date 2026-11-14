@@ -15,7 +15,7 @@ export default function VideoPlayer({ src }: VideoPlayerProps) {
       preload="metadata"
       src={src}
       aria-label={ariaLabel}
-      style={{ display: "block", width: "100%", height: "auto", maxHeight: "70vh" }}
+      style={{ display: "block", width: "100%", height: "100%", objectFit: "contain" }}
     >
       {messages.files.video.unsupported}
     </video>

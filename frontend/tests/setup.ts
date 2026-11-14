@@ -28,6 +28,19 @@ Object.defineProperty(globalThis, 'ResizeObserver', {
   value: ResizeObserverMock,
 })
 
+class IntersectionObserverMock {
+  disconnect() {}
+  observe() {}
+  unobserve() {}
+  takeRecords() {
+    return []
+  }
+}
+
+Object.defineProperty(globalThis, 'IntersectionObserver', {
+  value: IntersectionObserverMock,
+})
+
 if (!('PointerEvent' in globalThis)) {
   Object.defineProperty(globalThis, 'PointerEvent', {
     value: class PointerEvent extends MouseEvent {

@@ -28,6 +28,7 @@ export type Branding = {
       interactive: string;
       interactiveHover: string;
       shadow: string;
+      media: string;
     };
     border: {
       default: string;
@@ -91,6 +92,7 @@ export const branding: Branding = {
       interactive: "#2e2e2e",
       interactiveHover: "#292929",
       shadow: "#000000",
+      media: "#000000",
     },
     border: {
       default: "#626262",
