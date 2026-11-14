@@ -22,7 +22,7 @@ export default function VirtualMapViewer() {
   const { status, progress, error, retry } = useVirtualMap(canvasRef);
   const { selected, clearSelection } = useVirtualMapSelection();
   const entityPage = useVirtualMapEntityPage(selected);
-  useVirtualMapDeepLink(status === "ready");
+  useVirtualMapDeepLink(status === "ready", selected?.slug ?? null);
 
   const { status: pageStatus, page, blocks, error: pageError, retry: retryPage } = entityPage;
   // An entity without a page also starts as "loading", so the modal waits out the delay

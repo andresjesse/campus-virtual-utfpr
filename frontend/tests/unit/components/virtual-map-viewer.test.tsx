@@ -96,7 +96,17 @@ describe('VirtualMapViewer', () => {
   ] as const)('opens deep links only once the map is ready (%s)', (status, isMapReady) => {
     renderViewer({ status })
 
-    expect(useVirtualMapDeepLinkMock).toHaveBeenLastCalledWith(isMapReady)
+    expect(useVirtualMapDeepLinkMock).toHaveBeenLastCalledWith(isMapReady, null)
+  })
+
+  it('passes the selected entity slug to the deep link hook', () => {
+    renderViewer({ status: 'ready' })
+
+    act(() => {
+      virtualMapEventBus.dispatch(VIRTUAL_MAP_EVENTS.ENTITY_SELECTED, { id: 'block-b-id', slug: 'block_b' })
+    })
+
+    expect(useVirtualMapDeepLinkMock).toHaveBeenLastCalledWith(true, 'block_b')
   })
 
   it('shows the loading percentage while models load', () => {

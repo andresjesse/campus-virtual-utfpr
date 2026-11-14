@@ -1,6 +1,6 @@
 import { notifications } from '@mantine/notifications'
-import { render, screen, waitFor } from '@testing-library/react'
-import { MemoryRouter, Route, Routes, useLocation } from 'react-router'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-router'
 
 import { branding } from '@/config/branding.ts'
 import messages from '@/constants/messages.json'
@@ -8,6 +8,7 @@ import { VIRTUAL_MAP_EVENTS } from '@/constants/virtual-map-constants.ts'
 import { getRequestErrorMessage } from '@/helpers/request-error-helper.ts'
 import { virtualMapEventBus } from '@/helpers/virtual-map-event-bus.ts'
 import { useVirtualMapDeepLink } from '@/hooks/use-virtual-map-deep-link.ts'
+import { useVirtualMapSelection } from '@/hooks/use-virtual-map-selection.ts'
 import { getContentPageByEntity } from '@/services/content-page-service.ts'
 import { getActiveEntityBySlug } from '@/services/entity-service.ts'
 
@@ -29,8 +30,18 @@ const blockB = { id: 'block-b-id', slug: 'block_b' } as never
 const page = { id: 'page-id', title: 'Block B', entity: 'block-b-id' } as never
 
 function DeepLinkProbe({ isMapReady }: { isMapReady: boolean }) {
-  useVirtualMapDeepLink(isMapReady)
-  return <output data-testid="pathname">{useLocation().pathname}</output>
+  const { selected, clearSelection } = useVirtualMapSelection()
+  const navigate = useNavigate()
+  useVirtualMapDeepLink(isMapReady, selected?.slug ?? null)
+
+  return (
+    <>
+      <output data-testid="pathname">{useLocation().pathname}</output>
+      <output data-testid="selected">{selected?.slug ?? ''}</output>
+      <button onClick={clearSelection}>Close</button>
+      <button onClick={() => navigate(-1)}>Back</button>
+    </>
+  )
 }
 
 function renderDeepLink(path: string, isMapReady = true) {
@@ -48,6 +59,13 @@ function renderDeepLink(path: string, isMapReady = true) {
 }
 
 const pathname = () => screen.getByTestId('pathname').textContent
+const selectedSlug = () => screen.getByTestId('selected').textContent
+
+function selectInScene(id: string, slug: string) {
+  act(() => {
+    virtualMapEventBus.dispatch(VIRTUAL_MAP_EVENTS.ENTITY_SELECTED, { id, slug })
+  })
+}
 
 describe('useVirtualMapDeepLink', () => {
   const onSelected = jest.fn()
@@ -136,5 +154,61 @@ describe('useVirtualMapDeepLink', () => {
     )
     expect(pathname()).toBe('/map/block_b')
     expect(onSelected).not.toHaveBeenCalled()
+  })
+
+  it('moves the URL to the entity selected in the scene without resolving it again', () => {
+    renderDeepLink('/')
+
+    selectInScene('block-b-id', 'block_b')
+
+    expect(pathname()).toBe('/map/block_b')
+    expect(selectedSlug()).toBe('block_b')
+    expect(getActiveEntityBySlugMock).not.toHaveBeenCalled()
+  })
+
+  it('returns to the home URL when the selection is cleared', () => {
+    renderDeepLink('/')
+    selectInScene('block-b-id', 'block_b')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
+
+    expect(pathname()).toBe('/')
+    expect(selectedSlug()).toBe('')
+  })
+
+  it('clears the selection when history goes back to the home URL', () => {
+    renderDeepLink('/')
+    selectInScene('block-b-id', 'block_b')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Back' }))
+
+    expect(pathname()).toBe('/')
+    expect(selectedSlug()).toBe('')
+  })
+
+  it('selects the previous entity again when history goes back to its URL', async () => {
+    const blockA = { id: 'block-a-id', slug: 'block_a' } as never
+    getActiveEntityBySlugMock.mockResolvedValue(blockA)
+    getContentPageByEntityMock.mockResolvedValue(page)
+    renderDeepLink('/')
+    selectInScene('block-a-id', 'block_a')
+    selectInScene('block-b-id', 'block_b')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Back' }))
+
+    expect(pathname()).toBe('/map/block_a')
+    await waitFor(() => expect(selectedSlug()).toBe('block_a'))
+    expect(getActiveEntityBySlugMock).toHaveBeenCalledWith('block_a')
+  })
+
+  it('does not resolve a deep link again once it is selected', async () => {
+    getActiveEntityBySlugMock.mockResolvedValue(blockB)
+    getContentPageByEntityMock.mockResolvedValue(page)
+
+    renderDeepLink('/map/block_b')
+
+    await waitFor(() => expect(selectedSlug()).toBe('block_b'))
+    expect(getActiveEntityBySlugMock).toHaveBeenCalledTimes(1)
+    expect(pathname()).toBe('/map/block_b')
   })
 })
