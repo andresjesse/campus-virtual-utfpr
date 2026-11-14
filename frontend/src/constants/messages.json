@@ -68,6 +68,11 @@
     }
   },
   "files": {
+    "carousel": {
+      "previous": "Arquivo anterior",
+      "next": "Próximo arquivo",
+      "indicator": "Ir para o arquivo {index}"
+    },
     "video": {
       "ariaLabel": "Vídeo: {name}",
       "unsupported": "Seu navegador não suporta a reprodução deste vídeo."
