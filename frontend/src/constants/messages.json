@@ -396,6 +396,10 @@
       "loadErrorTitle": "Não foi possível carregar o conteúdo deste item",
       "emptyTitle": "Este item ainda não tem conteúdo"
     },
+    "deepLink": {
+      "notFoundTitle": "Item não encontrado",
+      "notFoundMessage": "O link aberto não corresponde a nenhum item disponível no mapa."
+    },
     "menu": {
       "toggleLabel": "Menu",
       "loadErrorTitle": "Não foi possível carregar o menu",
