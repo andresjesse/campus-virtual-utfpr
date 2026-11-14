@@ -398,7 +398,8 @@
     },
     "deepLink": {
       "notFoundTitle": "Item não encontrado",
-      "notFoundMessage": "O link aberto não corresponde a nenhum item disponível no mapa."
+      "notFoundMessage": "O link aberto não corresponde a nenhum item disponível no mapa.",
+      "loadErrorTitle": "Não foi possível abrir o link"
     },
     "menu": {
       "toggleLabel": "Menu",

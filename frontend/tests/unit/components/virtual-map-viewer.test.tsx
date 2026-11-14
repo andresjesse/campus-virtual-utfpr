@@ -11,10 +11,15 @@ import { VIRTUAL_MAP_TOUR_STORAGE_KEY } from '@/constants/virtual-map-tour-const
 import { formatMessage } from '@/helpers/message-helper.ts'
 import { virtualMapEventBus } from '@/helpers/virtual-map-event-bus.ts'
 import { useVirtualMap } from '@/hooks/use-virtual-map.ts'
+import { useVirtualMapDeepLink } from '@/hooks/use-virtual-map-deep-link.ts'
 import { useVirtualMapEntityPage } from '@/hooks/use-virtual-map-entity-page.ts'
 
 jest.mock('@/hooks/use-virtual-map.ts', () => ({
   useVirtualMap: jest.fn(),
+}))
+
+jest.mock('@/hooks/use-virtual-map-deep-link.ts', () => ({
+  useVirtualMapDeepLink: jest.fn(),
 }))
 
 jest.mock('@/hooks/content-blocks/useContentBlockData.tsx', () => ({
@@ -36,6 +41,7 @@ jest.mock('@/services/menu-item-service.ts', () => ({ getMenuItemIconUrl: () => 
 
 const useVirtualMapMock = jest.mocked(useVirtualMap)
 const useVirtualMapEntityPageMock = jest.mocked(useVirtualMapEntityPage)
+const useVirtualMapDeepLinkMock = jest.mocked(useVirtualMapDeepLink)
 
 function mockEntityPage(state: Partial<ReturnType<typeof useVirtualMapEntityPage>> = {}) {
   useVirtualMapEntityPageMock.mockReturnValue({
@@ -81,6 +87,16 @@ describe('VirtualMapViewer', () => {
     const canvas = screen.getByLabelText(messages.virtualMap.viewer.canvasAriaLabel)
     expect(canvas.tagName).toBe('CANVAS')
     expect(useVirtualMapMock.mock.calls[0][0].current).toBe(canvas)
+  })
+
+  it.each([
+    ['loading', false],
+    ['ready', true],
+    ['error', false],
+  ] as const)('opens deep links only once the map is ready (%s)', (status, isMapReady) => {
+    renderViewer({ status })
+
+    expect(useVirtualMapDeepLinkMock).toHaveBeenLastCalledWith(isMapReady)
   })
 
   it('shows the loading percentage while models load', () => {
