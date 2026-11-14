@@ -100,12 +100,16 @@ function createBoxGltf(size: number) {
   })
 }
 
-async function openMapWithOneEntity(page: Page, { withPage = true } = {}) {
-  await page.route('**/api/collections/entities/records**', (route) =>
-    route.fulfill({
-      json: { page: 1, perPage: 1000, totalItems: 1, totalPages: 1, items: [entity] },
-    }),
-  )
+async function openMapWithOneEntity(page: Page, { withPage = true, path = '/' } = {}) {
+  await page.route('**/api/collections/entities/records**', (route) => {
+    const filter = new URL(route.request().url()).searchParams.get('filter') ?? ''
+    const matches = !filter.includes('slug') || filter.includes(`'${entity.slug}'`)
+    return route.fulfill({
+      json: matches
+        ? { page: 1, perPage: 1000, totalItems: 1, totalPages: 1, items: [entity] }
+        : emptyList,
+    })
+  })
   await page.route('**/api/collections/content_page/records**', (route) =>
     route.fulfill({
       json: withPage
@@ -129,7 +133,7 @@ async function openMapWithOneEntity(page: Page, { withPage = true } = {}) {
   )
 
   await skipVirtualMapTour(page)
-  await page.goto('/')
+  await page.goto(path)
 
   const canvas = page.getByLabel(messages.virtualMap.viewer.canvasAriaLabel)
   await expect(canvas).toBeVisible()
@@ -145,6 +149,7 @@ async function openMapWithOneEntity(page: Page, { withPage = true } = {}) {
 }
 
 const modal = (page: Page) => page.getByRole('dialog', { name: contentPage.title })
+const pathname = (page: Page) => new URL(page.url()).pathname
 
 test.describe('virtual map selection', () => {
   test('opens the content page modal on click and closes it from its close button', async ({
@@ -266,5 +271,65 @@ test.describe('virtual map hover', () => {
     await page.mouse.down()
     await expect(canvasOf(page)).not.toHaveCSS('cursor', 'pointer')
     await page.mouse.up()
+  })
+})
+
+test.describe('virtual map deep link', () => {
+  const deepLink = `/map/${entity.slug}`
+
+  test('opens the content page modal from its link', async ({ page }) => {
+    await openMapWithOneEntity(page, { path: deepLink })
+
+    await expect(modal(page)).toBeVisible()
+    await expect(modal(page)).toContainText(rtfBlock.title)
+    expect(pathname(page)).toBe(deepLink)
+  })
+
+  test('opens the link even when the map loads slowly', async ({ page }) => {
+    await page.route('**/VirtualMapViewer.tsx*', async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 1500))
+      await route.continue()
+    })
+
+    await openMapWithOneEntity(page, { path: deepLink })
+
+    await expect(modal(page)).toBeVisible()
+  })
+
+  test('warns and returns home for an unknown link', async ({ page }) => {
+    await openMapWithOneEntity(page, { path: '/map/unknown' })
+
+    await expect(page.getByText(messages.virtualMap.deepLink.notFoundTitle)).toBeVisible()
+    await expect.poll(() => pathname(page)).toBe('/')
+    await expect(page.getByRole('dialog')).toBeHidden()
+  })
+
+  test('puts the selected entity in the URL and removes it on close', async ({ page }) => {
+    const { center } = await openMapWithOneEntity(page)
+
+    await page.mouse.click(center.x, center.y)
+    await expect(modal(page)).toBeVisible()
+    await expect.poll(() => pathname(page)).toBe(deepLink)
+
+    await page.keyboard.press('Escape')
+    await expect(modal(page)).toBeHidden()
+    await expect.poll(() => pathname(page)).toBe('/')
+  })
+
+  test('follows the selection through browser history', async ({ page }) => {
+    const { center } = await openMapWithOneEntity(page)
+
+    await page.mouse.click(center.x, center.y)
+    await expect(modal(page)).toBeVisible()
+    await page.keyboard.press('Escape')
+    await expect(modal(page)).toBeHidden()
+
+    await page.goBack()
+    await expect(modal(page)).toBeVisible()
+    expect(pathname(page)).toBe(deepLink)
+
+    await page.goBack()
+    await expect(modal(page)).toBeHidden()
+    expect(pathname(page)).toBe('/')
   })
 })
