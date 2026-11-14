@@ -1,6 +1,6 @@
 import { MantineProvider } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 
 import messages from '@/constants/messages.json'
 import { AuthenticationContext } from '@/contexts/authentication-context'
@@ -47,6 +47,30 @@ jest.mock('@/services/pocketbase', () => ({
   pocketbase: { files: { getURL: jest.fn(() => '') } },
 }))
 
+const mockViewerMount = jest.fn()
+
+jest.mock('@/components/virtual-map/virtual-map-viewer/VirtualMapViewer.tsx', () => {
+  const { createElement, useEffect } = jest.requireActual<typeof import('react')>('react')
+  const { useNavigate } = jest.requireActual<typeof import('react-router')>('react-router')
+
+  return {
+    __esModule: true,
+    default: function MockVirtualMapViewer() {
+      const navigate = useNavigate()
+      useEffect(() => {
+        mockViewerMount()
+      }, [])
+
+      return createElement(
+        'div',
+        { 'data-testid': 'virtual-map-viewer' },
+        createElement('button', { onClick: () => navigate('/map/block_b') }, 'Open block'),
+        createElement('button', { onClick: () => navigate('/') }, 'Close block'),
+      )
+    },
+  }
+})
+
 function renderRouter(
   authentication = createAuthenticationContextValue(),
 ) {
@@ -69,6 +93,41 @@ function authenticatedUser(isAdmin = false) {
 }
 
 describe('Router', () => {
+  beforeEach(() => {
+    mockViewerMount.mockClear()
+  })
+
+  it('renders the virtual map for an entity deep link', async () => {
+    window.history.pushState({}, '', '/map/block_b')
+
+    renderRouter()
+
+    expect(await screen.findByTestId('virtual-map-viewer')).toBeInTheDocument()
+    expect(window.location.pathname).toBe('/map/block_b')
+  })
+
+  it('redirects the map path without a slug to the home page', async () => {
+    window.history.pushState({}, '', '/map')
+
+    renderRouter()
+
+    expect(await screen.findByTestId('virtual-map-viewer')).toBeInTheDocument()
+    expect(window.location.pathname).toBe('/')
+  })
+
+  it('keeps the virtual map mounted when moving between the home page and a deep link', async () => {
+    window.history.pushState({}, '', '/')
+
+    renderRouter()
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Open block' }))
+    expect(window.location.pathname).toBe('/map/block_b')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Close block' }))
+    expect(window.location.pathname).toBe('/')
+
+    expect(mockViewerMount).toHaveBeenCalledTimes(1)
+  })
   it('redirects unauthenticated users from the administrator page to login', async () => {
     window.history.pushState({}, '', '/admin')
 
