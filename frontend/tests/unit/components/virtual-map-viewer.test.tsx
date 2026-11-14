@@ -11,10 +11,15 @@ import { VIRTUAL_MAP_TOUR_STORAGE_KEY } from '@/constants/virtual-map-tour-const
 import { formatMessage } from '@/helpers/message-helper.ts'
 import { virtualMapEventBus } from '@/helpers/virtual-map-event-bus.ts'
 import { useVirtualMap } from '@/hooks/use-virtual-map.ts'
+import { useVirtualMapDeepLink } from '@/hooks/use-virtual-map-deep-link.ts'
 import { useVirtualMapEntityPage } from '@/hooks/use-virtual-map-entity-page.ts'
 
 jest.mock('@/hooks/use-virtual-map.ts', () => ({
   useVirtualMap: jest.fn(),
+}))
+
+jest.mock('@/hooks/use-virtual-map-deep-link.ts', () => ({
+  useVirtualMapDeepLink: jest.fn(),
 }))
 
 jest.mock('@/hooks/content-blocks/useContentBlockData.tsx', () => ({
@@ -36,6 +41,7 @@ jest.mock('@/services/menu-item-service.ts', () => ({ getMenuItemIconUrl: () => 
 
 const useVirtualMapMock = jest.mocked(useVirtualMap)
 const useVirtualMapEntityPageMock = jest.mocked(useVirtualMapEntityPage)
+const useVirtualMapDeepLinkMock = jest.mocked(useVirtualMapDeepLink)
 
 function mockEntityPage(state: Partial<ReturnType<typeof useVirtualMapEntityPage>> = {}) {
   useVirtualMapEntityPageMock.mockReturnValue({
@@ -71,6 +77,7 @@ describe('VirtualMapViewer', () => {
   beforeEach(() => {
     window.localStorage.setItem(VIRTUAL_MAP_TOUR_STORAGE_KEY, 'true')
     mockEntityPage()
+    useVirtualMapDeepLinkMock.mockReturnValue({ slug: undefined })
   })
 
   afterEach(() => window.localStorage.clear())
@@ -81,6 +88,43 @@ describe('VirtualMapViewer', () => {
     const canvas = screen.getByLabelText(messages.virtualMap.viewer.canvasAriaLabel)
     expect(canvas.tagName).toBe('CANVAS')
     expect(useVirtualMapMock.mock.calls[0][0].current).toBe(canvas)
+  })
+
+  it('shows the tour to a new visitor on the plain map', () => {
+    window.localStorage.clear()
+
+    renderViewer({ status: 'ready' })
+
+    expect(screen.getByText(messages.virtualMap.tour.steps.welcome.title)).toBeInTheDocument()
+  })
+
+  it('holds the tour back while a deep link is in the URL', () => {
+    window.localStorage.clear()
+    useVirtualMapDeepLinkMock.mockReturnValue({ slug: 'block_b' })
+
+    renderViewer({ status: 'ready' })
+
+    expect(screen.queryByText(messages.virtualMap.tour.steps.welcome.title)).not.toBeInTheDocument()
+  })
+
+  it.each([
+    ['loading', false],
+    ['ready', true],
+    ['error', false],
+  ] as const)('opens deep links only once the map is ready (%s)', (status, isMapReady) => {
+    renderViewer({ status })
+
+    expect(useVirtualMapDeepLinkMock).toHaveBeenLastCalledWith(isMapReady, null)
+  })
+
+  it('passes the selected entity slug to the deep link hook', () => {
+    renderViewer({ status: 'ready' })
+
+    act(() => {
+      virtualMapEventBus.dispatch(VIRTUAL_MAP_EVENTS.ENTITY_SELECTED, { id: 'block-b-id', slug: 'block_b' })
+    })
+
+    expect(useVirtualMapDeepLinkMock).toHaveBeenLastCalledWith(true, 'block_b')
   })
 
   it('shows the loading percentage while models load', () => {

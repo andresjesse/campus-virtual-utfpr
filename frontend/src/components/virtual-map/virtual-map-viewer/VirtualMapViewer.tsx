@@ -13,6 +13,7 @@ import { VIRTUAL_MAP_TOUR_TARGETS } from "@/constants/virtual-map-tour-constants
 import { useDelayedFlag } from "@/hooks/use-delayed-flag.ts";
 import { useLastDefined } from "@/hooks/use-last-defined.ts";
 import { useVirtualMapEntityPage } from "@/hooks/use-virtual-map-entity-page.ts";
+import { useVirtualMapDeepLink } from "@/hooks/use-virtual-map-deep-link.ts";
 import { useVirtualMap } from "@/hooks/use-virtual-map.ts";
 import { useVirtualMapSelection } from "@/hooks/use-virtual-map-selection.ts";
 
@@ -21,6 +22,7 @@ export default function VirtualMapViewer() {
   const { status, progress, error, retry } = useVirtualMap(canvasRef);
   const { selected, clearSelection } = useVirtualMapSelection();
   const entityPage = useVirtualMapEntityPage(selected);
+  const { slug } = useVirtualMapDeepLink(status === "ready", selected?.slug ?? null);
 
   const { status: pageStatus, page, blocks, error: pageError, retry: retryPage } = entityPage;
   // An entity without a page also starts as "loading", so the modal waits out the delay
@@ -56,7 +58,7 @@ export default function VirtualMapViewer() {
       {status === "error" && <VirtualMapErrorOverlay description={error} onRetry={retry} />}
       {status === "ready" && <VirtualMapTopLeftToolbar />}
       {status === "ready" && <VirtualMapMenu />}
-      <VirtualMapTour enabled={status === "ready"} />
+      <VirtualMapTour enabled={status === "ready" && !slug} />
       {modalContent && (
         <VirtualMapEntityModal
           opened={isModalOpen}

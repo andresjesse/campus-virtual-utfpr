@@ -2,6 +2,7 @@ import { ENTITY_COLLECTION } from '@/constants/entity-constants.ts'
 import {
   createEntity,
   deleteEntity,
+  getActiveEntityBySlug,
   getEntity,
   listActiveEntities,
   listEntities,
@@ -12,6 +13,7 @@ import type { EntityFormValues } from '@/types/entity.ts'
 const mockCreate = jest.fn()
 const mockDelete = jest.fn()
 const mockGetFullList = jest.fn()
+const mockGetList = jest.fn()
 const mockGetOne = jest.fn()
 const mockUpdate = jest.fn()
 const mockCollection = jest.fn((_name: string) => ({
@@ -19,6 +21,7 @@ const mockCollection = jest.fn((_name: string) => ({
   create: mockCreate,
   delete: mockDelete,
   getFullList: mockGetFullList,
+  getList: mockGetList,
   getOne: mockGetOne,
   update: mockUpdate,
 }))
@@ -26,6 +29,8 @@ const mockCollection = jest.fn((_name: string) => ({
 jest.mock('@/services/pocketbase.ts', () => ({
   pocketbase: {
     collection: (name: string) => mockCollection(name),
+    filter: (expression: string, params: Record<string, string>) =>
+      expression.replace('{:slug}', `"${params.slug}"`),
   },
 }))
 
@@ -89,6 +94,32 @@ describe('entity service', () => {
       filter: 'is_active = true',
       requestKey: null,
     })
+  })
+
+  it('finds an active entity by its exact slug', async () => {
+    const entity = { id: 'entity-id', slug: 'block_b' }
+    mockGetList.mockResolvedValue({ items: [entity] })
+
+    await expect(getActiveEntityBySlug('block_b')).resolves.toBe(entity)
+
+    expect(mockCollection).toHaveBeenCalledWith(ENTITY_COLLECTION)
+    expect(mockGetList).toHaveBeenCalledWith(1, 1, {
+      filter: 'slug = "block_b" && is_active = true',
+      requestKey: null,
+    })
+  })
+
+  it('returns null when no active entity has the slug', async () => {
+    mockGetList.mockResolvedValue({ items: [] })
+
+    await expect(getActiveEntityBySlug('block_b')).resolves.toBeNull()
+  })
+
+  it('rethrows a failed slug lookup', async () => {
+    const error = new Error('Network error')
+    mockGetList.mockRejectedValue(error)
+
+    await expect(getActiveEntityBySlug('block_b')).rejects.toBe(error)
   })
 
   it('reads a single entity without expanding', async () => {

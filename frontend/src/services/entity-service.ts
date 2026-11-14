@@ -31,6 +31,17 @@ export async function listActiveEntities(): Promise<EntityRecord[]> {
     .getFullList({ expand: "mesh", filter: "is_active = true", requestKey: null });
 }
 
+export async function getActiveEntityBySlug(slug: string): Promise<EntityRecord | null> {
+  const result = await pocketbase
+    .collection<EntityRecord>(ENTITY_COLLECTION)
+    .getList(1, 1, {
+      filter: pocketbase.filter("slug = {:slug} && is_active = true", { slug }),
+      requestKey: null,
+    });
+
+  return result.items[0] ?? null;
+}
+
 export async function getEntity(id: string): Promise<EntityRecord> {
   return pocketbase
     .collection<EntityRecord>(ENTITY_COLLECTION)
