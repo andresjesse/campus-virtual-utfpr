@@ -1,4 +1,9 @@
 import { VIRTUAL_MAP_TOUR_STORAGE_KEY } from "@/constants/virtual-map-tour-constants.ts";
+import type { VirtualMapTourTarget } from "@/constants/virtual-map-tour-constants.ts";
+
+export function getTourTargetSelector(target: VirtualMapTourTarget): string {
+  return `[data-tour="${target}"]`;
+}
 
 export function hasCompletedTour(storage: Storage = window.localStorage): boolean {
   try {

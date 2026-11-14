@@ -1,5 +1,13 @@
-import { VIRTUAL_MAP_TOUR_STORAGE_KEY } from '@/constants/virtual-map-tour-constants.ts'
-import { hasCompletedTour, markTourCompleted } from '@/helpers/virtual-map-tour-helper.ts'
+import {
+  VIRTUAL_MAP_TOUR_STEP_TARGETS,
+  VIRTUAL_MAP_TOUR_STORAGE_KEY,
+  VIRTUAL_MAP_TOUR_TARGETS,
+} from '@/constants/virtual-map-tour-constants.ts'
+import {
+  getTourTargetSelector,
+  hasCompletedTour,
+  markTourCompleted,
+} from '@/helpers/virtual-map-tour-helper.ts'
 
 function createThrowingStorage(): Storage {
   return {
@@ -43,5 +51,19 @@ describe('virtual map tour helper', () => {
 
     expect(hasCompletedTour(storage)).toBe(false)
     expect(() => markTourCompleted(storage)).not.toThrow()
+  })
+})
+
+describe('virtual map tour targets', () => {
+  it('builds a data-tour selector that matches the marked element', () => {
+    document.body.innerHTML = `<button data-tour="${VIRTUAL_MAP_TOUR_TARGETS.menuToggle}"></button>`
+
+    expect(document.querySelector(getTourTargetSelector(VIRTUAL_MAP_TOUR_TARGETS.menuToggle))).not.toBeNull()
+    expect(document.querySelector(getTourTargetSelector(VIRTUAL_MAP_TOUR_TARGETS.canvas))).toBeNull()
+  })
+
+  it('centers the first and last steps instead of pointing at an element', () => {
+    expect(VIRTUAL_MAP_TOUR_STEP_TARGETS.welcome).toBeNull()
+    expect(VIRTUAL_MAP_TOUR_STEP_TARGETS.finish).toBeNull()
   })
 })

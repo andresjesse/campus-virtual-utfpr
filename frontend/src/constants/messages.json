@@ -1,6 +1,9 @@
 {
   "common": {
     "back": "Voltar",
+    "next": "Próximo",
+    "skip": "Pular",
+    "finish": "Concluir",
     "retry": "Tentar novamente",
     "save": "Salvar",
     "showMore": "Ver mais",
@@ -397,6 +400,33 @@
       "toggleLabel": "Menu",
       "loadErrorTitle": "Não foi possível carregar o menu",
       "emptyTitle": "Nenhum item de menu disponível"
+    },
+    "tour": {
+      "stepCounter": "{current} de {total}",
+      "steps": {
+        "welcome": {
+          "title": "Boas-vindas ao mapa virtual",
+          "body": "Este tour rápido mostra como explorar o mapa. Você pode pular a qualquer momento."
+        },
+        "camera": {
+          "title": "Movimente a câmera",
+          "body": "Arraste com o botão esquerdo do mouse para girar, com o botão direito para mover e use a roda do mouse para aproximar ou afastar.",
+          "touchBody": "Arraste com um dedo para girar, use dois dedos para mover e faça o movimento de pinça para aproximar ou afastar."
+        },
+        "entity": {
+          "title": "Explore os locais",
+          "body": "Passe o mouse sobre um local para destacá-lo e clique nele para ver suas informações.",
+          "touchBody": "Toque em um local para ver suas informações."
+        },
+        "menu": {
+          "title": "Abra o menu",
+          "body": "Use o menu para acessar páginas e links organizados por categoria."
+        },
+        "finish": {
+          "title": "Tudo pronto!",
+          "body": "Agora é com você. Bom passeio pelo mapa."
+        }
+      }
     }
   },
   "authentication": {
