@@ -4,6 +4,8 @@ import {
   VIRTUAL_MAP_TOUR_TARGETS,
 } from '@/constants/virtual-map-tour-constants.ts'
 import {
+  getTourMaskPath,
+  getTourSpotlight,
   getTourTargetSelector,
   hasCompletedTour,
   markTourCompleted,
@@ -65,5 +67,35 @@ describe('virtual map tour targets', () => {
   it('centers the first and last steps instead of pointing at an element', () => {
     expect(VIRTUAL_MAP_TOUR_STEP_TARGETS.welcome).toBeNull()
     expect(VIRTUAL_MAP_TOUR_STEP_TARGETS.finish).toBeNull()
+  })
+})
+
+describe('virtual map tour spotlight', () => {
+  const viewport = { width: 1280, height: 720 }
+
+  it('pads the target rect on every side', () => {
+    expect(getTourSpotlight({ top: 0, left: 570, width: 140, height: 56 }, viewport, 8)).toEqual({
+      top: -8,
+      left: 562,
+      width: 156,
+      height: 72,
+    })
+  })
+
+  it('returns no spotlight without a target or for a target that fills the viewport', () => {
+    expect(getTourSpotlight(null, viewport, 8)).toBeNull()
+    expect(getTourSpotlight({ top: 0, left: 0, width: 1280, height: 720 }, viewport, 8)).toBeNull()
+  })
+
+  it('dims the whole viewport when there is no spotlight', () => {
+    expect(getTourMaskPath(viewport, null, 16)).toBe('M0 0H1280V720H0Z')
+  })
+
+  it('cuts a rounded hole for the spotlight, shrinking the radius to fit small rects', () => {
+    const path = getTourMaskPath(viewport, { top: 10, left: 20, width: 100, height: 20 }, 16)
+
+    expect(path.startsWith('M0 0H1280V720H0Z')).toBe(true)
+    expect(path).toContain('M30 10H110A10 10 0 0 1 120 20')
+    expect(path.endsWith('Z')).toBe(true)
   })
 })
