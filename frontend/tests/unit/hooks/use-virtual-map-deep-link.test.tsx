@@ -1,5 +1,5 @@
 import { notifications } from '@mantine/notifications'
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-router'
 
 import { branding } from '@/config/branding.ts'
@@ -103,6 +103,20 @@ describe('useVirtualMapDeepLink', () => {
     rerenderReady()
 
     await waitFor(() => expect(onSelected).toHaveBeenCalledTimes(1))
+  })
+
+  it('returns the slug in the URL', () => {
+    const { result } = renderHook(() => useVirtualMapDeepLink(false, null), {
+      wrapper: ({ children }) => (
+        <MemoryRouter initialEntries={['/map/block_b']}>
+          <Routes>
+            <Route path="/map/:slug" element={children} />
+          </Routes>
+        </MemoryRouter>
+      ),
+    })
+
+    expect(result.current.slug).toBe('block_b')
   })
 
   it('does nothing without a slug', () => {

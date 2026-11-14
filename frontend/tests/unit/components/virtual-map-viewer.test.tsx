@@ -77,6 +77,7 @@ describe('VirtualMapViewer', () => {
   beforeEach(() => {
     window.localStorage.setItem(VIRTUAL_MAP_TOUR_STORAGE_KEY, 'true')
     mockEntityPage()
+    useVirtualMapDeepLinkMock.mockReturnValue({ slug: undefined })
   })
 
   afterEach(() => window.localStorage.clear())
@@ -87,6 +88,23 @@ describe('VirtualMapViewer', () => {
     const canvas = screen.getByLabelText(messages.virtualMap.viewer.canvasAriaLabel)
     expect(canvas.tagName).toBe('CANVAS')
     expect(useVirtualMapMock.mock.calls[0][0].current).toBe(canvas)
+  })
+
+  it('shows the tour to a new visitor on the plain map', () => {
+    window.localStorage.clear()
+
+    renderViewer({ status: 'ready' })
+
+    expect(screen.getByText(messages.virtualMap.tour.steps.welcome.title)).toBeInTheDocument()
+  })
+
+  it('holds the tour back while a deep link is in the URL', () => {
+    window.localStorage.clear()
+    useVirtualMapDeepLinkMock.mockReturnValue({ slug: 'block_b' })
+
+    renderViewer({ status: 'ready' })
+
+    expect(screen.queryByText(messages.virtualMap.tour.steps.welcome.title)).not.toBeInTheDocument()
   })
 
   it.each([

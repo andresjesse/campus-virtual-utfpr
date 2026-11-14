@@ -83,4 +83,6 @@ export function useVirtualMapDeepLink(isMapReady: boolean, selectedSlug: string 
       cancelled = true;
     };
   }, [slug, isMapReady, navigate]);
+
+  return { slug };
 }

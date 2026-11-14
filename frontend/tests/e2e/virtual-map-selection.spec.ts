@@ -100,7 +100,10 @@ function createBoxGltf(size: number) {
   })
 }
 
-async function openMapWithOneEntity(page: Page, { withPage = true, path = '/' } = {}) {
+async function openMapWithOneEntity(
+  page: Page,
+  { withPage = true, path = '/', skipTour = true } = {},
+) {
   await page.route('**/api/collections/entities/records**', (route) => {
     const filter = new URL(route.request().url()).searchParams.get('filter') ?? ''
     const matches = !filter.includes('slug') || filter.includes(`'${entity.slug}'`)
@@ -132,7 +135,7 @@ async function openMapWithOneEntity(page: Page, { withPage = true, path = '/' } 
     route.fulfill({ contentType: 'model/gltf+json', body: createBoxGltf(60) }),
   )
 
-  await skipVirtualMapTour(page)
+  if (skipTour) await skipVirtualMapTour(page)
   await page.goto(path)
 
   const canvas = page.getByLabel(messages.virtualMap.viewer.canvasAriaLabel)
@@ -330,6 +333,21 @@ test.describe('virtual map deep link', () => {
 
     await page.goBack()
     await expect(modal(page)).toBeHidden()
+    expect(pathname(page)).toBe('/')
+  })
+
+  test('holds the tour back for a new visitor until the content is closed', async ({ page }) => {
+    const tourTitle = page.getByText(messages.virtualMap.tour.steps.welcome.title)
+
+    await openMapWithOneEntity(page, { path: deepLink, skipTour: false })
+
+    await expect(modal(page)).toBeVisible()
+    await expect(tourTitle).toBeHidden()
+
+    await page.keyboard.press('Escape')
+
+    await expect(modal(page)).toBeHidden()
+    await expect(tourTitle).toBeVisible()
     expect(pathname(page)).toBe('/')
   })
 })
