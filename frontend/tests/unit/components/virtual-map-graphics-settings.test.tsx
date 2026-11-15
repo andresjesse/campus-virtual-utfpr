@@ -1,5 +1,5 @@
 import { MantineProvider } from '@mantine/core'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import type { ReactNode } from 'react'
 
 import VirtualMapGraphicsSettings from '@/components/virtual-map/virtual-map-graphics/VirtualMapGraphicsSettings.tsx'
@@ -40,6 +40,10 @@ function renderSettings(overrides: Partial<Parameters<typeof VirtualMapGraphicsS
   return props
 }
 
+function getSwitch(label: string) {
+  return screen.getByRole('switch', { name: (name) => name.startsWith(label) })
+}
+
 function getSaveButton() {
   return screen.getByRole('button', { name: graphicsMessages.saveLabel })
 }
@@ -49,8 +53,8 @@ describe('VirtualMapGraphicsSettings', () => {
     const draft: GraphicsSettings = { shadowsEnabled: false, pixelDensity: 'medium', fpsCounterVisible: true }
     renderSettings({ draft })
 
-    expect(screen.getByRole('switch', { name: graphicsMessages.shadowsLabel })).not.toBeChecked()
-    expect(screen.getByRole('switch', { name: graphicsMessages.fpsCounterLabel })).toBeChecked()
+    expect(getSwitch(graphicsMessages.shadowsLabel)).not.toBeChecked()
+    expect(getSwitch(graphicsMessages.fpsCounterLabel)).toBeChecked()
     expect(
       screen.getByRole('radio', { name: graphicsMessages.pixelDensityOptions.medium }),
     ).toBeChecked()
@@ -69,9 +73,9 @@ describe('VirtualMapGraphicsSettings', () => {
   it('reports each change with its setting key', () => {
     const { onChange } = renderSettings()
 
-    fireEvent.click(screen.getByRole('switch', { name: graphicsMessages.shadowsLabel }))
+    fireEvent.click(getSwitch(graphicsMessages.shadowsLabel))
     fireEvent.click(screen.getByRole('radio', { name: graphicsMessages.pixelDensityOptions.low }))
-    fireEvent.click(screen.getByRole('switch', { name: graphicsMessages.fpsCounterLabel }))
+    fireEvent.click(getSwitch(graphicsMessages.fpsCounterLabel))
 
     expect(onChange).toHaveBeenNthCalledWith(1, 'shadowsEnabled', false)
     expect(onChange).toHaveBeenNthCalledWith(2, 'pixelDensity', 'low')
@@ -99,9 +103,19 @@ describe('VirtualMapGraphicsSettingsButton', () => {
     window.localStorage.clear()
   })
 
-  function openMenu() {
+  // jsdom has no layout, so Mantine's hideDetached keeps the open dropdown at display: none.
+  async function openMenu() {
     fireEvent.click(screen.getByRole('button', { name: graphicsMessages.buttonLabel }))
-    return screen.findByRole('dialog')
+    const dialog = await screen.findByRole('dialog', { hidden: true })
+
+    return {
+      dialog,
+      getSwitch: (label: string) =>
+        within(dialog).getByRole('switch', { hidden: true, name: (name) => name.startsWith(label) }),
+      getRadio: (label: string) => within(dialog).getByRole('radio', { hidden: true, name: label }),
+      getSaveButton: () =>
+        within(dialog).getByRole('button', { hidden: true, name: graphicsMessages.saveLabel }),
+    }
   }
 
   it('marks the button as the tour target of the graphics step', () => {
@@ -119,20 +133,20 @@ describe('VirtualMapGraphicsSettingsButton', () => {
     )
     renderWithMantine(<VirtualMapGraphicsSettingsButton />)
 
-    await openMenu()
+    const menu = await openMenu()
 
-    expect(screen.getByText(graphicsMessages.title)).toBeInTheDocument()
-    expect(screen.getByRole('switch', { name: graphicsMessages.shadowsLabel })).not.toBeChecked()
-    expect(screen.getByRole('radio', { name: graphicsMessages.pixelDensityOptions.low })).toBeChecked()
+    expect(within(menu.dialog).getByText(graphicsMessages.title)).toBeInTheDocument()
+    expect(menu.getSwitch(graphicsMessages.shadowsLabel)).not.toBeChecked()
+    expect(menu.getRadio(graphicsMessages.pixelDensityOptions.low)).toBeChecked()
   })
 
   it('applies the edited settings on save', async () => {
     renderWithMantine(<VirtualMapGraphicsSettingsButton />)
-    await openMenu()
+    const menu = await openMenu()
 
-    fireEvent.click(screen.getByRole('switch', { name: graphicsMessages.shadowsLabel }))
-    fireEvent.click(screen.getByRole('radio', { name: graphicsMessages.pixelDensityOptions.medium }))
-    fireEvent.click(getSaveButton())
+    fireEvent.click(menu.getSwitch(graphicsMessages.shadowsLabel))
+    fireEvent.click(menu.getRadio(graphicsMessages.pixelDensityOptions.medium))
+    fireEvent.click(menu.getSaveButton())
 
     expect(applyMock).toHaveBeenCalledWith({
       ...VIRTUAL_MAP_GRAPHICS_DEFAULTS,
@@ -143,16 +157,18 @@ describe('VirtualMapGraphicsSettingsButton', () => {
 
   it('discards the edits when the menu is closed without saving', async () => {
     renderWithMantine(<VirtualMapGraphicsSettingsButton />)
-    const dialog = await openMenu()
+    const firstMenu = await openMenu()
 
-    fireEvent.click(screen.getByRole('switch', { name: graphicsMessages.fpsCounterLabel }))
-    fireEvent.keyDown(dialog, { key: 'Escape' })
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    fireEvent.click(firstMenu.getSwitch(graphicsMessages.fpsCounterLabel))
+    expect(firstMenu.getSwitch(graphicsMessages.fpsCounterLabel)).toBeChecked()
 
-    await openMenu()
+    fireEvent.keyDown(firstMenu.dialog, { key: 'Escape' })
+    await waitFor(() => expect(screen.queryByRole('dialog', { hidden: true })).not.toBeInTheDocument())
 
-    expect(screen.getByRole('switch', { name: graphicsMessages.fpsCounterLabel })).not.toBeChecked()
-    expect(getSaveButton()).toBeDisabled()
+    const menu = await openMenu()
+
+    expect(menu.getSwitch(graphicsMessages.fpsCounterLabel)).not.toBeChecked()
+    expect(menu.getSaveButton()).toBeDisabled()
     expect(applyMock).not.toHaveBeenCalled()
   })
 })
