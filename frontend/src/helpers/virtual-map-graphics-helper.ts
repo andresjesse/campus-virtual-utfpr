@@ -89,3 +89,23 @@ export function saveGraphicsSettings(
     return;
   }
 }
+
+export function applyGraphicsSettings(
+  settings: VirtualMapGraphicsSettings,
+  storage: Storage = window.localStorage,
+  reload: () => void = () => window.location.reload(),
+): void {
+  saveGraphicsSettings(settings, storage);
+  reload();
+}
+
+export function areGraphicsSettingsEqual(
+  a: VirtualMapGraphicsSettings,
+  b: VirtualMapGraphicsSettings,
+): boolean {
+  return (
+    a.shadowsEnabled === b.shadowsEnabled &&
+    a.pixelDensity === b.pixelDensity &&
+    a.fpsCounterVisible === b.fpsCounterVisible
+  );
+}

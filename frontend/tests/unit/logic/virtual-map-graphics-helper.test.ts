@@ -5,6 +5,8 @@ import {
   VIRTUAL_MAP_PIXEL_DENSITY_RATIOS,
 } from '@/constants/virtual-map-graphics-constants.ts'
 import {
+  applyGraphicsSettings,
+  areGraphicsSettingsEqual,
   loadGraphicsSettings,
   readDeviceInfo,
   resolvePixelRatio,
@@ -187,5 +189,48 @@ describe('graphics settings storage', () => {
 
     expect(loadGraphicsSettings(storage)).toEqual(VIRTUAL_MAP_GRAPHICS_DEFAULTS)
     expect(() => saveGraphicsSettings(VIRTUAL_MAP_GRAPHICS_DEFAULTS, storage)).not.toThrow()
+  })
+})
+
+describe('applyGraphicsSettings', () => {
+  const settings: VirtualMapGraphicsSettings = {
+    shadowsEnabled: false,
+    pixelDensity: 'medium',
+    fpsCounterVisible: true,
+  }
+
+  beforeEach(() => {
+    window.localStorage.clear()
+  })
+
+  it('saves the settings and then reloads', () => {
+    const reload = jest.fn(() => {
+      expect(loadGraphicsSettings()).toEqual(settings)
+    })
+
+    applyGraphicsSettings(settings, window.localStorage, reload)
+
+    expect(reload).toHaveBeenCalledTimes(1)
+  })
+
+  it('still reloads when the storage is unavailable', () => {
+    const reload = jest.fn()
+
+    applyGraphicsSettings(settings, createThrowingStorage(), reload)
+
+    expect(reload).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('areGraphicsSettingsEqual', () => {
+  it('compares every setting', () => {
+    const base = VIRTUAL_MAP_GRAPHICS_DEFAULTS
+
+    expect(areGraphicsSettingsEqual(base, { ...base })).toBe(true)
+    expect(areGraphicsSettingsEqual(base, { ...base, shadowsEnabled: !base.shadowsEnabled })).toBe(false)
+    expect(areGraphicsSettingsEqual(base, { ...base, pixelDensity: 'low' })).toBe(false)
+    expect(
+      areGraphicsSettingsEqual(base, { ...base, fpsCounterVisible: !base.fpsCounterVisible }),
+    ).toBe(false)
   })
 })
