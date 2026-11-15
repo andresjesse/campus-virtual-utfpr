@@ -7,6 +7,7 @@ import {
   VIRTUAL_MAP_ENTITY_LOADING_DELAY_MS,
   VIRTUAL_MAP_EVENTS,
 } from '@/constants/virtual-map-constants.ts'
+import { VIRTUAL_MAP_GRAPHICS_STORAGE_KEY } from '@/constants/virtual-map-graphics-constants.ts'
 import { VIRTUAL_MAP_TOUR_STORAGE_KEY } from '@/constants/virtual-map-tour-constants.ts'
 import { formatMessage } from '@/helpers/message-helper.ts'
 import { virtualMapEventBus } from '@/helpers/virtual-map-event-bus.ts'
@@ -88,6 +89,42 @@ describe('VirtualMapViewer', () => {
     const canvas = screen.getByLabelText(messages.virtualMap.viewer.canvasAriaLabel)
     expect(canvas.tagName).toBe('CANVAS')
     expect(useVirtualMapMock.mock.calls[0][0].current).toBe(canvas)
+  })
+
+  describe('FPS counter', () => {
+    const stats = { fps: 60 }
+    const fpsText = formatMessage(messages.virtualMap.fpsCounter.fps, stats.fps.toLocaleString())
+
+    it('stays hidden by default', () => {
+      renderViewer({ status: 'ready' })
+      act(() => virtualMapEventBus.dispatch(VIRTUAL_MAP_EVENTS.RENDER_STATS_UPDATED, stats))
+
+      expect(screen.queryByText(fpsText)).not.toBeInTheDocument()
+    })
+
+    it('shows the render stats once the visitor turned it on', () => {
+      window.localStorage.setItem(
+        VIRTUAL_MAP_GRAPHICS_STORAGE_KEY,
+        JSON.stringify({ fpsCounterVisible: true }),
+      )
+
+      renderViewer({ status: 'ready' })
+      act(() => virtualMapEventBus.dispatch(VIRTUAL_MAP_EVENTS.RENDER_STATS_UPDATED, stats))
+
+      expect(screen.getByText(fpsText)).toBeInTheDocument()
+    })
+
+    it('waits for the map to be ready', () => {
+      window.localStorage.setItem(
+        VIRTUAL_MAP_GRAPHICS_STORAGE_KEY,
+        JSON.stringify({ fpsCounterVisible: true }),
+      )
+
+      renderViewer({ status: 'loading' })
+      act(() => virtualMapEventBus.dispatch(VIRTUAL_MAP_EVENTS.RENDER_STATS_UPDATED, stats))
+
+      expect(screen.queryByText(fpsText)).not.toBeInTheDocument()
+    })
   })
 
   it('shows the tour to a new visitor on the plain map', () => {

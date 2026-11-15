@@ -4,10 +4,20 @@ import { Raycaster, type Object3D, type Vector2 } from "three";
 
 import { branding } from "@/config/branding.ts";
 import messages from "@/constants/messages.json";
-import { VIRTUAL_MAP_EVENTS, VIRTUAL_MAP_HIGHLIGHT } from "@/constants/virtual-map-constants.ts";
+import {
+  VIRTUAL_MAP_EVENTS,
+  VIRTUAL_MAP_HIGHLIGHT,
+  VIRTUAL_MAP_STATS_SAMPLE_MS,
+} from "@/constants/virtual-map-constants.ts";
 import { formatMessage } from "@/helpers/message-helper.ts";
 import { getRequestErrorMessage } from "@/helpers/request-error-helper.ts";
+import {
+  loadGraphicsSettings,
+  readDeviceInfo,
+  resolvePixelRatio,
+} from "@/helpers/virtual-map-graphics-helper.ts";
 import { virtualMapEventBus } from "@/helpers/virtual-map-event-bus.ts";
+import { createFrameRateSampler } from "@/helpers/virtual-map-render-stats-helper.ts";
 import {
   applyEdgeFade,
   applyEntityHighlight,
@@ -40,7 +50,11 @@ export function useVirtualMap(canvasRef: RefObject<HTMLCanvasElement | null>) {
     if (!canvas) return;
 
     let disposed = false;
-    const { renderer, scene, camera, controls } = createVirtualMapScene(canvas);
+    const graphics = loadGraphicsSettings();
+    const { renderer, scene, camera, controls } = createVirtualMapScene(canvas, {
+      shadowsEnabled: graphics.shadowsEnabled,
+      pixelRatio: resolvePixelRatio(graphics.pixelDensity, readDeviceInfo()),
+    });
     const container = canvas.parentElement ?? canvas;
 
     const resize = () => {
@@ -81,13 +95,19 @@ export function useVirtualMap(canvasRef: RefObject<HTMLCanvasElement | null>) {
       setHovered(null);
     };
 
-    renderer.setAnimationLoop(() => {
+    const sampleFrameRate = createFrameRateSampler(VIRTUAL_MAP_STATS_SAMPLE_MS);
+    renderer.setAnimationLoop((time: number) => {
       if (hoverPointer) {
         setHovered(pickEntityRoot(raycaster, hoverPointer, camera, pickable));
         hoverPointer = null;
       }
       controls.update();
       renderer.render(scene, camera);
+
+      const fps = sampleFrameRate(time);
+      if (fps === null) return;
+
+      virtualMapEventBus.dispatch(VIRTUAL_MAP_EVENTS.RENDER_STATS_UPDATED, { fps });
     });
 
     const handlePointerDown = (event: PointerEvent) => {
@@ -161,6 +181,8 @@ export function useVirtualMap(canvasRef: RefObject<HTMLCanvasElement | null>) {
       });
 
       if (disposed) return;
+
+      if (graphics.shadowsEnabled) renderer.shadowMap.needsUpdate = true;
 
       const failedCount = results.filter((result) => result.status === "rejected").length;
       if (failedCount > 0) {

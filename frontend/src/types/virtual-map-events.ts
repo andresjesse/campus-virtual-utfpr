@@ -5,7 +5,12 @@ export type VirtualMapSelectedEntity = {
   slug: string;
 };
 
+export type VirtualMapRenderStats = {
+  fps: number;
+};
+
 export type VirtualMapEvents = {
   [VIRTUAL_MAP_EVENTS.ENTITY_SELECTED]: VirtualMapSelectedEntity;
   [VIRTUAL_MAP_EVENTS.SELECTION_CLEARED]: undefined;
+  [VIRTUAL_MAP_EVENTS.RENDER_STATS_UPDATED]: VirtualMapRenderStats;
 };
