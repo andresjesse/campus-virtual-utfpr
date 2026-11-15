@@ -93,7 +93,6 @@ function createFakeScene() {
     dispose: jest.fn(),
     forceContextLoss: jest.fn(),
     shadowMap: { needsUpdate: false },
-    info: { render: { calls: 0, triangles: 0 } },
   }
   const controls = { update: jest.fn(), dispose: jest.fn() }
   const camera = new PerspectiveCamera()
@@ -433,7 +432,7 @@ describe('useVirtualMap', () => {
     expect(cleared).not.toHaveBeenCalled()
   })
 
-  it('dispatches the render stats once per sample window', async () => {
+  it('dispatches the frame rate once per sample window', async () => {
     const { renderer } = createFakeScene()
     listActiveEntitiesMock.mockResolvedValue([])
     loadModelsMock.mockResolvedValue([])
@@ -445,7 +444,6 @@ describe('useVirtualMap', () => {
     const { result } = renderVirtualMap()
     await waitFor(() => expect(result.current.status).toBe('ready'))
     const frame = renderer.setAnimationLoop.mock.calls[0][0] as (time: number) => void
-    renderer.info.render = { calls: 12, triangles: 34000 }
 
     act(() => {
       frame(0)
@@ -459,8 +457,6 @@ describe('useVirtualMap', () => {
     expect(statsListener).toHaveBeenCalledTimes(1)
     expect(statsListener).toHaveBeenCalledWith({
       fps: Math.round((2 * 1000) / VIRTUAL_MAP_STATS_SAMPLE_MS),
-      drawCalls: 12,
-      triangles: 34000,
     })
   })
 

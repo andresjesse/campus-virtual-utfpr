@@ -1,5 +1,5 @@
 import { MantineProvider } from '@mantine/core'
-import { act, render, screen } from '@testing-library/react'
+import { act, render } from '@testing-library/react'
 
 import VirtualMapFpsCounter from '@/components/virtual-map/virtual-map-graphics/VirtualMapFpsCounter.tsx'
 import messages from '@/constants/messages.json'
@@ -17,7 +17,7 @@ function renderCounter() {
   )
 }
 
-function dispatchStats(stats = { fps: 58, drawCalls: 42, triangles: 125000 }) {
+function dispatchStats(stats = { fps: 58 }) {
   act(() => virtualMapEventBus.dispatch(VIRTUAL_MAP_EVENTS.RENDER_STATS_UPDATED, stats))
 }
 
@@ -28,19 +28,15 @@ describe('VirtualMapFpsCounter', () => {
     expect(container.querySelector('.mantine-Paper-root')).not.toBeInTheDocument()
   })
 
-  it('shows the latest frame rate, draw calls and triangles', () => {
-    renderCounter()
+  it('shows only the latest frame rate', () => {
+    const { container } = renderCounter()
 
-    dispatchStats({ fps: 30, drawCalls: 10, triangles: 500 })
+    dispatchStats({ fps: 30 })
     dispatchStats()
 
-    expect(screen.getByText(formatMessage(counterMessages.fps, (58).toLocaleString()))).toBeInTheDocument()
-    expect(
-      screen.getByText(formatMessage(counterMessages.drawCalls, (42).toLocaleString())),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByText(formatMessage(counterMessages.triangles, (125000).toLocaleString())),
-    ).toBeInTheDocument()
+    expect(container.querySelector('.mantine-Paper-root')?.textContent).toBe(
+      formatMessage(counterMessages.fps, (58).toLocaleString()),
+    )
   })
 
   it('stops listening once unmounted', () => {

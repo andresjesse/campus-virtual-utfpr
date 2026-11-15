@@ -92,7 +92,7 @@ describe('VirtualMapViewer', () => {
   })
 
   describe('FPS counter', () => {
-    const stats = { fps: 60, drawCalls: 8, triangles: 900 }
+    const stats = { fps: 60 }
     const fpsText = formatMessage(messages.virtualMap.fpsCounter.fps, stats.fps.toLocaleString())
 
     it('stays hidden by default', () => {

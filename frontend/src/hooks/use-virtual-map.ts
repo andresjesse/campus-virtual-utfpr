@@ -107,11 +107,7 @@ export function useVirtualMap(canvasRef: RefObject<HTMLCanvasElement | null>) {
       const fps = sampleFrameRate(time);
       if (fps === null) return;
 
-      virtualMapEventBus.dispatch(VIRTUAL_MAP_EVENTS.RENDER_STATS_UPDATED, {
-        fps,
-        drawCalls: renderer.info.render.calls,
-        triangles: renderer.info.render.triangles,
-      });
+      virtualMapEventBus.dispatch(VIRTUAL_MAP_EVENTS.RENDER_STATS_UPDATED, { fps });
     });
 
     const handlePointerDown = (event: PointerEvent) => {

@@ -7,8 +7,6 @@ export type VirtualMapSelectedEntity = {
 
 export type VirtualMapRenderStats = {
   fps: number;
-  drawCalls: number;
-  triangles: number;
 };
 
 export type VirtualMapEvents = {

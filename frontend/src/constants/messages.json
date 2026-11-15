@@ -432,9 +432,7 @@
       "saveLabel": "Salvar e recarregar o mapa"
     },
     "fpsCounter": {
-      "fps": "{fps} FPS",
-      "drawCalls": "{count} chamadas de desenho",
-      "triangles": "{count} triângulos"
+      "fps": "{fps} FPS"
     },
     "tour": {
       "stepCounter": "{current} de {total}",
