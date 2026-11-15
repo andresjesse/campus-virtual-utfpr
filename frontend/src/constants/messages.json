@@ -414,6 +414,23 @@
     "toolbar": {
       "ariaLabel": "Ferramentas do mapa"
     },
+    "graphics": {
+      "buttonLabel": "Configurações gráficas",
+      "title": "Configurações gráficas",
+      "shadowsLabel": "Sombras",
+      "shadowsDescription": "Desligar as sombras deixa o mapa mais leve em aparelhos mais simples.",
+      "pixelDensityLabel": "Densidade de pixels",
+      "pixelDensityOptions": {
+        "auto": "Automático",
+        "low": "Baixa",
+        "medium": "Média",
+        "high": "Alta"
+      },
+      "currentPixelRatio": "Atual: {ratio}x",
+      "fpsCounterLabel": "Contador de FPS",
+      "fpsCounterDescription": "Mostra quantos quadros por segundo o mapa está desenhando.",
+      "saveLabel": "Salvar e recarregar o mapa"
+    },
     "tour": {
       "stepCounter": "{current} de {total}",
       "restartLabel": "Ver o tour novamente",

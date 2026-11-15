@@ -90,6 +90,17 @@ describe('VirtualMapToolbarButton', () => {
 })
 
 describe('VirtualMapTopLeftToolbar', () => {
+  it('shows the graphics settings button above the help button', () => {
+    renderWithMantine(<VirtualMapTopLeftToolbar />)
+
+    const names = screen.getAllByRole('button').map((button) => button.getAttribute('aria-label'))
+
+    expect(names).toEqual([
+      messages.virtualMap.graphics.buttonLabel,
+      messages.virtualMap.tour.restartLabel,
+    ])
+  })
+
   it('restarts the tour from its help button', () => {
     renderWithMantine(<VirtualMapTopLeftToolbar />)
 
