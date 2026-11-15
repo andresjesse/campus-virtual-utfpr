@@ -456,6 +456,10 @@
           "title": "Abrindo o menu",
           "body": "Use o menu para acessar páginas e links organizados por categoria."
         },
+        "graphics": {
+          "title": "Ajustando os gráficos",
+          "body": "Se o mapa estiver lento, use este botão para desligar as sombras ou reduzir a densidade de pixels. Aqui você também pode exibir o contador de FPS."
+        },
         "finish": {
           "title": "Tudo pronto!",
           "body": "Agora é com você. Bom passeio!"

@@ -7,6 +7,7 @@ import VirtualMapGraphicsSettings from "@/components/virtual-map/virtual-map-gra
 import VirtualMapToolbarButton from "@/components/virtual-map/virtual-map-toolbar/VirtualMapToolbarButton.tsx";
 import { branding } from "@/config/branding.ts";
 import messages from "@/constants/messages.json";
+import { VIRTUAL_MAP_TOUR_TARGETS } from "@/constants/virtual-map-tour-constants.ts";
 import { useVirtualMapGraphicsSettings } from "@/hooks/use-virtual-map-graphics-settings.ts";
 
 export default function VirtualMapGraphicsSettingsButton() {
@@ -31,7 +32,7 @@ export default function VirtualMapGraphicsSettingsButton() {
       trapFocus
     >
       <Popover.Target>
-        <Box>
+        <Box data-tour={VIRTUAL_MAP_TOUR_TARGETS.graphicsSettings}>
           <VirtualMapToolbarButton
             icon={SlidersHorizontalIcon}
             label={messages.virtualMap.graphics.buttonLabel}

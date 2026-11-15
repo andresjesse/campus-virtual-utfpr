@@ -9,6 +9,7 @@ import {
   VIRTUAL_MAP_GRAPHICS_DEFAULTS,
   VIRTUAL_MAP_GRAPHICS_STORAGE_KEY,
 } from '@/constants/virtual-map-graphics-constants.ts'
+import { VIRTUAL_MAP_TOUR_TARGETS } from '@/constants/virtual-map-tour-constants.ts'
 import { applyGraphicsSettings } from '@/helpers/virtual-map-graphics-helper.ts'
 import { formatMessage } from '@/helpers/message-helper.ts'
 import type { VirtualMapGraphicsSettings as GraphicsSettings } from '@/types/virtual-map-graphics.ts'
@@ -102,6 +103,14 @@ describe('VirtualMapGraphicsSettingsButton', () => {
     fireEvent.click(screen.getByRole('button', { name: graphicsMessages.buttonLabel }))
     return screen.findByRole('dialog')
   }
+
+  it('marks the button as the tour target of the graphics step', () => {
+    renderWithMantine(<VirtualMapGraphicsSettingsButton />)
+
+    const button = screen.getByRole('button', { name: graphicsMessages.buttonLabel })
+
+    expect(button.closest(`[data-tour="${VIRTUAL_MAP_TOUR_TARGETS.graphicsSettings}"]`)).not.toBeNull()
+  })
 
   it('opens the menu with the stored settings', async () => {
     window.localStorage.setItem(

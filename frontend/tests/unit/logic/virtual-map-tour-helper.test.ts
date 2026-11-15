@@ -85,6 +85,10 @@ describe('virtual map tour targets', () => {
     expect(document.querySelector(getTourTargetSelector(VIRTUAL_MAP_TOUR_TARGETS.canvas))).toBeNull()
   })
 
+  it('points the graphics step at the graphics settings button', () => {
+    expect(VIRTUAL_MAP_TOUR_STEP_TARGETS.graphics).toBe(VIRTUAL_MAP_TOUR_TARGETS.graphicsSettings)
+  })
+
   it('centers the first and last steps instead of pointing at an element', () => {
     expect(VIRTUAL_MAP_TOUR_STEP_TARGETS.welcome).toBeNull()
     expect(VIRTUAL_MAP_TOUR_STEP_TARGETS.finish).toBeNull()

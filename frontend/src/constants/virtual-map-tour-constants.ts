@@ -2,13 +2,14 @@ import { getStorageKey } from "@/config/branding.ts";
 
 export const VIRTUAL_MAP_TOUR_STORAGE_KEY = getStorageKey("virtual-map-tour-completed");
 
-export const VIRTUAL_MAP_TOUR_STEPS = ["welcome", "camera", "entity", "menu", "finish"] as const;
+export const VIRTUAL_MAP_TOUR_STEPS = ["welcome", "camera", "entity", "menu", "graphics", "finish"] as const;
 
 export type VirtualMapTourStep = (typeof VIRTUAL_MAP_TOUR_STEPS)[number];
 
 export const VIRTUAL_MAP_TOUR_TARGETS = {
   canvas: "virtual-map-canvas",
   menuToggle: "virtual-map-menu-toggle",
+  graphicsSettings: "virtual-map-graphics-settings",
 } as const;
 
 export type VirtualMapTourTarget =
@@ -19,5 +20,6 @@ export const VIRTUAL_MAP_TOUR_STEP_TARGETS: Record<VirtualMapTourStep, VirtualMa
   camera: VIRTUAL_MAP_TOUR_TARGETS.canvas,
   entity: VIRTUAL_MAP_TOUR_TARGETS.canvas,
   menu: VIRTUAL_MAP_TOUR_TARGETS.menuToggle,
+  graphics: VIRTUAL_MAP_TOUR_TARGETS.graphicsSettings,
   finish: null,
 };
