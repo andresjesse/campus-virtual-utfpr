@@ -87,6 +87,7 @@ function createFakeScene() {
     render: jest.fn(),
     dispose: jest.fn(),
     forceContextLoss: jest.fn(),
+    shadowMap: { needsUpdate: false },
   }
   const controls = { update: jest.fn(), dispose: jest.fn() }
   const camera = new PerspectiveCamera()
@@ -201,6 +202,41 @@ describe('useVirtualMap', () => {
     )
   })
 
+  it('requests one shadow pass once every model is placed', async () => {
+    const { scene, renderer } = createFakeScene()
+    let finishLoading!: (results: PromiseSettledResult<never>[]) => void
+    listActiveEntitiesMock.mockResolvedValue([
+      createEntity('library-north', library),
+      createEntity('gym-main', gym),
+    ])
+    loadModelsMock.mockReturnValue(
+      new Promise((resolve) => {
+        finishLoading = resolve
+      }),
+    )
+
+    const { result } = renderVirtualMap()
+    await waitFor(() => expect(loadModelsMock).toHaveBeenCalled())
+
+    expect(renderer.shadowMap.needsUpdate).toBe(false)
+
+    await act(async () => finishLoading([fulfilled(), fulfilled()]))
+
+    expect(result.current.status).toBe('ready')
+    expect(scene.children).toHaveLength(2)
+    expect(renderer.shadowMap.needsUpdate).toBe(true)
+  })
+
+  it('does not request a shadow pass when the listing fails', async () => {
+    const { renderer } = createFakeScene()
+    listActiveEntitiesMock.mockRejectedValueOnce(new Error('Network down'))
+
+    const { result } = renderVirtualMap()
+    await waitFor(() => expect(result.current.status).toBe('error'))
+
+    expect(renderer.shadowMap.needsUpdate).toBe(false)
+  })
+
   it('reports a listing failure and rebuilds the scene on retry', async () => {
     const firstScene = createFakeScene()
     const requestError = new Error('Network down')
@@ -244,7 +280,7 @@ describe('useVirtualMap', () => {
   })
 
   it('disposes a model that finishes loading after unmount instead of adding it', async () => {
-    const { scene } = createFakeScene()
+    const { scene, renderer } = createFakeScene()
     let finishLoading!: (results: PromiseSettledResult<never>[]) => void
     listActiveEntitiesMock.mockResolvedValue([createEntity('library-north', library)])
     loadModelsMock.mockReturnValue(
@@ -262,6 +298,7 @@ describe('useVirtualMap', () => {
 
     expect(disposeMock).toHaveBeenCalledWith(lateModel)
     expect(scene.children).toHaveLength(0)
+    expect(renderer.shadowMap.needsUpdate).toBe(false)
   })
 
   it('dispatches ENTITY_SELECTED with the entity under a click', async () => {
@@ -426,6 +463,18 @@ describe('useVirtualMap', () => {
         expect.any(Number),
       )
       expect(canvas.style.cursor).toBe('pointer')
+    })
+
+    it('does not request a new shadow pass while highlighting', async () => {
+      const { scene, canvas, renderer } = await renderReady()
+      renderer.shadowMap.needsUpdate = false
+      pickEntityRootMock.mockReturnValueOnce(scene.children[0])
+      hover(canvas, renderer)
+
+      pickEntityRootMock.mockReturnValueOnce(null)
+      hover(canvas, renderer)
+
+      expect(renderer.shadowMap.needsUpdate).toBe(false)
     })
 
     it('only raycasts on the next frame, not on every pointer move', async () => {

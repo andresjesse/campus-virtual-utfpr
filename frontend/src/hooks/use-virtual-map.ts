@@ -162,6 +162,8 @@ export function useVirtualMap(canvasRef: RefObject<HTMLCanvasElement | null>) {
 
       if (disposed) return;
 
+      renderer.shadowMap.needsUpdate = true;
+
       const failedCount = results.filter((result) => result.status === "rejected").length;
       if (failedCount > 0) {
         notifications.show({

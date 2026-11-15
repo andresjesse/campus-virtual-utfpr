@@ -68,6 +68,7 @@ export function createVirtualMapScene(canvas: HTMLCanvasElement): VirtualMapScen
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, VIRTUAL_MAP_MAX_PIXEL_RATIO));
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = PCFShadowMap;
+  renderer.shadowMap.autoUpdate = false;
 
   const scene = new Scene();
   scene.background = new Color(branding.colors.scene.background);
