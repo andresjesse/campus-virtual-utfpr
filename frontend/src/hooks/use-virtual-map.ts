@@ -7,6 +7,11 @@ import messages from "@/constants/messages.json";
 import { VIRTUAL_MAP_EVENTS, VIRTUAL_MAP_HIGHLIGHT } from "@/constants/virtual-map-constants.ts";
 import { formatMessage } from "@/helpers/message-helper.ts";
 import { getRequestErrorMessage } from "@/helpers/request-error-helper.ts";
+import {
+  loadGraphicsSettings,
+  readDeviceInfo,
+  resolvePixelRatio,
+} from "@/helpers/virtual-map-graphics-helper.ts";
 import { virtualMapEventBus } from "@/helpers/virtual-map-event-bus.ts";
 import {
   applyEdgeFade,
@@ -40,7 +45,11 @@ export function useVirtualMap(canvasRef: RefObject<HTMLCanvasElement | null>) {
     if (!canvas) return;
 
     let disposed = false;
-    const { renderer, scene, camera, controls } = createVirtualMapScene(canvas);
+    const graphics = loadGraphicsSettings();
+    const { renderer, scene, camera, controls } = createVirtualMapScene(canvas, {
+      shadowsEnabled: graphics.shadowsEnabled,
+      pixelRatio: resolvePixelRatio(graphics.pixelDensity, readDeviceInfo()),
+    });
     const container = canvas.parentElement ?? canvas;
 
     const resize = () => {
@@ -162,7 +171,7 @@ export function useVirtualMap(canvasRef: RefObject<HTMLCanvasElement | null>) {
 
       if (disposed) return;
 
-      renderer.shadowMap.needsUpdate = true;
+      if (graphics.shadowsEnabled) renderer.shadowMap.needsUpdate = true;
 
       const failedCount = results.filter((result) => result.status === "rejected").length;
       if (failedCount > 0) {

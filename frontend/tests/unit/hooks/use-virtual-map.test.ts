@@ -4,9 +4,14 @@ import { Group, PerspectiveCamera, Scene } from 'three'
 
 import messages from '@/constants/messages.json'
 import { VIRTUAL_MAP_EVENTS } from '@/constants/virtual-map-constants.ts'
+import {
+  VIRTUAL_MAP_GRAPHICS_STORAGE_KEY,
+  VIRTUAL_MAP_PIXEL_DENSITY_RATIOS,
+} from '@/constants/virtual-map-graphics-constants.ts'
 import { formatMessage } from '@/helpers/message-helper.ts'
 import { getRequestErrorMessage } from '@/helpers/request-error-helper.ts'
 import { virtualMapEventBus } from '@/helpers/virtual-map-event-bus.ts'
+import { readDeviceInfo, resolvePixelRatio } from '@/helpers/virtual-map-graphics-helper.ts'
 import {
   applyEntityHighlight,
   createVirtualMapScene,
@@ -144,6 +149,7 @@ afterEach(() => {
 
 beforeEach(() => {
   jest.clearAllMocks()
+  window.localStorage.clear()
   listEntityIdsWithPageMock.mockImplementation(async () => new Set(['library-north', 'gym-main', 'library-south']))
 })
 
@@ -225,6 +231,53 @@ describe('useVirtualMap', () => {
     expect(result.current.status).toBe('ready')
     expect(scene.children).toHaveLength(2)
     expect(renderer.shadowMap.needsUpdate).toBe(true)
+  })
+
+  it('builds the scene with the default graphics settings on a first visit', async () => {
+    createFakeScene()
+    listActiveEntitiesMock.mockResolvedValue([])
+    loadModelsMock.mockResolvedValue([])
+
+    const { canvas, result } = renderVirtualMap()
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+
+    expect(createSceneMock).toHaveBeenCalledWith(canvas, {
+      shadowsEnabled: true,
+      pixelRatio: resolvePixelRatio('auto', readDeviceInfo()),
+    })
+  })
+
+  it('builds the scene with the stored graphics settings', async () => {
+    window.localStorage.setItem(
+      VIRTUAL_MAP_GRAPHICS_STORAGE_KEY,
+      JSON.stringify({ shadowsEnabled: false, pixelDensity: 'low', fpsCounterVisible: false }),
+    )
+    createFakeScene()
+    listActiveEntitiesMock.mockResolvedValue([])
+    loadModelsMock.mockResolvedValue([])
+
+    const { canvas, result } = renderVirtualMap()
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+
+    expect(createSceneMock).toHaveBeenCalledWith(canvas, {
+      shadowsEnabled: false,
+      pixelRatio: VIRTUAL_MAP_PIXEL_DENSITY_RATIOS.low,
+    })
+  })
+
+  it('does not request a shadow pass when shadows are off', async () => {
+    window.localStorage.setItem(
+      VIRTUAL_MAP_GRAPHICS_STORAGE_KEY,
+      JSON.stringify({ shadowsEnabled: false }),
+    )
+    const { renderer } = createFakeScene()
+    listActiveEntitiesMock.mockResolvedValue([createEntity('library-north', library)])
+    loadModelsMock.mockResolvedValue([fulfilled()])
+
+    const { result } = renderVirtualMap()
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+
+    expect(renderer.shadowMap.needsUpdate).toBe(false)
   })
 
   it('does not request a shadow pass when the listing fails', async () => {

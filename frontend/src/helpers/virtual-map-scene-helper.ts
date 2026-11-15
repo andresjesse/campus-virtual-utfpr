@@ -28,7 +28,6 @@ import {
   VIRTUAL_MAP_CAMERA,
   VIRTUAL_MAP_EDGE_FADE,
   VIRTUAL_MAP_LIGHTING,
-  VIRTUAL_MAP_MAX_PIXEL_RATIO,
   VIRTUAL_MAP_ORBIT_LIMITS,
   VIRTUAL_MAP_POINTER,
   VIRTUAL_MAP_SKY,
@@ -52,6 +51,11 @@ export type VirtualMapScene = {
   controls: OrbitControls;
 };
 
+export type VirtualMapSceneOptions = {
+  shadowsEnabled: boolean;
+  pixelRatio: number;
+};
+
 const targetMin = new Vector3(
   VIRTUAL_MAP_ORBIT_LIMITS.targetMin.x,
   VIRTUAL_MAP_ORBIT_LIMITS.targetMin.y,
@@ -63,10 +67,13 @@ const targetMax = new Vector3(
   VIRTUAL_MAP_ORBIT_LIMITS.targetMax.z,
 );
 
-export function createVirtualMapScene(canvas: HTMLCanvasElement): VirtualMapScene {
+export function createVirtualMapScene(
+  canvas: HTMLCanvasElement,
+  { shadowsEnabled, pixelRatio }: VirtualMapSceneOptions,
+): VirtualMapScene {
   const renderer = new WebGLRenderer({ canvas, antialias: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, VIRTUAL_MAP_MAX_PIXEL_RATIO));
-  renderer.shadowMap.enabled = true;
+  renderer.setPixelRatio(pixelRatio);
+  renderer.shadowMap.enabled = shadowsEnabled;
   renderer.shadowMap.type = PCFShadowMap;
   renderer.shadowMap.autoUpdate = false;
 
@@ -88,7 +95,7 @@ export function createVirtualMapScene(canvas: HTMLCanvasElement): VirtualMapScen
   scene.add(
     new AmbientLight(branding.colors.scene.ambientLight, VIRTUAL_MAP_LIGHTING.ambientIntensity),
   );
-  scene.add(createSunLight());
+  scene.add(createSunLight(shadowsEnabled));
 
   const controls = new OrbitControls(camera, canvas);
   controls.enableDamping = true;
@@ -112,7 +119,7 @@ export function createVirtualMapScene(canvas: HTMLCanvasElement): VirtualMapScen
   return { renderer, scene, camera, controls };
 }
 
-function createSunLight(): DirectionalLight {
+function createSunLight(castShadow: boolean): DirectionalLight {
   const {
     directionalIntensity,
     directionalPosition,
@@ -127,7 +134,7 @@ function createSunLight(): DirectionalLight {
     directionalIntensity,
   );
   light.position.set(directionalPosition.x, directionalPosition.y, directionalPosition.z);
-  light.castShadow = true;
+  light.castShadow = castShadow;
   light.shadow.mapSize.set(shadowMapSize, shadowMapSize);
   light.shadow.bias = shadowBias;
   light.shadow.camera.left = -shadowCameraExtent;
