@@ -4,7 +4,11 @@ import { Raycaster, type Object3D, type Vector2 } from "three";
 
 import { branding } from "@/config/branding.ts";
 import messages from "@/constants/messages.json";
-import { VIRTUAL_MAP_EVENTS, VIRTUAL_MAP_HIGHLIGHT } from "@/constants/virtual-map-constants.ts";
+import {
+  VIRTUAL_MAP_EVENTS,
+  VIRTUAL_MAP_HIGHLIGHT,
+  VIRTUAL_MAP_STATS_SAMPLE_MS,
+} from "@/constants/virtual-map-constants.ts";
 import { formatMessage } from "@/helpers/message-helper.ts";
 import { getRequestErrorMessage } from "@/helpers/request-error-helper.ts";
 import {
@@ -13,6 +17,7 @@ import {
   resolvePixelRatio,
 } from "@/helpers/virtual-map-graphics-helper.ts";
 import { virtualMapEventBus } from "@/helpers/virtual-map-event-bus.ts";
+import { createFrameRateSampler } from "@/helpers/virtual-map-render-stats-helper.ts";
 import {
   applyEdgeFade,
   applyEntityHighlight,
@@ -90,13 +95,23 @@ export function useVirtualMap(canvasRef: RefObject<HTMLCanvasElement | null>) {
       setHovered(null);
     };
 
-    renderer.setAnimationLoop(() => {
+    const sampleFrameRate = createFrameRateSampler(VIRTUAL_MAP_STATS_SAMPLE_MS);
+    renderer.setAnimationLoop((time: number) => {
       if (hoverPointer) {
         setHovered(pickEntityRoot(raycaster, hoverPointer, camera, pickable));
         hoverPointer = null;
       }
       controls.update();
       renderer.render(scene, camera);
+
+      const fps = sampleFrameRate(time);
+      if (fps === null) return;
+
+      virtualMapEventBus.dispatch(VIRTUAL_MAP_EVENTS.RENDER_STATS_UPDATED, {
+        fps,
+        drawCalls: renderer.info.render.calls,
+        triangles: renderer.info.render.triangles,
+      });
     });
 
     const handlePointerDown = (event: PointerEvent) => {

@@ -431,6 +431,11 @@
       "fpsCounterDescription": "Mostra quantos quadros por segundo o mapa está desenhando.",
       "saveLabel": "Salvar e recarregar o mapa"
     },
+    "fpsCounter": {
+      "fps": "{fps} FPS",
+      "drawCalls": "{count} chamadas de desenho",
+      "triangles": "{count} triângulos"
+    },
     "tour": {
       "stepCounter": "{current} de {total}",
       "restartLabel": "Ver o tour novamente",

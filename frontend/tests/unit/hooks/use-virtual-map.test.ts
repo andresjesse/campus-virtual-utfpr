@@ -3,7 +3,7 @@ import { act, fireEvent, renderHook, waitFor } from '@testing-library/react'
 import { Group, PerspectiveCamera, Scene } from 'three'
 
 import messages from '@/constants/messages.json'
-import { VIRTUAL_MAP_EVENTS } from '@/constants/virtual-map-constants.ts'
+import { VIRTUAL_MAP_EVENTS, VIRTUAL_MAP_STATS_SAMPLE_MS } from '@/constants/virtual-map-constants.ts'
 import {
   VIRTUAL_MAP_GRAPHICS_STORAGE_KEY,
   VIRTUAL_MAP_PIXEL_DENSITY_RATIOS,
@@ -93,6 +93,7 @@ function createFakeScene() {
     dispose: jest.fn(),
     forceContextLoss: jest.fn(),
     shadowMap: { needsUpdate: false },
+    info: { render: { calls: 0, triangles: 0 } },
   }
   const controls = { update: jest.fn(), dispose: jest.fn() }
   const camera = new PerspectiveCamera()
@@ -127,8 +128,8 @@ function click(canvas: HTMLCanvasElement, from = { clientX: 10, clientY: 10 }, t
 
 function hover(canvas: HTMLCanvasElement, renderer: ReturnType<typeof createFakeScene>['renderer']) {
   fireEvent.pointerMove(canvas, { pointerType: 'mouse', buttons: 0, clientX: 10, clientY: 10 })
-  const frame = renderer.setAnimationLoop.mock.calls[0][0] as () => void
-  act(() => frame())
+  const frame = renderer.setAnimationLoop.mock.calls[0][0] as (time: number) => void
+  act(() => frame(0))
 }
 
 function listenToSelection() {
@@ -432,6 +433,37 @@ describe('useVirtualMap', () => {
     expect(cleared).not.toHaveBeenCalled()
   })
 
+  it('dispatches the render stats once per sample window', async () => {
+    const { renderer } = createFakeScene()
+    listActiveEntitiesMock.mockResolvedValue([])
+    loadModelsMock.mockResolvedValue([])
+    const statsListener = jest.fn()
+    afterEachCleanups.push(
+      virtualMapEventBus.register(VIRTUAL_MAP_EVENTS.RENDER_STATS_UPDATED, statsListener),
+    )
+
+    const { result } = renderVirtualMap()
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+    const frame = renderer.setAnimationLoop.mock.calls[0][0] as (time: number) => void
+    renderer.info.render = { calls: 12, triangles: 34000 }
+
+    act(() => {
+      frame(0)
+      frame(VIRTUAL_MAP_STATS_SAMPLE_MS / 2)
+    })
+
+    expect(statsListener).not.toHaveBeenCalled()
+
+    act(() => frame(VIRTUAL_MAP_STATS_SAMPLE_MS))
+
+    expect(statsListener).toHaveBeenCalledTimes(1)
+    expect(statsListener).toHaveBeenCalledWith({
+      fps: Math.round((2 * 1000) / VIRTUAL_MAP_STATS_SAMPLE_MS),
+      drawCalls: 12,
+      triangles: 34000,
+    })
+  })
+
   it('stops listening to the canvas on unmount', async () => {
     createFakeScene()
     listActiveEntitiesMock.mockResolvedValue([])
@@ -578,11 +610,11 @@ describe('useVirtualMap', () => {
 
     it('ignores touch pointers and moves with a button held', async () => {
       const { canvas, renderer } = await renderReady()
-      const frame = renderer.setAnimationLoop.mock.calls[0][0] as () => void
+      const frame = renderer.setAnimationLoop.mock.calls[0][0] as (time: number) => void
 
       fireEvent.pointerMove(canvas, { pointerType: 'touch', buttons: 0, clientX: 10, clientY: 10 })
       fireEvent.pointerMove(canvas, { pointerType: 'mouse', buttons: 1, clientX: 10, clientY: 10 })
-      act(() => frame())
+      act(() => frame(0))
 
       expect(pickEntityRootMock).not.toHaveBeenCalled()
     })
