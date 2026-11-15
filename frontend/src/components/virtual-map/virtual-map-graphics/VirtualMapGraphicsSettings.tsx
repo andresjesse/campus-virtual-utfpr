@@ -6,13 +6,14 @@ import messages from "@/constants/messages.json";
 import {
   VIRTUAL_MAP_PIXEL_DENSITIES,
   type VirtualMapPixelDensity,
+  type VirtualMapPixelDensityLevel,
 } from "@/constants/virtual-map-graphics-constants.ts";
 import { formatMessage } from "@/helpers/message-helper.ts";
 import type { VirtualMapGraphicsSettings as GraphicsSettings } from "@/types/virtual-map-graphics.ts";
 
 type VirtualMapGraphicsSettingsProps = {
   draft: GraphicsSettings;
-  currentPixelRatio: number;
+  currentPixelDensity: VirtualMapPixelDensityLevel;
   isDirty: boolean;
   onChange: <Key extends keyof GraphicsSettings>(key: Key, value: GraphicsSettings[Key]) => void;
   onSave: () => void;
@@ -25,15 +26,15 @@ const densityOptions = VIRTUAL_MAP_PIXEL_DENSITIES.map((value) => ({
 
 export default function VirtualMapGraphicsSettings({
   draft,
-  currentPixelRatio,
+  currentPixelDensity,
   isDirty,
   onChange,
   onSave,
 }: VirtualMapGraphicsSettingsProps) {
   const graphicsMessages = messages.virtualMap.graphics;
-  const currentRatioLabel = formatMessage(
-    graphicsMessages.currentPixelRatio,
-    currentPixelRatio.toLocaleString(undefined, { maximumFractionDigits: 2 }),
+  const currentDensityLabel = formatMessage(
+    graphicsMessages.currentPixelDensity,
+    graphicsMessages.pixelDensityOptions[currentPixelDensity],
   );
 
   return (
@@ -53,7 +54,7 @@ export default function VirtualMapGraphicsSettings({
           onChange={(value) => onChange("pixelDensity", value as VirtualMapPixelDensity)}
         />
         <Text size="xs" c={branding.colors.text.muted}>
-          {currentRatioLabel}
+          {currentDensityLabel}
         </Text>
       </Stack>
       <Switch

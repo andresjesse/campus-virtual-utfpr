@@ -3,9 +3,12 @@ import { act, renderHook } from '@testing-library/react'
 import {
   VIRTUAL_MAP_GRAPHICS_DEFAULTS,
   VIRTUAL_MAP_GRAPHICS_STORAGE_KEY,
-  VIRTUAL_MAP_PIXEL_DENSITY_RATIOS,
 } from '@/constants/virtual-map-graphics-constants.ts'
-import { applyGraphicsSettings } from '@/helpers/virtual-map-graphics-helper.ts'
+import {
+  applyGraphicsSettings,
+  readDeviceInfo,
+  resolvePixelDensityLevel,
+} from '@/helpers/virtual-map-graphics-helper.ts'
 import { useVirtualMapGraphicsSettings } from '@/hooks/use-virtual-map-graphics-settings.ts'
 import type { VirtualMapGraphicsSettings } from '@/types/virtual-map-graphics.ts'
 
@@ -45,17 +48,22 @@ describe('useVirtualMapGraphicsSettings', () => {
     expect(result.current.draft).toEqual(stored)
   })
 
-  it('reports the pixel ratio of the stored density, not of the draft', () => {
-    const originalRatio = window.devicePixelRatio
-    Object.defineProperty(window, 'devicePixelRatio', { value: 3, configurable: true })
+  it('reports the level of the stored density, not of the draft', () => {
     window.localStorage.setItem(VIRTUAL_MAP_GRAPHICS_STORAGE_KEY, JSON.stringify(stored))
     const { result } = renderHook(() => useVirtualMapGraphicsSettings())
 
     act(() => result.current.updateDraft('pixelDensity', 'high'))
 
-    expect(result.current.currentPixelRatio).toBe(VIRTUAL_MAP_PIXEL_DENSITY_RATIOS.low)
+    expect(result.current.currentPixelDensity).toBe('low')
+  })
 
-    Object.defineProperty(window, 'devicePixelRatio', { value: originalRatio, configurable: true })
+  it('reports the level that auto picked on this device', () => {
+    const { result } = renderHook(() => useVirtualMapGraphicsSettings())
+
+    expect(result.current.currentPixelDensity).toBe(
+      resolvePixelDensityLevel('auto', readDeviceInfo()),
+    )
+    expect(result.current.currentPixelDensity).not.toBe('auto')
   })
 
   it('becomes dirty when the draft changes and clean again when it goes back', () => {

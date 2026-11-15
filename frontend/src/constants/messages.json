@@ -426,7 +426,7 @@
         "medium": "Média",
         "high": "Alta"
       },
-      "currentPixelRatio": "Atual: {ratio}x",
+      "currentPixelDensity": "Atual: {level}",
       "fpsCounterLabel": "Contador de FPS",
       "fpsCounterDescription": "Mostra quantos quadros por segundo o mapa está desenhando.",
       "saveLabel": "Salvar e recarregar o mapa"

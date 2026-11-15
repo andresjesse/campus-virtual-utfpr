@@ -32,7 +32,7 @@ function isLowEndDevice({ hardwareConcurrency, deviceMemory }: VirtualMapDeviceI
   return fewCores || littleMemory;
 }
 
-function resolvePixelDensityLevel(
+export function resolvePixelDensityLevel(
   density: VirtualMapPixelDensity,
   device: VirtualMapDeviceInfo,
 ): VirtualMapPixelDensityLevel {

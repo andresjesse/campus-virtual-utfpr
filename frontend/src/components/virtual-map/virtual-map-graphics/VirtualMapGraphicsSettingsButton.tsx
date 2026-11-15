@@ -10,7 +10,7 @@ import { useVirtualMapGraphicsSettings } from "@/hooks/use-virtual-map-graphics-
 
 export default function VirtualMapGraphicsSettingsButton() {
   const [opened, setOpened] = useState(false);
-  const { draft, isDirty, currentPixelRatio, updateDraft, reset, save } =
+  const { draft, isDirty, currentPixelDensity, updateDraft, reset, save } =
     useVirtualMapGraphicsSettings();
 
   const close = () => {
@@ -32,7 +32,7 @@ export default function VirtualMapGraphicsSettingsButton() {
       <Popover.Dropdown bg={branding.colors.surface.interactive}>
         <VirtualMapGraphicsSettings
           draft={draft}
-          currentPixelRatio={currentPixelRatio}
+          currentPixelDensity={currentPixelDensity}
           isDirty={isDirty}
           onChange={updateDraft}
           onSave={save}

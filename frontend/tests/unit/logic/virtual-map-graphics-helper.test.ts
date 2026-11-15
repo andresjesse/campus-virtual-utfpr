@@ -9,6 +9,7 @@ import {
   areGraphicsSettingsEqual,
   loadGraphicsSettings,
   readDeviceInfo,
+  resolvePixelDensityLevel,
   resolvePixelRatio,
   saveGraphicsSettings,
 } from '@/helpers/virtual-map-graphics-helper.ts'
@@ -105,6 +106,20 @@ describe('resolvePixelRatio', () => {
         ),
       ).toBe(VIRTUAL_MAP_PIXEL_DENSITY_RATIOS.high)
     })
+  })
+})
+
+describe('resolvePixelDensityLevel', () => {
+  it('keeps a fixed level as it is', () => {
+    expect(resolvePixelDensityLevel('low', createDevice())).toBe('low')
+    expect(resolvePixelDensityLevel('medium', createDevice())).toBe('medium')
+    expect(resolvePixelDensityLevel('high', createDevice({ hardwareConcurrency: 2 }))).toBe('high')
+  })
+
+  it('turns auto into the level picked for the device', () => {
+    expect(resolvePixelDensityLevel('auto', createDevice())).toBe('high')
+    expect(resolvePixelDensityLevel('auto', createDevice({ coarsePointer: true }))).toBe('medium')
+    expect(resolvePixelDensityLevel('auto', createDevice({ deviceMemory: 2 }))).toBe('low')
   })
 })
 

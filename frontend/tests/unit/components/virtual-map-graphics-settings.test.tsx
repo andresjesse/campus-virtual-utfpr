@@ -28,7 +28,7 @@ function renderWithMantine(ui: ReactNode) {
 function renderSettings(overrides: Partial<Parameters<typeof VirtualMapGraphicsSettings>[0]> = {}) {
   const props = {
     draft: VIRTUAL_MAP_GRAPHICS_DEFAULTS,
-    currentPixelRatio: 2,
+    currentPixelDensity: 'high' as const,
     isDirty: false,
     onChange: jest.fn(),
     onSave: jest.fn(),
@@ -55,15 +55,12 @@ describe('VirtualMapGraphicsSettings', () => {
     ).toBeChecked()
   })
 
-  it('shows the pixel ratio currently in use', () => {
-    renderSettings({ currentPixelRatio: 1.5 })
+  it('shows the pixel density level currently in use', () => {
+    renderSettings({ currentPixelDensity: 'medium' })
 
     expect(
       screen.getByText(
-        formatMessage(
-          graphicsMessages.currentPixelRatio,
-          (1.5).toLocaleString(undefined, { maximumFractionDigits: 2 }),
-        ),
+        formatMessage(graphicsMessages.currentPixelDensity, graphicsMessages.pixelDensityOptions.medium),
       ),
     ).toBeInTheDocument()
   })

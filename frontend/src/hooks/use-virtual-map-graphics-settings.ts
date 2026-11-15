@@ -5,7 +5,7 @@ import {
   areGraphicsSettingsEqual,
   loadGraphicsSettings,
   readDeviceInfo,
-  resolvePixelRatio,
+  resolvePixelDensityLevel,
 } from "@/helpers/virtual-map-graphics-helper.ts";
 import type { VirtualMapGraphicsSettings } from "@/types/virtual-map-graphics.ts";
 
@@ -13,8 +13,8 @@ export function useVirtualMapGraphicsSettings() {
   const [settings] = useState(loadGraphicsSettings);
   const [draft, setDraft] = useState(settings);
 
-  const currentPixelRatio = useMemo(
-    () => resolvePixelRatio(settings.pixelDensity, readDeviceInfo()),
+  const currentPixelDensity = useMemo(
+    () => resolvePixelDensityLevel(settings.pixelDensity, readDeviceInfo()),
     [settings],
   );
 
@@ -36,7 +36,7 @@ export function useVirtualMapGraphicsSettings() {
     settings,
     draft,
     isDirty: !areGraphicsSettingsEqual(settings, draft),
-    currentPixelRatio,
+    currentPixelDensity,
     updateDraft,
     reset,
     save,
