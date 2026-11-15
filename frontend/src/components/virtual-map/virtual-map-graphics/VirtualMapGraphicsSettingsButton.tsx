@@ -1,4 +1,5 @@
-import { Box, Popover } from "@mantine/core";
+import { Box, Popover, useMantineTheme } from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 import { SlidersHorizontalIcon } from "@phosphor-icons/react/dist/csr/SlidersHorizontal";
 import { useState } from "react";
 
@@ -10,6 +11,8 @@ import { useVirtualMapGraphicsSettings } from "@/hooks/use-virtual-map-graphics-
 
 export default function VirtualMapGraphicsSettingsButton() {
   const [opened, setOpened] = useState(false);
+  const theme = useMantineTheme();
+  const isNarrow = useMediaQuery(`(max-width: ${theme.breakpoints.xs})`);
   const { draft, isDirty, currentPixelDensity, updateDraft, reset, save } =
     useVirtualMapGraphicsSettings();
 
@@ -19,7 +22,14 @@ export default function VirtualMapGraphicsSettingsButton() {
   };
 
   return (
-    <Popover opened={opened} onDismiss={close} position="right-start" offset={12} trapFocus>
+    <Popover
+      opened={opened}
+      onDismiss={close}
+      position={isNarrow ? "bottom-start" : "right-start"}
+      offset={12}
+      middlewares={{ flip: true, shift: true, size: { padding: 16 } }}
+      trapFocus
+    >
       <Popover.Target>
         <Box>
           <VirtualMapToolbarButton
@@ -29,7 +39,7 @@ export default function VirtualMapGraphicsSettingsButton() {
           />
         </Box>
       </Popover.Target>
-      <Popover.Dropdown bg={branding.colors.surface.interactive}>
+      <Popover.Dropdown bg={branding.colors.surface.interactive} style={{ overflowY: "auto" }}>
         <VirtualMapGraphicsSettings
           draft={draft}
           currentPixelDensity={currentPixelDensity}

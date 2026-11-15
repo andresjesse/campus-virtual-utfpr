@@ -38,7 +38,7 @@ export default function VirtualMapGraphicsSettings({
   );
 
   return (
-    <Stack gap="md" w={320}>
+    <Stack gap="md" w="min(320px, calc(100vw - 64px))">
       <Text fw={600}>{graphicsMessages.title}</Text>
       <Switch
         label={graphicsMessages.shadowsLabel}
