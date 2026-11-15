@@ -4,6 +4,7 @@ module.exports = {
     '\\.module\\.css$': '<rootDir>/tests/style-mock.cjs',
     '^@/mocks/(.*)$': '<rootDir>/tests/mocks/$1',
     '^@/config/locale\\.ts$': '<rootDir>/tests/mocks/locale.ts',
+    '^@/config/environment\\.ts$': '<rootDir>/tests/mocks/environment.ts',
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],

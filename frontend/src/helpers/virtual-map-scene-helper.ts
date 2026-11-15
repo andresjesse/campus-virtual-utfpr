@@ -33,6 +33,10 @@ import {
   VIRTUAL_MAP_POINTER,
   VIRTUAL_MAP_SKY,
 } from "@/constants/virtual-map-constants.ts";
+import {
+  DEFAULT_VIRTUAL_MAP_EXPERIMENT,
+  type VirtualMapExperiment,
+} from "@/helpers/virtual-map-experiment-helper.ts";
 import { createSkyDome, createSkyUniforms, SKY_GRADIENT_GLSL } from "@/helpers/virtual-map-sky-helper.ts";
 import type { EntityRecord, EntityTransformField } from "@/types/entity.ts";
 import type { MeshRecord } from "@/types/mesh.ts";
@@ -63,11 +67,17 @@ const targetMax = new Vector3(
   VIRTUAL_MAP_ORBIT_LIMITS.targetMax.z,
 );
 
-export function createVirtualMapScene(canvas: HTMLCanvasElement): VirtualMapScene {
-  const renderer = new WebGLRenderer({ canvas, antialias: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, VIRTUAL_MAP_MAX_PIXEL_RATIO));
-  renderer.shadowMap.enabled = true;
+export function createVirtualMapScene(
+  canvas: HTMLCanvasElement,
+  experiment: VirtualMapExperiment = DEFAULT_VIRTUAL_MAP_EXPERIMENT,
+): VirtualMapScene {
+  const renderer = new WebGLRenderer({ canvas, antialias: !experiment.noAntialias });
+  const maxPixelRatio = experiment.pixelRatioOne ? 1 : VIRTUAL_MAP_MAX_PIXEL_RATIO;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, maxPixelRatio));
+  renderer.shadowMap.enabled = !experiment.noShadow;
   renderer.shadowMap.type = PCFShadowMap;
+  // Sombra estática: calculada uma vez (o chamador pede `needsUpdate` quando a cena estiver pronta).
+  renderer.shadowMap.autoUpdate = !experiment.staticShadow;
 
   const scene = new Scene();
   scene.background = new Color(branding.colors.scene.background);
@@ -87,7 +97,7 @@ export function createVirtualMapScene(canvas: HTMLCanvasElement): VirtualMapScen
   scene.add(
     new AmbientLight(branding.colors.scene.ambientLight, VIRTUAL_MAP_LIGHTING.ambientIntensity),
   );
-  scene.add(createSunLight());
+  scene.add(createSunLight(experiment.shadowMapSize));
 
   const controls = new OrbitControls(camera, canvas);
   controls.enableDamping = true;
@@ -111,15 +121,16 @@ export function createVirtualMapScene(canvas: HTMLCanvasElement): VirtualMapScen
   return { renderer, scene, camera, controls };
 }
 
-function createSunLight(): DirectionalLight {
+function createSunLight(shadowMapSizeOverride: number | null = null): DirectionalLight {
   const {
     directionalIntensity,
     directionalPosition,
     shadowBias,
     shadowCameraExtent,
     shadowCameraFar,
-    shadowMapSize,
+    shadowMapSize: defaultShadowMapSize,
   } = VIRTUAL_MAP_LIGHTING;
+  const shadowMapSize = shadowMapSizeOverride ?? defaultShadowMapSize;
 
   const light = new DirectionalLight(
     branding.colors.scene.directionalLight,

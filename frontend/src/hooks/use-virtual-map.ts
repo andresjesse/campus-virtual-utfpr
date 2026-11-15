@@ -7,6 +7,8 @@ import messages from "@/constants/messages.json";
 import { VIRTUAL_MAP_EVENTS, VIRTUAL_MAP_HIGHLIGHT } from "@/constants/virtual-map-constants.ts";
 import { formatMessage } from "@/helpers/message-helper.ts";
 import { getRequestErrorMessage } from "@/helpers/request-error-helper.ts";
+import { parseVirtualMapExperiment } from "@/helpers/virtual-map-experiment-helper.ts";
+import { virtualMapStats } from "@/helpers/virtual-map-stats.ts";
 import { virtualMapEventBus } from "@/helpers/virtual-map-event-bus.ts";
 import {
   applyEdgeFade,
@@ -29,6 +31,11 @@ import { listActiveEntities } from "@/services/entity-service.ts";
 import { getMeshFileUrl } from "@/services/mesh-service.ts";
 import type { VirtualMapStatus } from "@/types/virtual-map-status.ts";
 
+/** Marcador de tempo para os experimentos de desempenho; ignorado onde a API não existe (ex.: testes em jsdom). */
+function markPerformance(name: string) {
+  if (typeof performance !== "undefined" && typeof performance.mark === "function") performance.mark(name);
+}
+
 export function useVirtualMap(canvasRef: RefObject<HTMLCanvasElement | null>) {
   const [status, setStatus] = useState<VirtualMapStatus>("loading");
   const [progress, setProgress] = useState(0);
@@ -40,7 +47,9 @@ export function useVirtualMap(canvasRef: RefObject<HTMLCanvasElement | null>) {
     if (!canvas) return;
 
     let disposed = false;
-    const { renderer, scene, camera, controls } = createVirtualMapScene(canvas);
+    const experiment = parseVirtualMapExperiment(window.location.search);
+    let needsRender = true;
+    const { renderer, scene, camera, controls } = createVirtualMapScene(canvas, experiment);
     const container = canvas.parentElement ?? canvas;
 
     const resize = () => {
@@ -50,6 +59,7 @@ export function useVirtualMap(canvasRef: RefObject<HTMLCanvasElement | null>) {
       renderer.setSize(clientWidth, clientHeight, false);
       camera.aspect = clientWidth / clientHeight;
       camera.updateProjectionMatrix();
+      needsRender = true;
     };
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(container);
@@ -64,6 +74,7 @@ export function useVirtualMap(canvasRef: RefObject<HTMLCanvasElement | null>) {
 
     const setHovered = (root: Object3D | null) => {
       if (root === hovered) return;
+      needsRender = true;
 
       restoreHovered?.();
       restoreHovered = root
@@ -86,8 +97,13 @@ export function useVirtualMap(canvasRef: RefObject<HTMLCanvasElement | null>) {
         setHovered(pickEntityRoot(raycaster, hoverPointer, camera, pickable));
         hoverPointer = null;
       }
-      controls.update();
+      const moved = controls.update();
+      if (experiment.onDemand && !moved && !needsRender) return;
+
+      needsRender = false;
       renderer.render(scene, camera);
+      virtualMapStats.drawCalls = renderer.info.render.calls;
+      virtualMapStats.triangles = renderer.info.render.triangles;
     });
 
     const handlePointerDown = (event: PointerEvent) => {
@@ -115,6 +131,7 @@ export function useVirtualMap(canvasRef: RefObject<HTMLCanvasElement | null>) {
     canvas.addEventListener("pointerleave", clearHover);
 
     const load = async () => {
+      markPerformance("map-load-start");
       let groups: MeshEntityGroup[];
       let entityIdsWithPage: Set<string>;
       try {
@@ -131,6 +148,7 @@ export function useVirtualMap(canvasRef: RefObject<HTMLCanvasElement | null>) {
         return;
       }
 
+      markPerformance("map-models-start");
       const results = await loadModels(
         groups.map((group) => getMeshFileUrl(group.mesh)),
         (percent) => {
@@ -160,6 +178,8 @@ export function useVirtualMap(canvasRef: RefObject<HTMLCanvasElement | null>) {
         });
       });
 
+      markPerformance("map-models-end");
+
       if (disposed) return;
 
       const failedCount = results.filter((result) => result.status === "rejected").length;
@@ -171,6 +191,9 @@ export function useVirtualMap(canvasRef: RefObject<HTMLCanvasElement | null>) {
         });
       }
 
+      renderer.shadowMap.needsUpdate = true;
+      needsRender = true;
+      markPerformance("map-ready");
       setStatus("ready");
     };
 

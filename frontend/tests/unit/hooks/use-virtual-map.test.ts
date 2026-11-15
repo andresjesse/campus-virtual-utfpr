@@ -85,6 +85,8 @@ function createFakeScene() {
     setAnimationLoop: jest.fn(),
     setSize: jest.fn(),
     render: jest.fn(),
+    shadowMap: { needsUpdate: false },
+    info: { render: { calls: 0, triangles: 0 } },
     dispose: jest.fn(),
     forceContextLoss: jest.fn(),
   }

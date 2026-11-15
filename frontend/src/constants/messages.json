@@ -414,6 +414,11 @@
     "toolbar": {
       "ariaLabel": "Ferramentas do mapa"
     },
+    "fpsCounter": {
+      "label": "{fps} FPS",
+      "drawCalls": "{count} desenhos",
+      "triangles": "{count} triângulos"
+    },
     "tour": {
       "stepCounter": "{current} de {total}",
       "restartLabel": "Ver o tour novamente",
