@@ -468,11 +468,6 @@
     }
   },
   "authentication": {
-    "footer": {
-      "privacyTerms": "TERMOS DE PRIVACIDADE",
-      "serviceTerms": "TERMOS DE SERVIÇO",
-      "systemStatus": "Status do sistema"
-    },
     "route": {
       "verifyingLabel": "Verificando autenticação",
       "restrictedTitle": "Acesso restrito",
@@ -481,6 +476,7 @@
   },
   "adminLayout": {
     "openNavigationLabel": "Abrir navegação",
+    "closeNavigationLabel": "Fechar navegação",
     "expandMenuLabel": "Expandir menu",
     "collapseMenuLabel": "Recolher menu",
     "logoutLabel": "Sair da conta"
@@ -503,7 +499,7 @@
     "images": "Imagens",
     "richText": "Texto (RTF)",
     "richTextSample": "Lorem Ipsum",
-    "previewAriaLabel": "{label} (indisponível)"
+    "addAriaLabel": "Adicionar bloco: {label}"
   },
   "login": {
     "subtitle": "ACESSO AO PORTAL ADMINISTRATIVO",

@@ -80,7 +80,7 @@ export default function ContentPageEditorPage() {
     <Flex
       component="main"
       direction={{ base: "column", md: "row" }}
-      mih="calc(100dvh - 60px)"
+      mih="calc(100dvh - var(--app-shell-header-offset))"
     >
       <EditorPageContainer
         navRoute="/admin/pages"

@@ -1,6 +1,8 @@
 import { ActionIcon, Table } from "@mantine/core";
 import { TrashIcon } from "@phosphor-icons/react/dist/csr/Trash";
 
+import classes from "@/components/action/touch-action-icon.module.css";
+
 type TableDeleteActionCellProps = {
   ariaLabel: string;
   deleting: boolean;
@@ -19,6 +21,7 @@ export default function TableDeleteActionCell({
         color="red"
         variant="subtle"
         size="sm"
+        className={classes.action}
         loading={deleting}
         onClick={(event) => {
           event.stopPropagation();

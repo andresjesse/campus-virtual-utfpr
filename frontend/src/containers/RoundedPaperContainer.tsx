@@ -16,7 +16,7 @@ export default function RoundedPaperContainer({ children, ariaLabel, ...boxProps
       bg={branding.colors.surface.panel}
       flex="1"
       px="0"
-      bdrs="48px 48px 0 0"
+      bdrs={{ base: "24px 24px 0 0", sm: "48px 48px 0 0" }}
       {...boxProps}
     >
       { children }

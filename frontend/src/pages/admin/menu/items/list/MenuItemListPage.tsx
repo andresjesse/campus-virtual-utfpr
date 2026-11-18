@@ -1,10 +1,9 @@
-import { Button, Flex, Group } from "@mantine/core";
-import { PlusIcon } from "@phosphor-icons/react/dist/csr/Plus";
+import { Flex } from "@mantine/core";
 import { useNavigate } from "react-router";
 
-import PageSearch from "@/components/content-page/page-search";
 import FeedbackState from "@/components/feedback-state";
 import MenuItemTable from "@/components/menu/menu-item-table/MenuItemTable.tsx";
+import RecordListToolbar from "@/components/table/RecordListToolbar.tsx";
 import RouteTabs from "@/components/tabs/RouteTabs.tsx";
 import { branding } from "@/config/branding.ts";
 import messages from "@/constants/messages.json";
@@ -34,26 +33,21 @@ export default function MenuItemListPage() {
   });
 
   return (
-    <Flex direction="column" px="lg" pt="lg" pb={0} mih="calc(100dvh - 60px)">
-      <Group justify="space-between" gap="xl" w="100%" mx={0} mt="auto" mb="lg" px="lg">
-        <Flex flex={1}>
-          <PageSearch
-            ariaLabel={messages.menuItems.list.searchLabel}
-            placeholder={messages.menuItems.list.searchPlaceholder}
-            value={query}
-            onChange={setQuery}
-          />
-        </Flex>
-        <Button
-          variant="outline"
-          color="brand"
-          size="sm"
-          leftSection={<PlusIcon aria-hidden size={16} />}
-          onClick={() => navigate("/admin/menu/items/new")}
-        >
-          {messages.menuItems.list.new}
-        </Button>
-      </Group>
+    <Flex
+      direction="column"
+      px={{ base: "sm", sm: "lg" }}
+      pt={{ base: "sm", sm: "lg" }}
+      pb={0}
+      mih="calc(100dvh - var(--app-shell-header-offset))"
+    >
+      <RecordListToolbar
+        searchLabel={messages.menuItems.list.searchLabel}
+        searchPlaceholder={messages.menuItems.list.searchPlaceholder}
+        query={query}
+        onQueryChange={setQuery}
+        newLabel={messages.menuItems.list.new}
+        onNew={() => navigate("/admin/menu/items/new")}
+      />
 
       <Flex
         flex={1}

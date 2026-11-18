@@ -1,4 +1,4 @@
-import { Group, NumberInput } from "@mantine/core";
+import { NumberInput, SimpleGrid } from "@mantine/core";
 
 import {
   ENTITY_TRANSFORM_AXES,
@@ -31,7 +31,7 @@ export default function EntityTransformRow({
   onChange,
 }: EntityTransformRowProps) {
   return (
-    <Group grow gap="md" align="flex-start" wrap="wrap">
+    <SimpleGrid cols={{ base: 1, xs: 3 }} spacing="md" verticalSpacing="sm">
       {ENTITY_TRANSFORM_AXES.map((axis) => (
         <NumberInput
           key={axis}
@@ -48,6 +48,6 @@ export default function EntityTransformRow({
           onChange={(value) => onChange(axis, value)}
         />
       ))}
-    </Group>
+    </SimpleGrid>
   );
 }

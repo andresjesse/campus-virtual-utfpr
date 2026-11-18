@@ -19,3 +19,9 @@
   --app-feedback-info: initial;
   --app-login-background: initial;
 }
+
+@media (pointer: coarse) and (min-width: $mantine-breakpoint-xs) {
+  html {
+    font-size: 112.5%;
+  }
+}

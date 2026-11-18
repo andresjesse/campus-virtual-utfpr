@@ -1,5 +1,5 @@
-import { AppShell, Burger, Group } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import { AppShell, Burger, Group, useMantineTheme } from "@mantine/core";
+import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { CaretDoubleLeftIcon } from "@phosphor-icons/react/dist/csr/CaretDoubleLeft";
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router";
@@ -9,22 +9,26 @@ import AdminNavigation from "@/components/admin-navigation";
 import AdminUserSummary from "@/components/admin-user-summary";
 import { getStorageKey } from "@/config/branding";
 import messages from "@/constants/messages.json";
+import { readStorageItem, writeStorageItem } from "@/helpers/storage-helper.ts";
 
 import classes from "./admin-layout.module.css";
 
 const SIDEBAR_STORAGE_KEY = getStorageKey("admin-sidebar-collapsed");
 
 export default function AdminLayout() {
-  const [opened, { toggle }] = useDisclosure();
+  const theme = useMantineTheme();
+  const [opened, { toggle, close }] = useDisclosure();
   const [desktopCollapsed, setDesktopCollapsed] = useState(
-    () => window.localStorage.getItem(SIDEBAR_STORAGE_KEY) === "true",
+    () => readStorageItem(SIDEBAR_STORAGE_KEY) === "true",
   );
+  const desktopQuery = `(min-width: ${theme.breakpoints.sm})`;
+  const isDesktop = useMediaQuery(desktopQuery, window.matchMedia(desktopQuery).matches, {
+    getInitialValueInEffect: false,
+  });
+  const collapsed = desktopCollapsed && isDesktop;
 
   useEffect(() => {
-    window.localStorage.setItem(
-      SIDEBAR_STORAGE_KEY,
-      String(desktopCollapsed),
-    );
+    writeStorageItem(SIDEBAR_STORAGE_KEY, String(desktopCollapsed));
   }, [desktopCollapsed]);
 
   return (
@@ -49,7 +53,11 @@ export default function AdminLayout() {
             onClick={toggle}
             hiddenFrom="sm"
             size="sm"
-            aria-label={messages.adminLayout.openNavigationLabel}
+            aria-label={
+              opened
+                ? messages.adminLayout.closeNavigationLabel
+                : messages.adminLayout.openNavigationLabel
+            }
           />
           <AdminBrand />
         </Group>
@@ -57,7 +65,7 @@ export default function AdminLayout() {
 
       <AppShell.Navbar p={8}>
         <AppShell.Section grow>
-          <AdminNavigation collapsed={desktopCollapsed} />
+          <AdminNavigation collapsed={collapsed} onNavigate={close} />
         </AppShell.Section>
         <AppShell.Section
           visibleFrom="sm"
@@ -68,7 +76,7 @@ export default function AdminLayout() {
           <button
             type="button"
             className={classes.collapseButton}
-            onClick={() => setDesktopCollapsed((collapsed) => !collapsed)}
+            onClick={() => setDesktopCollapsed((current) => !current)}
             aria-label={
               desktopCollapsed
                 ? messages.adminLayout.expandMenuLabel
@@ -82,7 +90,7 @@ export default function AdminLayout() {
           </button>
         </AppShell.Section>
         <AppShell.Section>
-          <AdminUserSummary collapsed={desktopCollapsed} />
+          <AdminUserSummary collapsed={collapsed} />
         </AppShell.Section>
       </AppShell.Navbar>
 

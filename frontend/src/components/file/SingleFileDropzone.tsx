@@ -14,6 +14,8 @@ import type {
 import { CloudArrowUpIcon } from "@phosphor-icons/react/dist/csr/CloudArrowUp";
 import { XIcon } from "@phosphor-icons/react/dist/csr/X";
 
+import classes from "@/components/action/touch-action-icon.module.css";
+
 type SingleFileDropzoneProps = {
   value: File | null;
   accept: DropzoneAccept;
@@ -49,6 +51,7 @@ export default function SingleFileDropzone({
             color="red"
             variant="subtle"
             size="sm"
+            className={classes.action}
             onClick={() => {
               setIsReplacing(false);
               onChange(null);

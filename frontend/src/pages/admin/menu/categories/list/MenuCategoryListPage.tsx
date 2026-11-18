@@ -1,10 +1,9 @@
-import { Button, Flex, Group } from "@mantine/core";
-import { PlusIcon } from "@phosphor-icons/react/dist/csr/Plus";
+import { Flex } from "@mantine/core";
 import { useNavigate } from "react-router";
 
-import PageSearch from "@/components/content-page/page-search";
 import FeedbackState from "@/components/feedback-state";
 import MenuCategoryTable from "@/components/menu/menu-category-table/MenuCategoryTable.tsx";
+import RecordListToolbar from "@/components/table/RecordListToolbar.tsx";
 import RouteTabs from "@/components/tabs/RouteTabs.tsx";
 import { branding } from "@/config/branding.ts";
 import messages from "@/constants/messages.json";
@@ -38,26 +37,21 @@ export default function MenuCategoryListPage() {
   });
 
   return (
-    <Flex direction="column" px="lg" pt="lg" pb={0} mih="calc(100dvh - 60px)">
-      <Group justify="space-between" gap="xl" w="100%" mx={0} mt="auto" mb="lg" px="lg">
-        <Flex flex={1}>
-          <PageSearch
-            ariaLabel={messages.menuCategories.list.searchLabel}
-            placeholder={messages.menuCategories.list.searchPlaceholder}
-            value={query}
-            onChange={setQuery}
-          />
-        </Flex>
-        <Button
-          variant="outline"
-          color="brand"
-          size="sm"
-          leftSection={<PlusIcon aria-hidden size={16} />}
-          onClick={() => navigate("/admin/menu/categories/new")}
-        >
-          {messages.menuCategories.list.new}
-        </Button>
-      </Group>
+    <Flex
+      direction="column"
+      px={{ base: "sm", sm: "lg" }}
+      pt={{ base: "sm", sm: "lg" }}
+      pb={0}
+      mih="calc(100dvh - var(--app-shell-header-offset))"
+    >
+      <RecordListToolbar
+        searchLabel={messages.menuCategories.list.searchLabel}
+        searchPlaceholder={messages.menuCategories.list.searchPlaceholder}
+        query={query}
+        onQueryChange={setQuery}
+        newLabel={messages.menuCategories.list.new}
+        onNew={() => navigate("/admin/menu/categories/new")}
+      />
 
       <Flex
         flex={1}

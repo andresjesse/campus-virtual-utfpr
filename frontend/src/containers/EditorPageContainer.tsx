@@ -17,7 +17,7 @@ export default function EditorPageContainer({ navRoute, ariaLabel, children }: E
       direction="column"
       flex="1 1 auto"
       miw={0}
-      mih="calc(100dvh - 60px)"
+      mih="calc(100dvh - var(--app-shell-header-offset))"
       px={{ base: "0.75rem", md: "md" }}
       pt="sm"
       pb={{ base: "0.75rem", md: 0 }}
@@ -26,7 +26,7 @@ export default function EditorPageContainer({ navRoute, ariaLabel, children }: E
 
       <RoundedPaperContainer
         ariaLabel={ariaLabel}
-        mih={{ base: "calc(100dvh - 6.5rem)", md: 0 }}
+        mih={{ base: "calc(100dvh - var(--app-shell-header-offset) - 2.75rem)", md: 0 }}
         style={{ overflow: "hidden" }}
       >
         {children}

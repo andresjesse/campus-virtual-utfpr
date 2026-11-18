@@ -4,6 +4,8 @@ import {CaretDownIcon} from "@phosphor-icons/react/dist/csr/CaretDown";
 import messages from "@/constants/messages.json";
 import {formatMessage} from "@/helpers/message-helper.ts";
 
+import classes from "@/components/action/touch-action-icon.module.css";
+
 type BlockMoveButtonsProps = {
   blockName: string
   canMoveUp: boolean
@@ -27,6 +29,7 @@ export default function BlockMoveButtons({
         aria-label={formatMessage(messages.block.list.moveUpAriaLabel, blockName)}
         variant="subtle"
         size="md"
+        className={classes.action}
         disabled={disabled || !canMoveUp}
         onClick={(event) => {
           event.stopPropagation();
@@ -41,6 +44,7 @@ export default function BlockMoveButtons({
         aria-label={formatMessage(messages.block.list.moveDownAriaLabel, blockName)}
         variant="subtle"
         size="md"
+        className={classes.action}
         disabled={disabled || !canMoveDown}
         onClick={(event) => {
           event.stopPropagation();

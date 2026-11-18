@@ -13,7 +13,7 @@ export default function VirtualMapMenuHeader({ brand = branding }: VirtualMapMen
     <Group justify="space-between" gap="sm" mb="xl">
       <BrandText
         parts={getBrandTitleParts(brand)}
-        fz="xl"
+        fz={{ base: "lg", sm: "xl" }}
         fw={700}
         style={{
           textShadow: `0 2px 10px color-mix(in srgb, ${branding.colors.surface.shadow} 60%, transparent)`,
@@ -22,7 +22,7 @@ export default function VirtualMapMenuHeader({ brand = branding }: VirtualMapMen
       {brand.location.length > 0 && (
         <BrandText
           parts={brand.location}
-          fz="xl"
+          fz={{ base: "lg", sm: "xl" }}
           fw={700}
           style={{
             textShadow: `0 2px 10px color-mix(in srgb, ${branding.colors.surface.shadow} 60%, transparent)`,

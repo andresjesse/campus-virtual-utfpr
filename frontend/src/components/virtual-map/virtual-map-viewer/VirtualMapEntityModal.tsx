@@ -1,4 +1,5 @@
-import { Modal } from "@mantine/core";
+import { Modal, useMantineTheme } from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 
 import FeedbackState from "@/components/feedback-state/index.tsx";
 import VirtualMapBlock from "@/components/virtual-map/virtual-map-viewer/VirtualMapBlock.tsx";
@@ -19,12 +20,18 @@ export default function VirtualMapEntityModal({
   onClose,
 }: VirtualMapEntityModalProps) {
   const { status, page, blocks, error, retry } = entityPage;
+  const theme = useMantineTheme();
+  const desktopQuery = `(min-width: ${theme.breakpoints.sm})`;
+  const isDesktop = useMediaQuery(desktopQuery, window.matchMedia(desktopQuery).matches, {
+    getInitialValueInEffect: false,
+  });
 
   return (
     <Modal
       opened={opened}
       centered
       size="lg"
+      fullScreen={!isDesktop}
       onClose={onClose}
       title={page?.title ?? fallbackTitle}
       closeButtonProps={{ "aria-label": messages.virtualMap.entityModal.closeAriaLabel }}
