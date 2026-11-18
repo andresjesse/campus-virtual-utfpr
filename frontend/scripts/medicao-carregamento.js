@@ -5,7 +5,7 @@
  * O script roda numa página em branco do mesmo servidor (/blank.html) e carrega o mapa várias vezes dentro
  * de um iframe, uma carga por vez. Assim, a página que roda o script não desenha o mapa e não disputa a
  * GPU com ele. As marcas de tempo vêm do hook use-virtual-map (map-load-start, map-models-start,
- * map-models-end, map-ready), presentes na branch experimento-qualidade-grafica.
+ * map-models-end, map-ready), presentes na branch performance-experiments.
  *
  * Condições (configuradas no DevTools, aba Network, e mantidas durante toda a sequência):
  *   - Limite de rede (throttling) com o mesmo perfil em todos os aparelhos;
