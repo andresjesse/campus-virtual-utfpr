@@ -4,7 +4,7 @@
   background: var(--app-surface-sidebar);
 }
 
-@media (max-width: 62rem) {
+@mixin smaller-than $mantine-breakpoint-md {
   .palette {
     display: grid;
     gap: 0.75rem;

@@ -468,11 +468,6 @@
     }
   },
   "authentication": {
-    "footer": {
-      "privacyTerms": "TERMOS DE PRIVACIDADE",
-      "serviceTerms": "TERMOS DE SERVIÇO",
-      "systemStatus": "Status do sistema"
-    },
     "route": {
       "verifyingLabel": "Verificando autenticação",
       "restrictedTitle": "Acesso restrito",

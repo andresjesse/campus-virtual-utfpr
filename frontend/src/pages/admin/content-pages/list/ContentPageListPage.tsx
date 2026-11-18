@@ -36,7 +36,7 @@ export default function ContentPageList() {
   });
 
   return (
-    <Flex direction="column" px="lg" pt="lg" pb={0} mih="calc(100dvh - 60px)" >
+    <Flex direction="column" px="lg" pt="lg" pb={0} mih="calc(100dvh - var(--app-shell-header-offset))">
       <Group justify="space-between" gap="xl" w="100%" mx={0} mt="auto" mb="lg" px="lg">
         <Flex flex={1}>
           <PageSearch
