@@ -42,7 +42,7 @@ export default function VirtualMapMenu() {
             bg={`color-mix(in srgb, ${branding.colors.surface.panel} 85%, transparent)`}
             c={branding.colors.text.primary}
             py="xl"
-            px={{ base: "xl", md: "7.5rem" }}
+            px={{ base: "md", sm: "xl", md: "7.5rem" }}
             h="calc(100dvh - 72px)"
             style={{
               overflowY: "auto",
