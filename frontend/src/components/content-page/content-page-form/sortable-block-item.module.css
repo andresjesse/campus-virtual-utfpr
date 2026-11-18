@@ -1,0 +1,5 @@
+@media (pointer: coarse) {
+  .handle {
+    display: none;
+  }
+}

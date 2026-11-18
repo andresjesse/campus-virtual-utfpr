@@ -1,5 +1,6 @@
 @media (pointer: coarse) {
   .action {
     --ai-size-sm: 2.75rem;
+    --ai-size-md: 2.75rem;
   }
 }

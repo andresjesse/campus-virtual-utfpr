@@ -8,6 +8,8 @@ import {branding} from "@/config/branding.ts";
 import messages from "@/constants/messages.json";
 import type {BlockDropPlacement} from "@/types/content-page.ts";
 
+import classes from "./sortable-block-item.module.css";
+
 type SortableBlockItemProps = {
   children: React.ReactNode
   dragId: string
@@ -91,6 +93,7 @@ export default function SortableBlockItem({
       >
         <Flex gap="xs" align="flex-start">
           <Box
+            className={classes.handle}
             title={messages.block.list.dragHandleTitle}
             c="dimmed"
             pt={4}
