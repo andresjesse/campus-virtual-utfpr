@@ -1,6 +1,9 @@
 {
   "common": {
     "back": "Voltar",
+    "next": "Próximo",
+    "skip": "Pular",
+    "finish": "Concluir",
     "retry": "Tentar novamente",
     "save": "Salvar",
     "showMore": "Ver mais",
@@ -65,6 +68,11 @@
     }
   },
   "files": {
+    "carousel": {
+      "previous": "Arquivo anterior",
+      "next": "Próximo arquivo",
+      "indicator": "Ir para o arquivo {index}"
+    },
     "video": {
       "ariaLabel": "Vídeo: {name}",
       "unsupported": "Seu navegador não suporta a reprodução deste vídeo."
@@ -393,18 +401,73 @@
       "loadErrorTitle": "Não foi possível carregar o conteúdo deste item",
       "emptyTitle": "Este item ainda não tem conteúdo"
     },
+    "deepLink": {
+      "notFoundTitle": "Item não encontrado",
+      "notFoundMessage": "O link aberto não corresponde a nenhum item disponível no mapa.",
+      "loadErrorTitle": "Não foi possível abrir o link"
+    },
     "menu": {
       "toggleLabel": "Menu",
       "loadErrorTitle": "Não foi possível carregar o menu",
       "emptyTitle": "Nenhum item de menu disponível"
+    },
+    "toolbar": {
+      "ariaLabel": "Ferramentas do mapa"
+    },
+    "graphics": {
+      "buttonLabel": "Configurações gráficas",
+      "title": "Configurações gráficas",
+      "shadowsLabel": "Sombras",
+      "shadowsDescription": "Desligar as sombras deixa o mapa mais leve em aparelhos mais simples.",
+      "pixelDensityLabel": "Densidade de pixels",
+      "pixelDensityOptions": {
+        "auto": "Automático",
+        "low": "Baixa",
+        "medium": "Média",
+        "high": "Alta"
+      },
+      "currentPixelDensity": "Atual: {level}",
+      "fpsCounterLabel": "Contador de FPS",
+      "fpsCounterDescription": "Mostra quantos quadros por segundo o mapa está desenhando.",
+      "saveLabel": "Salvar e recarregar o mapa"
+    },
+    "fpsCounter": {
+      "fps": "{fps} FPS"
+    },
+    "tour": {
+      "stepCounter": "{current} de {total}",
+      "restartLabel": "Ver o tour novamente",
+      "steps": {
+        "welcome": {
+          "title": "Boas-vindas ao Campus Virtual - UTFPR Guarapuava!",
+          "body": "Este tour rápido mostra como explorar o mapa. Você pode pular a qualquer momento."
+        },
+        "camera": {
+          "title": "Movimentando a câmera",
+          "body": "Arraste com o botão esquerdo do mouse para girar, com o botão direito para mover e use a roda do mouse para aproximar ou afastar.",
+          "touchBody": "Arraste com um dedo para girar, use dois dedos para mover e faça o movimento de pinça para aproximar ou afastar."
+        },
+        "entity": {
+          "title": "Explorando os locais",
+          "body": "Passe o mouse sobre um local para destacá-lo e clique nele para ver suas informações.",
+          "touchBody": "Toque em um local (ex.: bloco estudantil) para ver suas informações."
+        },
+        "menu": {
+          "title": "Abrindo o menu",
+          "body": "Use o menu para acessar páginas e links organizados por categoria."
+        },
+        "graphics": {
+          "title": "Ajustando os gráficos",
+          "body": "Se o mapa estiver lento, use este botão para desligar as sombras ou reduzir a densidade de pixels. Aqui você também pode exibir o contador de FPS."
+        },
+        "finish": {
+          "title": "Tudo pronto!",
+          "body": "Agora é com você. Bom passeio!"
+        }
+      }
     }
   },
   "authentication": {
-    "footer": {
-      "privacyTerms": "TERMOS DE PRIVACIDADE",
-      "serviceTerms": "TERMOS DE SERVIÇO",
-      "systemStatus": "Status do sistema"
-    },
     "route": {
       "verifyingLabel": "Verificando autenticação",
       "restrictedTitle": "Acesso restrito",
@@ -413,6 +476,7 @@
   },
   "adminLayout": {
     "openNavigationLabel": "Abrir navegação",
+    "closeNavigationLabel": "Fechar navegação",
     "expandMenuLabel": "Expandir menu",
     "collapseMenuLabel": "Recolher menu",
     "logoutLabel": "Sair da conta"
@@ -435,7 +499,7 @@
     "images": "Imagens",
     "richText": "Texto (RTF)",
     "richTextSample": "Lorem Ipsum",
-    "previewAriaLabel": "{label} (indisponível)"
+    "addAriaLabel": "Adicionar bloco: {label}"
   },
   "login": {
     "subtitle": "ACESSO AO PORTAL ADMINISTRATIVO",

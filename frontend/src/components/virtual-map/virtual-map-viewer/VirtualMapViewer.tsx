@@ -1,15 +1,21 @@
 import { Box } from "@mantine/core";
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 
+import VirtualMapFpsCounter from "@/components/virtual-map/virtual-map-graphics/VirtualMapFpsCounter.tsx";
 import VirtualMapMenu from "@/components/virtual-map/virtual-map-menu/VirtualMapMenu.tsx";
+import VirtualMapTopLeftToolbar from "@/components/virtual-map/virtual-map-toolbar/VirtualMapTopLeftToolbar.tsx";
+import VirtualMapTour from "@/components/virtual-map/virtual-map-tour/VirtualMapTour.tsx";
 import VirtualMapEntityModal from "@/components/virtual-map/virtual-map-viewer/VirtualMapEntityModal.tsx";
 import VirtualMapErrorOverlay from "@/components/virtual-map/virtual-map-viewer/VirtualMapErrorOverlay.tsx";
 import VirtualMapLoadingOverlay from "@/components/virtual-map/virtual-map-viewer/VirtualMapLoadingOverlay.tsx";
 import messages from "@/constants/messages.json";
 import { VIRTUAL_MAP_ENTITY_LOADING_DELAY_MS } from "@/constants/virtual-map-constants.ts";
+import { VIRTUAL_MAP_TOUR_TARGETS } from "@/constants/virtual-map-tour-constants.ts";
+import { loadGraphicsSettings } from "@/helpers/virtual-map-graphics-helper.ts";
 import { useDelayedFlag } from "@/hooks/use-delayed-flag.ts";
 import { useLastDefined } from "@/hooks/use-last-defined.ts";
 import { useVirtualMapEntityPage } from "@/hooks/use-virtual-map-entity-page.ts";
+import { useVirtualMapDeepLink } from "@/hooks/use-virtual-map-deep-link.ts";
 import { useVirtualMap } from "@/hooks/use-virtual-map.ts";
 import { useVirtualMapSelection } from "@/hooks/use-virtual-map-selection.ts";
 
@@ -18,6 +24,8 @@ export default function VirtualMapViewer() {
   const { status, progress, error, retry } = useVirtualMap(canvasRef);
   const { selected, clearSelection } = useVirtualMapSelection();
   const entityPage = useVirtualMapEntityPage(selected);
+  const { slug } = useVirtualMapDeepLink(status === "ready", selected?.slug ?? null);
+  const [{ fpsCounterVisible }] = useState(loadGraphicsSettings);
 
   const { status: pageStatus, page, blocks, error: pageError, retry: retryPage } = entityPage;
   // An entity without a page also starts as "loading", so the modal waits out the delay
@@ -47,10 +55,14 @@ export default function VirtualMapViewer() {
         w="100%"
         h="100%"
         aria-label={messages.virtualMap.viewer.canvasAriaLabel}
+        data-tour={VIRTUAL_MAP_TOUR_TARGETS.canvas}
       />
       {status === "loading" && <VirtualMapLoadingOverlay progress={progress} />}
       {status === "error" && <VirtualMapErrorOverlay description={error} onRetry={retry} />}
+      {status === "ready" && <VirtualMapTopLeftToolbar />}
       {status === "ready" && <VirtualMapMenu />}
+      {status === "ready" && fpsCounterVisible && <VirtualMapFpsCounter />}
+      <VirtualMapTour enabled={status === "ready" && !slug} />
       {modalContent && (
         <VirtualMapEntityModal
           opened={isModalOpen}

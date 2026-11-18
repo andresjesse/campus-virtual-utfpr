@@ -1,10 +1,9 @@
-import {Button, Flex, Group} from "@mantine/core";
-import { PlusIcon } from "@phosphor-icons/react/dist/csr/Plus";
+import { Flex } from "@mantine/core";
 import { useNavigate } from "react-router";
 
 import FeedbackState from "@/components/feedback-state";
-import PageSearch from "@/components/content-page/page-search";
 import PageTable from "@/components/content-page/page-table/PageTable.tsx";
+import RecordListToolbar from "@/components/table/RecordListToolbar.tsx";
 import {
   deleteContentPage,
   listContentPages,
@@ -36,26 +35,21 @@ export default function ContentPageList() {
   });
 
   return (
-    <Flex direction="column" px="lg" pt="lg" pb={0} mih="calc(100dvh - 60px)" >
-      <Group justify="space-between" gap="xl" w="100%" mx={0} mt="auto" mb="lg" px="lg">
-        <Flex flex={1}>
-          <PageSearch
-            value={query}
-            onChange={setQuery}
-            ariaLabel={messages.contentPages.list.searchLabel}
-            placeholder={messages.contentPages.list.searchPlaceholder}
-          />
-        </Flex>
-        <Button
-          variant="outline"
-          color="brand"
-          size="sm"
-          leftSection={<PlusIcon aria-hidden size={16} />}
-          onClick={() => navigate("/admin/pages/new")}
-        >
-          {messages.contentPages.list.new}
-        </Button>
-      </Group>
+    <Flex
+      direction="column"
+      px={{ base: "sm", sm: "lg" }}
+      pt={{ base: "sm", sm: "lg" }}
+      pb={0}
+      mih="calc(100dvh - var(--app-shell-header-offset))"
+    >
+      <RecordListToolbar
+        searchLabel={messages.contentPages.list.searchLabel}
+        searchPlaceholder={messages.contentPages.list.searchPlaceholder}
+        query={query}
+        onQueryChange={setQuery}
+        newLabel={messages.contentPages.list.new}
+        onNew={() => navigate("/admin/pages/new")}
+      />
 
       <Flex
         flex={1}

@@ -24,7 +24,7 @@ export default function PageSearch({
       onChange={(event) => onChange(event.currentTarget.value)}
       leftSection={<MagnifyingGlassIcon aria-hidden size={20} />}
       classNames={{ input: classes.input }}
-      w="min(30rem, 60%)"
+      w={{ base: "100%", sm: "min(30rem, 60%)" }}
     />
   );
 }

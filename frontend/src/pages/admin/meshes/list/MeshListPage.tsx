@@ -1,10 +1,9 @@
-import {Button, Flex, Group} from "@mantine/core";
-import { PlusIcon } from "@phosphor-icons/react/dist/csr/Plus";
+import { Flex } from "@mantine/core";
 import { useNavigate } from "react-router";
 
 import FeedbackState from "@/components/feedback-state";
-import PageSearch from "@/components/content-page/page-search";
 import MeshTable from "@/components/mesh/mesh-table/MeshTable";
+import RecordListToolbar from "@/components/table/RecordListToolbar.tsx";
 import messages from "@/constants/messages.json";
 import { deleteMesh, listMeshes } from "@/services/mesh-service";
 
@@ -33,26 +32,21 @@ export default function MeshListPage() {
   });
 
   return (
-    <Flex direction="column" px="lg" pt="lg" pb={0} mih="calc(100dvh - 60px)" >
-      <Group justify="space-between" gap="xl" w="100%" mx={0} mt="auto" mb="lg" px="lg">
-        <Flex flex={1}>
-          <PageSearch
-            ariaLabel={messages.mesh.list.searchLabel}
-            placeholder={messages.mesh.list.searchPlaceholder}
-            value={query}
-            onChange={setQuery}
-          />
-        </Flex>
-        <Button
-          variant="outline"
-          color="brand"
-          size="sm"
-          leftSection={<PlusIcon aria-hidden size={16} />}
-          onClick={() => navigate("/admin/meshes/new")}
-        >
-          {messages.mesh.list.new}
-        </Button>
-      </Group>
+    <Flex
+      direction="column"
+      px={{ base: "sm", sm: "lg" }}
+      pt={{ base: "sm", sm: "lg" }}
+      pb={0}
+      mih="calc(100dvh - var(--app-shell-header-offset))"
+    >
+      <RecordListToolbar
+        searchLabel={messages.mesh.list.searchLabel}
+        searchPlaceholder={messages.mesh.list.searchPlaceholder}
+        query={query}
+        onQueryChange={setQuery}
+        newLabel={messages.mesh.list.new}
+        onNew={() => navigate("/admin/meshes/new")}
+      />
 
       <Flex
         flex={1}

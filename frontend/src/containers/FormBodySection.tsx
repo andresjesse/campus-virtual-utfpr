@@ -9,7 +9,7 @@ type FormBodySectionProps = BoxProps & {
 export default function FormBodySection({ children, ...boxProps }: FormBodySectionProps) {
   return (
     <Box
-      px={{ base: "2rem", md: "2.5rem" }}
+      px={{ base: "md", sm: "2rem", md: "2.5rem" }}
       {...boxProps}
     >
       {children}

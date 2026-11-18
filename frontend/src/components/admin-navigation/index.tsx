@@ -24,6 +24,7 @@ type NavigationItem = {
 
 type AdminNavigationProps = {
   collapsed?: boolean;
+  onNavigate?: () => void;
 };
 
 const NAVIGATION_ITEMS: NavigationItem[] = [
@@ -58,11 +59,13 @@ function AdminNavigationItem({
   icon: Icon,
   label,
   to,
+  onNavigate,
 }: NavigationItem & AdminNavigationProps) {
   return (
     <NavLink
       component={RouterNavLink}
       to={to}
+      onClick={onNavigate}
       label={label}
       aria-label={label}
       title={collapsed ? label : undefined}
@@ -78,7 +81,7 @@ function AdminNavigationItem({
   );
 }
 
-export default function AdminNavigation({ collapsed = false }: AdminNavigationProps) {
+export default function AdminNavigation({ collapsed = false, onNavigate }: AdminNavigationProps) {
   const { user } = useAuthentication();
 
   return (
@@ -86,7 +89,12 @@ export default function AdminNavigation({ collapsed = false }: AdminNavigationPr
       {NAVIGATION_ITEMS.filter(({ capability }) =>
         canAccessAdminCapability(user, capability),
       ).map((item) => (
-        <AdminNavigationItem key={item.to} {...item} collapsed={collapsed} />
+        <AdminNavigationItem
+          key={item.to}
+          {...item}
+          collapsed={collapsed}
+          onNavigate={onNavigate}
+        />
       ))}
     </Stack>
   );

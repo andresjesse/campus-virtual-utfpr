@@ -113,7 +113,12 @@ export default function ContentPageForm({
             </Box>
           </Flex>
         </FormMetadataSection>
-        <FormBodySection flex="1 1 0" mih={0} px={0} style={{ overflowY: "auto" }}>
+        <FormBodySection
+          flex={{ base: "1 0 auto", md: "1 1 0" }}
+          mih={0}
+          px={0}
+          style={{ overflowY: "auto" }}
+        >
           <BlocksList>
             <Group justify="flex-end" px="lg">
               <Button

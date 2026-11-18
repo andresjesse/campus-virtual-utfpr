@@ -10,6 +10,7 @@ import VirtualMapMenuCategory from "@/components/virtual-map/virtual-map-menu/Vi
 import VirtualMapEntityModal from "@/components/virtual-map/virtual-map-viewer/VirtualMapEntityModal.tsx";
 import { branding } from "@/config/branding.ts";
 import messages from "@/constants/messages.json";
+import { VIRTUAL_MAP_TOUR_TARGETS } from "@/constants/virtual-map-tour-constants.ts";
 import { useVirtualMapMenu } from "@/hooks/use-virtual-map-menu.ts";
 import { useVirtualMapPageBlocks } from "@/hooks/use-virtual-map-page-blocks.ts";
 import type { ContentPageRecord } from "@/types/content-page.ts";
@@ -41,7 +42,7 @@ export default function VirtualMapMenu() {
             bg={`color-mix(in srgb, ${branding.colors.surface.panel} 85%, transparent)`}
             c={branding.colors.text.primary}
             py="xl"
-            px={{ base: "xl", md: "7.5rem" }}
+            px={{ base: "md", sm: "xl", md: "7.5rem" }}
             h="calc(100dvh - 72px)"
             style={{
               overflowY: "auto",
@@ -94,6 +95,7 @@ export default function VirtualMapMenu() {
           }}
           aria-expanded={isOpen}
           aria-controls={panelId}
+          data-tour={VIRTUAL_MAP_TOUR_TARGETS.menuToggle}
           onClick={() => setIsOpen((current) => !current)}
         >
           <Stack gap={2} align="center">

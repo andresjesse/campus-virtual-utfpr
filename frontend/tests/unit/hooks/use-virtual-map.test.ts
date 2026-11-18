@@ -3,10 +3,15 @@ import { act, fireEvent, renderHook, waitFor } from '@testing-library/react'
 import { Group, PerspectiveCamera, Scene } from 'three'
 
 import messages from '@/constants/messages.json'
-import { VIRTUAL_MAP_EVENTS } from '@/constants/virtual-map-constants.ts'
+import { VIRTUAL_MAP_EVENTS, VIRTUAL_MAP_STATS_SAMPLE_MS } from '@/constants/virtual-map-constants.ts'
+import {
+  VIRTUAL_MAP_GRAPHICS_STORAGE_KEY,
+  VIRTUAL_MAP_PIXEL_DENSITY_RATIOS,
+} from '@/constants/virtual-map-graphics-constants.ts'
 import { formatMessage } from '@/helpers/message-helper.ts'
 import { getRequestErrorMessage } from '@/helpers/request-error-helper.ts'
 import { virtualMapEventBus } from '@/helpers/virtual-map-event-bus.ts'
+import { readDeviceInfo, resolvePixelRatio } from '@/helpers/virtual-map-graphics-helper.ts'
 import {
   applyEntityHighlight,
   createVirtualMapScene,
@@ -87,6 +92,7 @@ function createFakeScene() {
     render: jest.fn(),
     dispose: jest.fn(),
     forceContextLoss: jest.fn(),
+    shadowMap: { needsUpdate: false },
   }
   const controls = { update: jest.fn(), dispose: jest.fn() }
   const camera = new PerspectiveCamera()
@@ -121,8 +127,8 @@ function click(canvas: HTMLCanvasElement, from = { clientX: 10, clientY: 10 }, t
 
 function hover(canvas: HTMLCanvasElement, renderer: ReturnType<typeof createFakeScene>['renderer']) {
   fireEvent.pointerMove(canvas, { pointerType: 'mouse', buttons: 0, clientX: 10, clientY: 10 })
-  const frame = renderer.setAnimationLoop.mock.calls[0][0] as () => void
-  act(() => frame())
+  const frame = renderer.setAnimationLoop.mock.calls[0][0] as (time: number) => void
+  act(() => frame(0))
 }
 
 function listenToSelection() {
@@ -143,6 +149,7 @@ afterEach(() => {
 
 beforeEach(() => {
   jest.clearAllMocks()
+  window.localStorage.clear()
   listEntityIdsWithPageMock.mockImplementation(async () => new Set(['library-north', 'gym-main', 'library-south']))
 })
 
@@ -201,6 +208,88 @@ describe('useVirtualMap', () => {
     )
   })
 
+  it('requests one shadow pass once every model is placed', async () => {
+    const { scene, renderer } = createFakeScene()
+    let finishLoading!: (results: PromiseSettledResult<never>[]) => void
+    listActiveEntitiesMock.mockResolvedValue([
+      createEntity('library-north', library),
+      createEntity('gym-main', gym),
+    ])
+    loadModelsMock.mockReturnValue(
+      new Promise((resolve) => {
+        finishLoading = resolve
+      }),
+    )
+
+    const { result } = renderVirtualMap()
+    await waitFor(() => expect(loadModelsMock).toHaveBeenCalled())
+
+    expect(renderer.shadowMap.needsUpdate).toBe(false)
+
+    await act(async () => finishLoading([fulfilled(), fulfilled()]))
+
+    expect(result.current.status).toBe('ready')
+    expect(scene.children).toHaveLength(2)
+    expect(renderer.shadowMap.needsUpdate).toBe(true)
+  })
+
+  it('builds the scene with the default graphics settings on a first visit', async () => {
+    createFakeScene()
+    listActiveEntitiesMock.mockResolvedValue([])
+    loadModelsMock.mockResolvedValue([])
+
+    const { canvas, result } = renderVirtualMap()
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+
+    expect(createSceneMock).toHaveBeenCalledWith(canvas, {
+      shadowsEnabled: true,
+      pixelRatio: resolvePixelRatio('auto', readDeviceInfo()),
+    })
+  })
+
+  it('builds the scene with the stored graphics settings', async () => {
+    window.localStorage.setItem(
+      VIRTUAL_MAP_GRAPHICS_STORAGE_KEY,
+      JSON.stringify({ shadowsEnabled: false, pixelDensity: 'low', fpsCounterVisible: false }),
+    )
+    createFakeScene()
+    listActiveEntitiesMock.mockResolvedValue([])
+    loadModelsMock.mockResolvedValue([])
+
+    const { canvas, result } = renderVirtualMap()
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+
+    expect(createSceneMock).toHaveBeenCalledWith(canvas, {
+      shadowsEnabled: false,
+      pixelRatio: VIRTUAL_MAP_PIXEL_DENSITY_RATIOS.low,
+    })
+  })
+
+  it('does not request a shadow pass when shadows are off', async () => {
+    window.localStorage.setItem(
+      VIRTUAL_MAP_GRAPHICS_STORAGE_KEY,
+      JSON.stringify({ shadowsEnabled: false }),
+    )
+    const { renderer } = createFakeScene()
+    listActiveEntitiesMock.mockResolvedValue([createEntity('library-north', library)])
+    loadModelsMock.mockResolvedValue([fulfilled()])
+
+    const { result } = renderVirtualMap()
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+
+    expect(renderer.shadowMap.needsUpdate).toBe(false)
+  })
+
+  it('does not request a shadow pass when the listing fails', async () => {
+    const { renderer } = createFakeScene()
+    listActiveEntitiesMock.mockRejectedValueOnce(new Error('Network down'))
+
+    const { result } = renderVirtualMap()
+    await waitFor(() => expect(result.current.status).toBe('error'))
+
+    expect(renderer.shadowMap.needsUpdate).toBe(false)
+  })
+
   it('reports a listing failure and rebuilds the scene on retry', async () => {
     const firstScene = createFakeScene()
     const requestError = new Error('Network down')
@@ -244,7 +333,7 @@ describe('useVirtualMap', () => {
   })
 
   it('disposes a model that finishes loading after unmount instead of adding it', async () => {
-    const { scene } = createFakeScene()
+    const { scene, renderer } = createFakeScene()
     let finishLoading!: (results: PromiseSettledResult<never>[]) => void
     listActiveEntitiesMock.mockResolvedValue([createEntity('library-north', library)])
     loadModelsMock.mockReturnValue(
@@ -262,6 +351,7 @@ describe('useVirtualMap', () => {
 
     expect(disposeMock).toHaveBeenCalledWith(lateModel)
     expect(scene.children).toHaveLength(0)
+    expect(renderer.shadowMap.needsUpdate).toBe(false)
   })
 
   it('dispatches ENTITY_SELECTED with the entity under a click', async () => {
@@ -340,6 +430,34 @@ describe('useVirtualMap', () => {
     expect(pickEntityMock).not.toHaveBeenCalled()
     expect(selected).not.toHaveBeenCalled()
     expect(cleared).not.toHaveBeenCalled()
+  })
+
+  it('dispatches the frame rate once per sample window', async () => {
+    const { renderer } = createFakeScene()
+    listActiveEntitiesMock.mockResolvedValue([])
+    loadModelsMock.mockResolvedValue([])
+    const statsListener = jest.fn()
+    afterEachCleanups.push(
+      virtualMapEventBus.register(VIRTUAL_MAP_EVENTS.RENDER_STATS_UPDATED, statsListener),
+    )
+
+    const { result } = renderVirtualMap()
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+    const frame = renderer.setAnimationLoop.mock.calls[0][0] as (time: number) => void
+
+    act(() => {
+      frame(0)
+      frame(VIRTUAL_MAP_STATS_SAMPLE_MS / 2)
+    })
+
+    expect(statsListener).not.toHaveBeenCalled()
+
+    act(() => frame(VIRTUAL_MAP_STATS_SAMPLE_MS))
+
+    expect(statsListener).toHaveBeenCalledTimes(1)
+    expect(statsListener).toHaveBeenCalledWith({
+      fps: Math.round((2 * 1000) / VIRTUAL_MAP_STATS_SAMPLE_MS),
+    })
   })
 
   it('stops listening to the canvas on unmount', async () => {
@@ -428,6 +546,18 @@ describe('useVirtualMap', () => {
       expect(canvas.style.cursor).toBe('pointer')
     })
 
+    it('does not request a new shadow pass while highlighting', async () => {
+      const { scene, canvas, renderer } = await renderReady()
+      renderer.shadowMap.needsUpdate = false
+      pickEntityRootMock.mockReturnValueOnce(scene.children[0])
+      hover(canvas, renderer)
+
+      pickEntityRootMock.mockReturnValueOnce(null)
+      hover(canvas, renderer)
+
+      expect(renderer.shadowMap.needsUpdate).toBe(false)
+    })
+
     it('only raycasts on the next frame, not on every pointer move', async () => {
       const { scene, canvas } = await renderReady()
       pickEntityRootMock.mockReturnValue(scene.children[0])
@@ -476,11 +606,11 @@ describe('useVirtualMap', () => {
 
     it('ignores touch pointers and moves with a button held', async () => {
       const { canvas, renderer } = await renderReady()
-      const frame = renderer.setAnimationLoop.mock.calls[0][0] as () => void
+      const frame = renderer.setAnimationLoop.mock.calls[0][0] as (time: number) => void
 
       fireEvent.pointerMove(canvas, { pointerType: 'touch', buttons: 0, clientX: 10, clientY: 10 })
       fireEvent.pointerMove(canvas, { pointerType: 'mouse', buttons: 1, clientX: 10, clientY: 10 })
-      act(() => frame())
+      act(() => frame(0))
 
       expect(pickEntityRootMock).not.toHaveBeenCalled()
     })

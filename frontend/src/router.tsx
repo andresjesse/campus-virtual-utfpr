@@ -14,6 +14,8 @@ export const Router = () => {
       <Routes>
         <Route path="/" element={<Pages.Home />} />
         <Route path="/home" element={<Pages.Home />} />
+        <Route path="/map" element={<Navigate to="/" replace />} />
+        <Route path="/map/:slug" element={<Pages.Home />} />
 
         <Route element={<PublicOnlyRoute />}>
           <Route path="/login" element={<Pages.Login />} />

@@ -4,6 +4,10 @@ export const PAGE_BLOCK_COLLECTIONS = ["file_block", "rtf_block", "diagram_block
 
 export const BLOCK_REORDER_DATA_TYPE = "application/x-block-id";
 
+export const CONTENT_EDITOR_EVENTS = {
+  BLOCK_ADD_REQUESTED: "BLOCK_ADD_REQUESTED",
+} as const;
+
 export const CONTENT_COLLECTIONS = [CONTENT_PAGE_COLLECTION, ...PAGE_BLOCK_COLLECTIONS] as const;
 
 export const FILE_BLOCK_MIME_TYPES = ["image/png", "image/jpg", "image/jpeg", "video/mp4"];
@@ -15,3 +19,7 @@ export const FILE_BLOCK_MAX_SIZE_IN_BYTES = 1000 * 1000 * 15
 export const FILE_PREVIEW_CARD_SIZE = 120
 
 export const FILE_PREVIEW_GAP = 16
+
+export const FILE_CAROUSEL_MAX_HEIGHT = "70vh"
+
+export const FILE_CAROUSEL_ASPECT_RATIO = "16 / 9"

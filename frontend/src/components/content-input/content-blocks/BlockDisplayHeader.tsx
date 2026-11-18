@@ -7,6 +7,8 @@ import messages from "@/constants/messages.json";
 import {formatMessage} from "@/helpers/message-helper.ts";
 import type {ReactNode} from "react";
 
+import classes from "@/components/action/touch-action-icon.module.css";
+
 type RtfBlockDisplayHeaderProps = {
   metadata: ContentPageBlockMetadata
   actions?: ReactNode
@@ -18,9 +20,11 @@ export default function BlockDisplayHeader({ metadata, actions, onDelete, onEdit
   const blockName = metadata.title || messages.block.list.untitled;
 
   return (
-    <Flex mb="xs" pb="0" flex={1} justify="space-between">
-      <Title order={4}>{metadata.title}</Title>
-      <Flex align="center">
+    <Flex mb="xs" pb="0" flex={1} justify="space-between" align="center" wrap="wrap" gap="xs">
+      <Title order={4} flex="1 1 12rem" miw={0} style={{ overflowWrap: "anywhere" }}>
+        {metadata.title}
+      </Title>
+      <Flex align="center" ml="auto" flex="0 0 auto">
         {actions && (
           <>
             {actions}
@@ -33,6 +37,7 @@ export default function BlockDisplayHeader({ metadata, actions, onDelete, onEdit
           color="blue"
           variant="subtle"
           size="md"
+          className={classes.action}
           loading={false}
           onClick={(event) => {
             event.stopPropagation();
@@ -50,6 +55,7 @@ export default function BlockDisplayHeader({ metadata, actions, onDelete, onEdit
           color="red"
           variant="subtle"
           size="md"
+          className={classes.action}
           loading={false}
           onClick={(event) => {
             event.stopPropagation();
