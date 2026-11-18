@@ -7,6 +7,7 @@ import {
   type VirtualMapPixelDensity,
   type VirtualMapPixelDensityLevel,
 } from "@/constants/virtual-map-graphics-constants.ts";
+import { readStorageItem, writeStorageItem } from "@/helpers/storage-helper.ts";
 import type {
   VirtualMapDeviceInfo,
   VirtualMapGraphicsSettings,
@@ -73,7 +74,7 @@ export function loadGraphicsSettings(
   storage: Storage = window.localStorage,
 ): VirtualMapGraphicsSettings {
   try {
-    return parseGraphicsSettings(storage.getItem(VIRTUAL_MAP_GRAPHICS_STORAGE_KEY));
+    return parseGraphicsSettings(readStorageItem(VIRTUAL_MAP_GRAPHICS_STORAGE_KEY, storage));
   } catch {
     return { ...VIRTUAL_MAP_GRAPHICS_DEFAULTS };
   }
@@ -83,11 +84,7 @@ export function saveGraphicsSettings(
   settings: VirtualMapGraphicsSettings,
   storage: Storage = window.localStorage,
 ): void {
-  try {
-    storage.setItem(VIRTUAL_MAP_GRAPHICS_STORAGE_KEY, JSON.stringify(settings));
-  } catch {
-    return;
-  }
+  writeStorageItem(VIRTUAL_MAP_GRAPHICS_STORAGE_KEY, JSON.stringify(settings), storage);
 }
 
 export function applyGraphicsSettings(

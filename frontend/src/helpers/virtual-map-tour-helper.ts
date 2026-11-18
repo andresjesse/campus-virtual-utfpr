@@ -1,5 +1,6 @@
 import { VIRTUAL_MAP_TOUR_STORAGE_KEY } from "@/constants/virtual-map-tour-constants.ts";
 import type { VirtualMapTourTarget } from "@/constants/virtual-map-tour-constants.ts";
+import { readStorageItem, writeStorageItem } from "@/helpers/storage-helper.ts";
 import type { VirtualMapTourRect, VirtualMapTourViewport } from "@/types/virtual-map-tour.ts";
 
 export function getTourTargetSelector(target: VirtualMapTourTarget): string {
@@ -7,19 +8,11 @@ export function getTourTargetSelector(target: VirtualMapTourTarget): string {
 }
 
 export function hasCompletedTour(storage: Storage = window.localStorage): boolean {
-  try {
-    return storage.getItem(VIRTUAL_MAP_TOUR_STORAGE_KEY) === "true";
-  } catch {
-    return false;
-  }
+  return readStorageItem(VIRTUAL_MAP_TOUR_STORAGE_KEY, storage) === "true";
 }
 
 export function markTourCompleted(storage: Storage = window.localStorage): void {
-  try {
-    storage.setItem(VIRTUAL_MAP_TOUR_STORAGE_KEY, "true");
-  } catch {
-    return;
-  }
+  writeStorageItem(VIRTUAL_MAP_TOUR_STORAGE_KEY, "true", storage);
 }
 
 export function getTourSpotlight(

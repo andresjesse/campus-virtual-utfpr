@@ -476,6 +476,7 @@
   },
   "adminLayout": {
     "openNavigationLabel": "Abrir navegação",
+    "closeNavigationLabel": "Fechar navegação",
     "expandMenuLabel": "Expandir menu",
     "collapseMenuLabel": "Recolher menu",
     "logoutLabel": "Sair da conta"
