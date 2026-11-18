@@ -11,7 +11,7 @@ export default function FormMetadataSection({ children }: FormMetadataSectionPro
   return (
     <Flex direction="column" flex="0 0 auto">
       <Box
-        px={{ base: "2rem", md: "2.5rem" }}
+        px={{ base: "md", sm: "2rem", md: "2.5rem" }}
         pt={{ base: "1.15rem", md: "1.5rem" }}
         pb={{ base: "1rem", md: "0.8rem" }}
       >
