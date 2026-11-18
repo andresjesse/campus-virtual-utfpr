@@ -1,5 +1,5 @@
 import { MantineProvider } from '@mantine/core'
-import { createEvent, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { act, createEvent, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { notifications } from '@mantine/notifications'
@@ -13,6 +13,8 @@ import { deleteBlockContent, reorderBlocks } from '@/services/content-page-servi
 import type { ContentPageBlockMetadata } from '@/types/content-page.ts'
 import type { DialogContextValue } from '@/types/user-feedback.ts'
 import { createDataTransfer } from '@/mocks/data-transfer.ts'
+import { CONTENT_EDITOR_EVENTS } from '@/constants/content-constants.ts'
+import { contentEditorEventBus } from '@/helpers/content-editor-event-bus.ts'
 
 jest.mock('@/helpers/content-pages-service-helper.ts', () => ({
   getAllContentBlocksMetadata: jest.fn(),
@@ -471,6 +473,24 @@ describe('BlocksList', () => {
       JSON.stringify({
         title: messages.block.list.newBlockTitle,
         collectionName: 'rtf_block',
+        page: 'page-1',
+      }),
+    )
+  })
+
+  it('creates draft metadata when the palette requests a block', async () => {
+    getAllContentBlocksMetadataMock.mockResolvedValue({ rtf_block: [] })
+    renderBlocksList()
+    await screen.findByRole('button', { name: 'Drop rich text block' })
+
+    act(() => {
+      contentEditorEventBus.dispatch(CONTENT_EDITOR_EVENTS.BLOCK_ADD_REQUESTED, 'file_block')
+    })
+
+    expect(screen.getByTestId('editor-metadata')).toHaveTextContent(
+      JSON.stringify({
+        title: messages.block.list.newBlockTitle,
+        collectionName: 'file_block',
         page: 'page-1',
       }),
     )

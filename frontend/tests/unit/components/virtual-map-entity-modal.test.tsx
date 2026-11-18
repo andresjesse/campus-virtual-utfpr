@@ -46,6 +46,40 @@ describe('VirtualMapEntityModal', () => {
     } as never)
   })
 
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
+  it('fills the screen on a phone', () => {
+    renderModal()
+
+    expect(
+      screen.getByRole('dialog', { name: 'Main Library' }).closest('[data-full-screen]'),
+    ).not.toBeNull()
+  })
+
+  it('stays a centered dialog on wider screens', () => {
+    jest.spyOn(window, 'matchMedia').mockImplementation(
+      (query: string) =>
+        ({
+          matches: query.includes('min-width'),
+          media: query,
+          onchange: null,
+          addEventListener: jest.fn(),
+          removeEventListener: jest.fn(),
+          addListener: jest.fn(),
+          removeListener: jest.fn(),
+          dispatchEvent: jest.fn(),
+        }) as MediaQueryList,
+    )
+
+    renderModal()
+
+    expect(
+      screen.getByRole('dialog', { name: 'Main Library' }).closest('[data-full-screen]'),
+    ).toBeNull()
+  })
+
   it('shows the page title', () => {
     renderModal()
 
