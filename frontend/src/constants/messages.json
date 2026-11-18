@@ -499,7 +499,7 @@
     "images": "Imagens",
     "richText": "Texto (RTF)",
     "richTextSample": "Lorem Ipsum",
-    "previewAriaLabel": "{label} (indisponível)"
+    "addAriaLabel": "Adicionar bloco: {label}"
   },
   "login": {
     "subtitle": "ACESSO AO PORTAL ADMINISTRATIVO",

@@ -3,7 +3,7 @@ import BlockDisplay from "@/components/content-input/content-blocks/BlockDisplay
 // import classes from "@/components/content-page/content-page-form/content-page-form.module.css";
 import { type ContentPageBlockType } from "@/enums/content-pages-enum.ts";
 import DroppableContainer from "@/containers/DroppableContainer.tsx";
-import {useCallback, useContext, useEffect, useRef, useState} from "react";
+import {useCallback, useContext, useEffect, useEffectEvent, useRef, useState} from "react";
 import type {DragEvent, ReactNode} from "react";
 import {useParams} from "react-router";
 import { getAllContentBlocksMetadata } from "@/helpers/content-pages-service-helper.ts";
@@ -26,6 +26,8 @@ import {notifications} from "@mantine/notifications";
 import messages from "@/constants/messages.json";
 import {formatMessage} from "@/helpers/message-helper.ts";
 import {getRequestErrorMessage} from "@/helpers/request-error-helper.ts";
+import {CONTENT_EDITOR_EVENTS} from "@/constants/content-constants.ts";
+import {contentEditorEventBus} from "@/helpers/content-editor-event-bus.ts";
 
 export default function BlocksList({
   children,
@@ -72,6 +74,15 @@ export default function BlocksList({
     }
     setIsModalOpen(true);
   }
+
+  const onAddRequested = useEffectEvent(onDropNewBlock);
+
+  useEffect(() => {
+    return contentEditorEventBus.register(
+      CONTENT_EDITOR_EVENTS.BLOCK_ADD_REQUESTED,
+      (blockType) => onAddRequested(blockType),
+    );
+  }, []);
 
   function updateContentBlocks() {
     setIsModalOpen(false);
