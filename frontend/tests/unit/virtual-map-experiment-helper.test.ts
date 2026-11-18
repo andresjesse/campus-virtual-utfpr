@@ -22,5 +22,6 @@ describe("parseVirtualMapExperiment", () => {
     expect(parseVirtualMapExperiment("?exp=shadow1024").shadowMapSize).toBe(1024);
     expect(parseVirtualMapExperiment("?exp=noshadow").noShadow).toBe(true);
     expect(parseVirtualMapExperiment("?exp=ondemand").onDemand).toBe(true);
+    expect(parseVirtualMapExperiment("?exp=dpr15").pixelRatioOneHalf).toBe(true);
   });
 });

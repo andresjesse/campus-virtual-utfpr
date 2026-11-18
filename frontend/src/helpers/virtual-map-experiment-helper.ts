@@ -8,6 +8,7 @@ export type VirtualMapExperiment = {
   shadowMapSize: number | null;
   noAntialias: boolean;
   pixelRatioOne: boolean;
+  pixelRatioOneHalf: boolean;
   onDemand: boolean;
 };
 
@@ -17,6 +18,7 @@ export const DEFAULT_VIRTUAL_MAP_EXPERIMENT: VirtualMapExperiment = {
   shadowMapSize: null,
   noAntialias: false,
   pixelRatioOne: false,
+  pixelRatioOneHalf: false,
   onDemand: false,
 };
 
@@ -29,6 +31,7 @@ export function parseVirtualMapExperiment(search: string): VirtualMapExperiment 
     shadowMapSize: flags.has("shadow1024") ? 1024 : null,
     noAntialias: flags.has("noaa"),
     pixelRatioOne: flags.has("dpr1"),
+    pixelRatioOneHalf: flags.has("dpr15"),
     onDemand: flags.has("ondemand"),
   };
 }

@@ -72,7 +72,7 @@ export function createVirtualMapScene(
   experiment: VirtualMapExperiment = DEFAULT_VIRTUAL_MAP_EXPERIMENT,
 ): VirtualMapScene {
   const renderer = new WebGLRenderer({ canvas, antialias: !experiment.noAntialias });
-  const maxPixelRatio = experiment.pixelRatioOne ? 1 : VIRTUAL_MAP_MAX_PIXEL_RATIO;
+  const maxPixelRatio = experiment.pixelRatioOne ? 1 : experiment.pixelRatioOneHalf ? 1.5 : VIRTUAL_MAP_MAX_PIXEL_RATIO;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, maxPixelRatio));
   renderer.shadowMap.enabled = !experiment.noShadow;
   renderer.shadowMap.type = PCFShadowMap;
