@@ -23,7 +23,8 @@ export default function VirtualMapFpsCounter() {
   return (
     <Paper
       pos="absolute"
-      top={16}
+      top={{ base: "auto", xs: 16 }}
+      bottom={{ base: 16, xs: "auto" }}
       right={16}
       px="sm"
       py={4}
